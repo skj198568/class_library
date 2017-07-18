@@ -3,6 +3,7 @@
   "description": "tp5框架常用类库",
   "type": "library",
   "license": "MIT",
+  "version": "0.1",
   "authors": [
     {
       "name": "宋可敬",
@@ -17,6 +18,7 @@
     "endroid/qrcode": "*"
   },
   "autoload": {
+    "files": ["ClassLibrary/common.php"],
     "psr-4": {
       "ClassLibrary\\": "ClassLibrary"
     }

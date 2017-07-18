@@ -1,18 +1,6 @@
 # class_library
-常用类库  
-### excel:
+tp5快速开发常用类库
+### composer
 ```
-composer require phpoffice/phpexcel
-```
-### email:
-```
-composer require phpmailer/phpmailer
-```
-### markdown:
-```
-composer require michelf/php-markdown
-```
-### qrcode:
-```
-composer require endroid/qrcode
+composer require "skj198568/class_library"
 ```

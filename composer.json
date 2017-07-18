@@ -1,0 +1,24 @@
+{
+  "name": "skj/class_library",
+  "description": "php常用类库",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "宋可敬",
+      "email": "597481334@qq.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "phpoffice/phpexcel": "*",
+    "phpmailer/phpmailer": "*",
+    "michelf/php-markdown": "*",
+    "endroid/qrcode": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "ClassLibrary\\": "ClassLibrary"
+    }
+  }
+}

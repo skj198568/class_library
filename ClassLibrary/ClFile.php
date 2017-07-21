@@ -47,7 +47,9 @@ class ClFile
         while (is_array($dir_array) && count($dir_array) > $min_limit) {
             $dir_str .= '/' . $dir_array[0];
             if (!is_dir($dir_str)) {
-                mkdir($dir_str, 0777, true);
+                mkdir($dir_str, 0777);
+                //修改权限，root用户创建可能是0755
+                chmod($dir_str, 0777);
             }
             array_shift($dir_array);
         }

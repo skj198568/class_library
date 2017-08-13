@@ -25,18 +25,35 @@ class ClCache
 
     /**
      * 获取历史调用函数的函数名，主要用于生成缓存
-     * @param int $index 函数调用逆序
+     * @param int $index 函数调用逆序 -1/获取所有调用
      * @return string
      */
     public static function getFunctionHistory($index = 1)
     {
         $functions = debug_backtrace();
-        if (count($functions) > 0 && array_key_exists($index, $functions)) {
-            if (array_key_exists('class', $functions[$index])) {
-                $class_array = explode('\\', $functions[$index]['class']);
-                return array_pop($class_array) . ucfirst($functions[$index]['function']);
-            } else {
-                return $functions[$index]['function'];
+        if (count($functions) > 0) {
+            if(array_key_exists($index, $functions)){
+                if (array_key_exists('class', $functions[$index])) {
+                    $class_array = explode('\\', $functions[$index]['class']);
+                    return array_pop($class_array) . ucfirst($functions[$index]['function']);
+                } else {
+                    return $functions[$index]['function'];
+                }
+            }else{
+                $call_array = [];
+                foreach($functions as $k => $v){
+                    if($k == 0){
+                        continue;
+                    }
+                    if (array_key_exists('class', $v)) {
+                        $class_array = explode('\\', $v['class']);
+                        $call_array[] = array_pop($class_array) . ucfirst($v['function']);
+                    } else {
+                        $call_array[] = $v['function'];
+                    }
+                }
+                $call_array = array_reverse($call_array);
+                return implode('->', $call_array);
             }
         } else {
             return '';
@@ -58,7 +75,7 @@ class ClCache
             if (ClVerify::isInt($each)) {
                 $key .= self::$seg_str . $each;
             } else if (is_array($each)) {
-                $key .= self::$seg_str . ClString::toCrc32(ClArray::toString($each));
+                $key .= self::$seg_str . ClString::toCrc32(json_encode($each, JSON_UNESCAPED_UNICODE));
             } else if (is_bool($each)) {
                 if($each){
                     $key .= self::$seg_str . 'true';

@@ -321,20 +321,26 @@ class ClFile
         $file_size = input('post.file_size', '', 'trim');
         $file_name = input('post.name', '', 'trim,strval');
         $chunk = input('post.chunk', 'no', 'trim');
-        $root_path = ROOT_PATH . 'public' . DS . 'uploads';
+        $root_path = sprintf(DOCUMENT_ROOT_PATH . '/files/%s/', date('Ymd'));
+        if (!is_dir($root_path)) {
+            ClFile::dirCreate($root_path);
+        }
         if ($chunk == 'no') {
-            $f = request()->file('file');
-            $info = $f->move($root_path);
-            if (empty($info)) {
+            $save_file = ($file_absolute_path == '' ? $root_path : $file_absolute_path) . date('His') .'.'. self::getSuffix($file_name);
+            if (!is_dir($save_file)) {
+                ClFile::dirCreate($save_file);
+            }
+            move_uploaded_file($_FILES['file']['tmp_name'], $save_file);
+            if (!empty($_FILES['file']['error'])) {
                 $return = array(
                     'result' => false,
-                    'msg' => $f->getError()
+                    'msg' => $_FILES['file']['error']
                 );
             } else {
                 $return = array(
                     'result' => true,
                     'msg' => '上传成功',
-                    'file' => str_replace('\\', '/', DS . 'uploads' . DS . $info->getSaveName())
+                    'file' => str_replace(DOCUMENT_ROOT_PATH, '', $save_file)
                 );
             }
             return $return;
@@ -402,11 +408,12 @@ class ClFile
      * @param $remote_file_url
      * @return int
      */
-    public static function getRemoteFileSize($remote_file_url){
+    public static function getRemoteFileSize($remote_file_url)
+    {
         $header = get_headers($remote_file_url, true);
-        if(empty($header)){
+        if (empty($header)) {
             return 0;
-        }else{
+        } else {
             return $header['Content-Length'];
         }
     }
@@ -419,14 +426,14 @@ class ClFile
      */
     public static function catchRemote($remote_file_url, $local_absolute_file = '', $is_file = true)
     {
-        if(empty($local_absolute_file)){
+        if (empty($local_absolute_file)) {
             //本地存储地址
             $local_absolute_file = ClFile::getLocalAbsoluteUrlByRemoteUrl($remote_file_url);
         }
         if (is_file($local_absolute_file)) {
-            if($is_file && filesize($local_absolute_file) == self::getRemoteFileSize($remote_file_url)){
+            if ($is_file && filesize($local_absolute_file) == self::getRemoteFileSize($remote_file_url)) {
                 return $local_absolute_file;
-            }else{
+            } else {
                 unlink($local_absolute_file);
             }
         } else {
@@ -437,36 +444,36 @@ class ClFile
         @ini_set('default_socket_timeout', 2);
         //下载文件
         $f_remote = fopen($remote_file_url, 'rb');
-        if(empty($f_remote)){
+        if (empty($f_remote)) {
             log_info('fopen error:', $remote_file_url);
             fclose($f_remote);
             //设置id
             return false;
         }
         $file_size = 0;
-        $local_temp = dirname($local_absolute_file).'/temp';
+        $local_temp = dirname($local_absolute_file) . '/temp';
         $f_local = fopen($local_temp, 'w+');
         // 输出文件内容
-        while(!feof($f_remote)){
+        while (!feof($f_remote)) {
             $content = fread($f_remote, 8192);
-            if(empty($content)){
+            if (empty($content)) {
                 log_info('file fetch:size 0', $remote_file_url);
                 break;
             }
             fputs($f_local, $content);
             $file_size += 8192;
-            if($file_size > 0 && $file_size%(1024*1024) == 0){
-                log_info('file_size:', $file_size/(1024*1024).'M');
+            if ($file_size > 0 && $file_size % (1024 * 1024) == 0) {
+                log_info('file_size:', $file_size / (1024 * 1024) . 'M');
             }
         }
         fclose($f_local);
         fclose($f_remote);
         $file_size = filesize($local_temp);
-        if($is_file && $file_size != self::getRemoteFileSize($remote_file_url)){
+        if ($is_file && $file_size != self::getRemoteFileSize($remote_file_url)) {
             //文件大小不一致
             unlink($local_temp);
             //设置id
-        }else{
+        } else {
             //重命名
             rename($local_temp, $local_absolute_file);
         }

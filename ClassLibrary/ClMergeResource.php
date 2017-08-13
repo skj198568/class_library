@@ -62,7 +62,7 @@ class ClMergeResource
         $js_files = array_unique($js_files);
         //去除无效js
         foreach ($js_files as $k => $v) {
-            if (!(strpos($v, ' src="') !== false && strpos($v, '.js') !== false)) {
+            if (!(strpos($v, 'uncompressed') === false && strpos($v, ' src="') !== false && strpos($v, '.js') !== false)) {
                 unset($js_files[$k]);
                 continue;
             }
@@ -107,7 +107,7 @@ class ClMergeResource
         $css_files = array_unique($css_files);
         //去除无效css
         foreach ($css_files as $k => $v) {
-            if (!(strpos($v, ' rel="stylesheet"') !== false && strpos($v, '.css') !== false)) {
+            if (!(strpos($v, 'uncompressed') === false && strpos($v, ' rel="stylesheet"') !== false && strpos($v, '.css') !== false)) {
                 unset($css_files[$k]);
                 continue;
             }

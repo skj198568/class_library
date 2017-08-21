@@ -168,16 +168,36 @@ class ClArray
      * 按keys过滤数组
      * @param $array
      * @param $keys
+     * @param array $filters 过滤器
      * @return array
      */
-    public static function getByKeys($array, $keys){
+    public static function getByKeys($array, $keys, $filters = ['trim']){
         $return = [];
         foreach($array as $k => $v){
             if(in_array($k, $keys)){
                 $return[$k] = $v;
             }
         }
+        if(!empty($filters)){
+            $return = self::itemFilters($return, $filters);
+        }
         return $return;
+    }
+
+    /**
+     * 对内容进行过滤处理
+     * @param $array
+     * @param array $filters
+     * @return array
+     */
+    public static function itemFilters($array, $filters = ['trim']){
+        if(!is_array($array)){
+            return $array;
+        }
+        foreach($filters as $function){
+            array_walk_recursive($array, $function);
+        }
+        return $array;
     }
 
 }

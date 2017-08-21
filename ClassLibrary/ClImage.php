@@ -7,6 +7,8 @@
  */
 
 namespace ClassLibrary;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\QrCode;
 
 /**
  * 图片处理类
@@ -20,13 +22,21 @@ class ClImage
      * 居中剪裁图片
      * @param $img_url 图片绝对地址
      * @param $cut_width 裁剪宽度
-     * @param $cut_height 裁剪高度
+     * @param integer $cut_height 裁剪高度，默认自动计算
      * @param string $save_img_url 保存的图片绝对地址，如果为'',则覆盖掉原图片
      * @param bool $is_delete 当save_img_url不为空时，是否删掉原始img
      */
-    public static function centerCut($img_url, $cut_width, $cut_height, $save_img_url = '', $is_delete = false)
+    public static function centerCut($img_url, $cut_width, $cut_height = 0, $save_img_url = '', $is_delete = false)
     {
+        if(!is_file($img_url)){
+            if(is_file(ClHttp::getServerDocumentRoot().$img_url)){
+                $img_url = ClHttp::getServerDocumentRoot().$img_url;
+            }
+        }
         $cut_width = intval($cut_width);
+        if($cut_height == 0){
+            $cut_height = self::getHeightByProportion($img_url, $cut_width);
+        }
         $cut_height = intval($cut_height);
         if ($cut_width > ClImage::getWidth($img_url) || $cut_height > ClImage::getHeight($img_url)) {
             if (!empty($save_img_url)) {
@@ -128,14 +138,15 @@ class ClImage
 
     /**
      * 生成二维码图片
-     * @param $str 二维码内容
+     * @param string $str 二维码内容
      * @param int $qr_width 二维码图片像素宽度
      * @param string $logo_absolute_file 二维码logo绝对路径
-     * @param bool $is_cut 是否精确剪裁到对应尺寸
      * @param bool $force 是否强制生成
-     * @return string 二维码图片路径
+     * @param array $background_color 背景颜色
+     * @param array $foreground_color 前景颜色
+     * @return string
      */
-    public static function qrCode($str, $qr_width = 93, $logo_absolute_file = '', $is_cut = false, $force = false)
+    public static function qrCode($str, $qr_width = 100, $logo_absolute_file = '', $force = false, $background_color = ['r' => 255, 'g' => 255, 'b' => 255], $foreground_color = ['r' => 0, 'g' => 0, 'b' => 0])
     {
         $file_dir = '/QrCode';
         $file_name = md5($str . $logo_absolute_file . $qr_width) . '.png';
@@ -145,17 +156,24 @@ class ClImage
             return $file;
         }
         ClFile::dirCreate(DOCUMENT_ROOT_PATH . $file);
-        include 'phpqrcode/phpqrcode.php';
-        \QRcode::png($str, DOCUMENT_ROOT_PATH . $file, QR_ECLEVEL_H, ceil($qr_width / 35), 1);
-        //剪裁图片
-        if ($is_cut && self::getWidth(DOCUMENT_ROOT_PATH . $file) > $qr_width) {
-            self::centerCut(DOCUMENT_ROOT_PATH . $file, $qr_width, $qr_width);
+        $qrCode = new QrCode($str);
+        $qrCode->setSize($qr_width);
+        // Set advanced options
+        $qrCode
+            ->setWriterByName('png')
+            ->setMargin(10)
+            ->setEncoding('UTF-8')
+            ->setErrorCorrectionLevel(ErrorCorrectionLevel::HIGH)
+            ->setForegroundColor($foreground_color)
+            ->setBackgroundColor($background_color)
+            ->setValidateResult(false);
+        if(!empty($logo_absolute_file)){
+            $qrCode
+                ->setLogoPath($logo_absolute_file)
+                ->setLogoWidth(ceil($qr_width/5));
         }
-        //是否生成带logo的二维码
-        if (is_file($logo_absolute_file)) {
-            $file = self::qrCodeAddLogo(DOCUMENT_ROOT_PATH . $file, $logo_absolute_file);
-            $file = str_replace(DOCUMENT_ROOT_PATH, '', $file);
-        }
+        //保存
+        $qrCode->writeFile(DOCUMENT_ROOT_PATH . $file);
         return $file;
     }
 

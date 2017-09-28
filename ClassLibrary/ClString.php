@@ -245,6 +245,22 @@ class ClString
     }
 
     /**
+     * 获取所有的中文
+     * @param $s
+     * @return string
+     */
+    public static function getChinese($s){
+        $array = self::toArray($s);
+        $str = '';
+        foreach($array as $each){
+            if(ClVerify::isChinese($each)){
+                $str .= $each;
+            }
+        }
+        return $str;
+    }
+
+    /**
      * 把格式化的字符串写入变量中，支持数组参数
      * @param $str
      * @param array $value_array

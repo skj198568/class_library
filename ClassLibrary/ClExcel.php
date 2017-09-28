@@ -101,19 +101,13 @@ class ClExcel
      */
     public function csvToExcel($csv_file, $suffix = 'xls', $is_delete = false)
     {
-        //导入phpExcel核心类
-        include_once (dirname(__FILE__).'/PHPExcel/PHPExcel.php');
-        //导入CSV
-        include_once (dirname(__FILE__).'/PHPExcel/PHPExcel/Reader/CSV.php');
         $object_csv = new \PHPExcel_Reader_CSV();
         $csv = $object_csv->load($csv_file);
         $object_writer = null;
         $suffix = strtolower($suffix);
         if ($suffix == 'xlsx') {
-            include_once (dirname(__FILE__).'/PHPExcel/PHPExcel/Writer/Excel2007.php');
             $object_writer = new \PHPExcel_Writer_Excel2007($csv);
         } else {
-            include_once (dirname(__FILE__).'/PHPExcel/PHPExcel/Writer/Excel5.php');
             $object_writer = new \PHPExcel_Writer_Excel5($csv);
         }
         $excel_file = explode('.', $csv_file);
@@ -141,17 +135,12 @@ class ClExcel
     {
         $suffix = ClFile::getSuffix($excel_file);
         $obj_reader = null;
-        //导入phpExcel核心类
-        include_once (dirname(__FILE__).'/PHPExcel/PHPExcel.php');
         if ($suffix == 'xlsx') {
-            include_once (dirname(__FILE__).'/PHPExcel/PHPExcel/Reader/Excel2007.php');
             $obj_reader = new \PHPExcel_Reader_Excel2007();
         } else {
-            include_once (dirname(__FILE__).'/PHPExcel/PHPExcel/Reader/Excel5.php');
             $obj_reader = new \PHPExcel_Reader_Excel5();
         }
         $excel = $obj_reader->load($excel_file);
-        include_once (dirname(__FILE__).'/PHPExcel/PHPExcel/Writer/CSV.php');
         $obj_writer = new \PHPExcel_Writer_CSV($excel);
         //保存csv格式
         $csv_file = explode('.', $excel_file);

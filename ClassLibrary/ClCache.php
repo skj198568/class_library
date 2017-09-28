@@ -8,6 +8,7 @@
  */
 
 namespace ClassLibrary;
+use think\Cache;
 
 /**
  * class library cache
@@ -22,6 +23,12 @@ class ClCache
      * @var string
      */
     private static $seg_str = '_';
+
+    /**
+     * 获取删除keys
+     * @var array
+     */
+    private static $get_remove_keys = [];
 
     /**
      * 获取历史调用函数的函数名，主要用于生成缓存
@@ -72,7 +79,7 @@ class ClCache
             if(is_string($each)){
                 $each = trim($each);
             }
-            if (ClVerify::isInt($each)) {
+            if (is_numeric($each)) {
                 $key .= self::$seg_str . $each;
             } else if (is_array($each)) {
                 $key .= self::$seg_str . ClString::toCrc32(json_encode($each, JSON_UNESCAPED_UNICODE));
@@ -122,36 +129,24 @@ class ClCache
         if (count($args) > 0) {
             $function .= self::createKeyByParams($args);
         }
-        $keys = self::getRemoveKeys($function);
-        if (!empty($keys)) {
-            foreach ($keys as $key_each) {
-                cache($key_each, null);
-            }
+        //已经删除过的，不再删除
+        if(in_array($function, self::$get_remove_keys)){
+            return true;
+        }else{
+            self::$get_remove_keys[] = $function;
+        }
+        foreach ([$function, $function . self::$seg_str . 'clCacheKeys'] as $key_each) {
+            cache($key_each, null);
         }
         return true;
     }
 
     /**
-     * 获取要删除的keys
-     * @param $root_key
-     * @return array
+     * 删除之后处理
      */
-    private static function getRemoveKeys($root_key)
-    {
-        $keys = [];
-        $keys_list = cache($root_key . self::$seg_str . 'clCacheKeys');
-        if (empty($keys_list)) {
-            return [$root_key];
-        } else {
-            foreach ($keys_list as $key_each) {
-                if (!empty(cache($key_each . self::$seg_str . 'clCacheKeys'))) {
-                    $keys = array_merge($keys, self::getRemoveKeys($key_each));
-                } else {
-                    array_push($keys, $key_each);
-                }
-            }
-        }
-        return $keys;
+    public static function removeAfter(){
+        //清空
+        self::$get_remove_keys = [];
     }
 
     /**

@@ -96,23 +96,13 @@ class ClVerify
     }
 
     /**
-     * 是否是英文
-     * @param $str
-     * @return bool
-     */
-    public static function isEnglish($str)
-    {
-        return preg_match('/^[A-Za-z]+$/', $str) === 1;
-    }
-
-    /**
      * 是否是手机
      * @param $str
      * @return bool
      */
     public static function isMobile($str)
     {
-        return preg_match('/^1(3|4|5|8)\d{9}$/', $str) === 1;
+        return preg_match('/^1(3|4|5|7|8)\d{9}$/', $str) === 1;
     }
 
     /**
@@ -120,7 +110,7 @@ class ClVerify
      * @param $str
      * @return bool
      */
-    public static function isFixedPhone($str)
+    public static function isTel($str)
     {
         return preg_match('/\d{3}(-?)\d{8}|\d{4}(-?)\d{7}$/', $str) === 1;
     }
@@ -130,7 +120,7 @@ class ClVerify
      * @param $str
      * @return bool
      */
-    public static function isIdNumber($str)
+    public static function isIdCard($str)
     {
         return preg_match('/\d{15}|\d{18}/', $str) === 1;
     }
@@ -144,7 +134,7 @@ class ClVerify
      */
     public static function isPassword($str, $length_min = 6, $length_max = 18)
     {
-        return preg_match('/^[a-zA-Z]\w{' . $length_min . ',' . $length_max . '}$/', $str) === 1;
+        return preg_match('/^[A-Za-z0-9\-\_]{' . $length_min . ',' . $length_max . '}$/', $str) === 1;
     }
 
     /**
@@ -156,28 +146,6 @@ class ClVerify
     {
         $str = json_decode($str);
         return !empty($str);
-    }
-
-    /**
-     * 判断字符串是否是int型
-     * @param $str
-     * @return bool
-     */
-    public static function isInt($str)
-    {
-        if (is_int($str)) {
-            return true;
-        } else if (is_string($str)) {
-            //整数
-            if (strpos($str, '.') === false) {
-                return strlen(intval($str)) === strlen($str);
-            } else {
-                //小数
-                return strlen(floatval($str)) === strlen(rtrim(rtrim($str, '0'), '.'));
-            }
-        } else {
-            return false;
-        }
     }
 
     /**
@@ -293,7 +261,7 @@ class ClVerify
      * @param $str
      * @return bool
      */
-    public static function isCapital($str)
+    public static function isAlphaCapital($str)
     {
         return preg_match('/^[A-Z]+$/', $str) === 1;
     }
@@ -303,7 +271,7 @@ class ClVerify
      * @param $str
      * @return bool
      */
-    public static function isLowercase($str){
+    public static function isAlphaLowercase($str){
         return preg_match('/^[a-z]+$/', $str) === 1;
     }
 
@@ -312,8 +280,80 @@ class ClVerify
      * @param $str
      * @return bool
      */
-    public static function isLetter($str){
+    public static function isAlpha($str){
         return preg_match('/^[A-Za-z]+$/', $str) === 1;
+    }
+
+    /**
+     * 是否是字母，数字
+     * @param $str
+     * @return bool
+     */
+    public static function isAlphaNum($str){
+        return preg_match('/^[A-Za-z0-9]+$/', $str) === 1;
+    }
+
+    /**
+     * 字母，数字，_，-
+     * @param $str
+     * @return bool
+     */
+    public static function isAlphaNumDash($str){
+        return preg_match('/^[A-Za-z0-9\-\_]+$/', $str) === 1;
+    }
+
+    /**
+     * 中文
+     * @param $str
+     * @return bool
+     */
+    public static function isChinese($str){
+        return preg_match('/^[\x{4e00}-\x{9fa5}]+$/u', $str) === 1;
+    }
+
+    /**
+     * 中文，英文
+     * @param $str
+     * @return bool
+     */
+    public static function isChineseAlpha($str){
+        return preg_match('/^[\x{4e00}-\x{9fa5}a-zA-Z]+$/u', $str) === 1;
+    }
+
+    /**
+     * 中文，英文，数字
+     * @param $str
+     * @return bool
+     */
+    public static function isChineseAlphaNum($str){
+        return preg_match('/^[\x{4e00}-\x{9fa5}a-zA-Z0-9]+$/u', $str) === 1;
+    }
+
+    /**
+     * 中文，英文，数字，_，-
+     * @param $str
+     * @return bool
+     */
+    public static function isChineseAlphaNumDash($str){
+        return preg_match('/^[\x{4e00}-\x{9fa5}a-zA-Z0-9\_\-]+$/u', $str) === 1;
+    }
+
+    /**
+     * 是否是boolean
+     * @param $str
+     * @return bool
+     */
+    public static function isBoolean($str){
+        return in_array($str, [true, false, 0, 1, '0', '1'], true);
+    }
+
+    /**
+     * 是否是时间
+     * @param $str
+     * @return bool
+     */
+    public static function isDate($str){
+        return false !== strtotime($str);
     }
 
 }

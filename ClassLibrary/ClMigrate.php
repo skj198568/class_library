@@ -33,7 +33,7 @@ class ClMigrate
      * 字段配置
      * @var array
      */
-    private $field_config = [];
+    protected $field_config = [];
 
     /**
      * 实例对象
@@ -50,52 +50,51 @@ class ClMigrate
     /**
      * 获取表名定义
      * @param $table_name
-     * @param integer $show_mode 1/modal, 2/page
      * @return array
      */
-    public function fetchTable($table_name, $show_mode = 1){
-        return [
+    public function fetchTable($table_name){
+        $result = [
             'comment' => json_encode(array_merge([
-                'name' => $table_name,
-                'show_mode' => $show_mode == 1 ? 'modal' : 'page',
+                'name' => $table_name
             ], $this->table_config), JSON_UNESCAPED_UNICODE)
         ];
+        $this->table_config = [];
+        return $result;
     }
 
     /**
      * 新增显示的字段，用于页面显示需求
-     * @param string $else_field_name 新增的字段名，默认为当前field+'_show'，例如:create_uid_show
+     * @param string $else_field_name 新增的字段名，建议为当前field+'_show'，例如:create_uid_show
      * @param string $relation_table_field 关联的表和字段，例如：'user.name'，会自动获取：select name form user where id == create_uid
-     * @param integer $is_searchable 是否可以检索
      * @param string $this_field 默认为空，不为空，则改变匹配的本表的字段，例如：c_uid，select name form user where id == c_uid，建议留空，程序自动处理
      * @return $this
      */
-    public function tableAddElseShowFields($else_field_name, $relation_table_field, $is_searchable = 0, $this_field = ''){
+    public function tableAddElseShowFields($else_field_name, $relation_table_field, $this_field = ''){
         $this->table_config['else_show_fields'][] = [
             $else_field_name,
             $relation_table_field,
-            $is_searchable,
             $this_field
         ];
         return $this;
     }
 
     /**
-     * 设置列表默认排序方式
+     * 是否启用缓存
+     * @param int $duration
      * @return $this
      */
-    public function tableListSortTypeDesc(){
-        $this->table_config['list_sort_type'] = 'DESC';
+    public function tableUsingCache($duration = 3600){
+        $this->table_config['is_cache'] = $duration;
         return $this;
     }
 
     /**
-     * field名字定义
-     * @param $name
+     * 是否创建视图层
+     * @param int $show_type 1/modal弹出框, 2/page单个页面
      * @return $this
      */
-    public function name($name){
-        $this->field_config['name'] = $name;
+    public function tableCreateView($show_type = 1){
+        $this->table_config['show_type'] = $show_type;
         return $this;
     }
 
@@ -103,8 +102,8 @@ class ClMigrate
      * 页面是否显示
      * @return $this
      */
-    public function isShowPage(){
-        $this->field_config['is_show_page'] = 1;
+    public function viewIsForPage(){
+        $this->field_config['view']['is_show_page'] = 1;
         return $this;
     }
 
@@ -112,8 +111,8 @@ class ClMigrate
      * 页面表格是否显示
      * @return $this
      */
-    public function isShowTable(){
-        $this->field_config['is_show_table'] = 1;
+    public function viewIsForTable(){
+        $this->field_config['view']['is_show_table'] = 1;
         return $this;
     }
 
@@ -121,8 +120,8 @@ class ClMigrate
      * 表单是否显示
      * @return $this
      */
-    public function isShowForm(){
-        $this->field_config['is_show_form'] = 1;
+    public function viewIsShowForm(){
+        $this->field_config['view']['is_show_form'] = 1;
         return $this;
     }
 
@@ -130,8 +129,8 @@ class ClMigrate
      * 添加的时候可编辑
      * @return $this
      */
-    public function editableAdd(){
-        $this->field_config['editable'][] = 'add';
+    public function viewEditableAdd(){
+        $this->field_config['view']['editable'][] = 'add';
         return $this;
     }
 
@@ -139,8 +138,8 @@ class ClMigrate
      * 修改的时候可编辑
      * @return $this
      */
-    public function editableUpdate(){
-        $this->field_config['editable'][] = 'update';
+    public function viewEditableUpdate(){
+        $this->field_config['view']['editable'][] = 'update';
         return $this;
     }
 
@@ -148,8 +147,8 @@ class ClMigrate
      * 类型
      * @return $this
      */
-    public function typeText(){
-        $this->field_config['type'] = 'text';
+    public function viewTypeText(){
+        $this->field_config['view']['type'] = 'text';
         return $this;
     }
 
@@ -157,8 +156,8 @@ class ClMigrate
      * 类型
      * @return $this
      */
-    public function typePassword(){
-        $this->field_config['type'] = 'password';
+    public function viewTypePassword(){
+        $this->field_config['view']['type'] = 'password';
         return $this;
     }
 
@@ -166,18 +165,8 @@ class ClMigrate
      * 类型
      * @return $this
      */
-    public function typeTextArea(){
-        $this->field_config['type'] = 'textarea';
-        return $this;
-    }
-
-    /**
-     * 类型
-     * @param array $values 类似['name' => '', 'value' => '', 'checked' => 0]
-     * @return $this
-     */
-    public function typeCheckbox($values = []){
-        $this->field_config['type'] = ['checkbox', ClArray::itemFilters($values)];
+    public function viewTypeTextArea(){
+        $this->field_config['view']['type'] = 'textarea';
         return $this;
     }
 
@@ -186,8 +175,8 @@ class ClMigrate
      * @param array $values 类似['name' => '', 'value' => '', 'checked' => 0]
      * @return $this
      */
-    public function typeRadio($values = []){
-        $this->field_config['type'] = ['radio', ClArray::itemFilters($values)];
+    public function viewTypeCheckbox($values = []){
+        $this->field_config['view']['type'] = ['checkbox', ClArray::itemFilters($values)];
         return $this;
     }
 
@@ -196,8 +185,18 @@ class ClMigrate
      * @param array $values 类似['name' => '', 'value' => '', 'checked' => 0]
      * @return $this
      */
-    public function typeSelect($values = []){
-        $this->field_config['type'] = ['select', ClArray::itemFilters($values)];
+    public function viewTypeRadio($values = []){
+        $this->field_config['view']['type'] = ['radio', ClArray::itemFilters($values)];
+        return $this;
+    }
+
+    /**
+     * 类型
+     * @param array $values 类似['name' => '', 'value' => '', 'checked' => 0]
+     * @return $this
+     */
+    public function viewTypeSelect($values = []){
+        $this->field_config['view']['type'] = ['select', ClArray::itemFilters($values)];
         return $this;
     }
 
@@ -206,8 +205,8 @@ class ClMigrate
      * @param string $format
      * @return $this
      */
-    public function typeDate($format = 'Ymd'){
-        $this->field_config['type'] = [
+    public function viewTypeDate($format = 'Ymd'){
+        $this->field_config['view']['type'] = [
             'date',
             $format
         ];
@@ -218,8 +217,8 @@ class ClMigrate
      * 类型
      * @return $this
      */
-    public function typeDatetime(){
-        $this->field_config['type'] = 'datetime';
+    public function viewTypeDatetime(){
+        $this->field_config['view']['type'] = 'datetime';
         return $this;
     }
 
@@ -229,8 +228,8 @@ class ClMigrate
      * @param array $valid_types 空则不限制，否则进行文件类型限制，例如: ['pdf', 'doc']
      * @return $this
      */
-    public function typeFile($file_max_size = 1, $valid_types = []){
-        $this->field_config['type'] = ['file', $file_max_size, ClArray::itemFilters($valid_types)];
+    public function viewTypeFile($file_max_size = 1, $valid_types = []){
+        $this->field_config['view']['type'] = ['file', $file_max_size, ClArray::itemFilters($valid_types)];
         return $this;
     }
 
@@ -240,8 +239,8 @@ class ClMigrate
      * @param array $valid_types 空则不限制，否则进行文件类型限制，例如: ['pdf', 'doc']
      * @return $this
      */
-    public function typeFiles($file_max_size = 1, $valid_types = []){
-        $this->field_config['type'] = ['files', $file_max_size, ClArray::itemFilters($valid_types)];
+    public function viewTypeFiles($file_max_size = 1, $valid_types = []){
+        $this->field_config['view']['type'] = ['files', $file_max_size, ClArray::itemFilters($valid_types)];
         return $this;
     }
 
@@ -249,8 +248,8 @@ class ClMigrate
      * 类型
      * @return $this
      */
-    public function typeAvatar(){
-        $this->field_config['type'] = 'avatar';
+    public function viewTypeAvatar(){
+        $this->field_config['view']['type'] = 'avatar';
         return $this;
     }
 
@@ -261,8 +260,8 @@ class ClMigrate
      * @param array $valid_types
      * @return $this
      */
-    public function typeImage($width = 600, $height = 400, $valid_types = ['jpg', 'png']){
-        $this->field_config['type'] = ['image', $width, $height, ClArray::itemFilters($valid_types)];
+    public function viewTypeImage($width = 600, $height = 400, $valid_types = ['jpg', 'png']){
+        $this->field_config['view']['type'] = ['image', $width, $height, ClArray::itemFilters($valid_types)];
         return $this;
     }
 
@@ -271,8 +270,8 @@ class ClMigrate
      * @param string $content
      * @return $this
      */
-    public function placeholder($content = ''){
-        $this->field_config['placeholder'] = $content;
+    public function viewPlaceholder($content = ''){
+        $this->field_config['view']['placeholder'] = $content;
         return $this;
     }
 
@@ -281,17 +280,8 @@ class ClMigrate
      * @param string $content
      * @return $this
      */
-    public function helpContent($content = ''){
-        $this->field_config['help_content'] = $content;
-        return $this;
-    }
-
-    /**
-     * 必须填写
-     * @return $this
-     */
-    public function isRequire(){
-        $this->field_config['is_require'] = 1;
+    public function viewHelpContent($content = ''){
+        $this->field_config['view']['help_content'] = $content;
         return $this;
     }
 
@@ -302,6 +292,32 @@ class ClMigrate
      */
     public function filters($filters = ['trim']){
         $this->field_config['filters'] = ClArray::itemFilters($filters);
+        return $this;
+    }
+
+    /**
+     * 必须填写
+     * @return $this
+     */
+    public function verifyIsRequire(){
+        if(!isset($this->field_config['verifies'])){
+            $this->field_config['verifies'][] = 'is_required';
+        }else{
+            if(!in_array('is_required', $this->field_config['verifies'])){
+                $this->field_config['verifies'][] = 'is_required';
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * 是否是密码
+     * @param int $min
+     * @param int $max
+     * @return $this
+     */
+    public function verifyIsPassword($min = 6, $max = 18){
+        $this->field_config['verifies'][] = ['password', $min, $max];
         return $this;
     }
 
@@ -394,15 +410,6 @@ class ClMigrate
     }
 
     /**
-     * mac地址
-     * @return $this
-     */
-    public function verifyMac(){
-        $this->field_config['verifies'][] = 'mac';
-        return $this;
-    }
-
-    /**
      * 邮政编码校验
      * @return $this
      */
@@ -424,8 +431,8 @@ class ClMigrate
      * 汉字
      * @return $this
      */
-    public function verifyChs(){
-        $this->field_config['verifies'][] = 'chs';
+    public function verifyChinese(){
+        $this->field_config['verifies'][] = 'chinese';
         return $this;
     }
 
@@ -433,8 +440,8 @@ class ClMigrate
      * 汉字、字母
      * @return $this
      */
-    public function verifyChsAlpha(){
-        $this->field_config['verifies'][] = 'chs_alpha';
+    public function verifyChineseAlpha(){
+        $this->field_config['verifies'][] = 'chinese_alpha';
         return $this;
     }
 
@@ -442,8 +449,8 @@ class ClMigrate
      * 汉字、字母、数字
      * @return $this
      */
-    public function verifyChsAlphaNum(){
-        $this->field_config['verifies'][] = 'chs_alpha_num';
+    public function verifyChineseAlphaNum(){
+        $this->field_config['verifies'][] = 'chinese_alpha_num';
         return $this;
     }
 
@@ -451,8 +458,8 @@ class ClMigrate
      * 汉字、字母、数字、下划线_、破折号-
      * @return $this
      */
-    public function verifyChsDash(){
-        $this->field_config['verifies'][] = 'chs_dash';
+    public function verifyChineseAlphaNumDash(){
+        $this->field_config['verifies'][] = 'chinese_alpha_num_dash';
         return $this;
     }
 
@@ -478,8 +485,8 @@ class ClMigrate
      * 字母、数字，下划线_、破折号-
      * @return $this
      */
-    public function verifyAlphaDash(){
-        $this->field_config['verifies'][] = 'alpha_dash';
+    public function verifyAlphaNumDash(){
+        $this->field_config['verifies'][] = 'alpha_num_dash';
         return $this;
     }
 
@@ -493,20 +500,20 @@ class ClMigrate
     }
 
     /**
-     * 浮点型
-     * @return $this
-     */
-    public function verifyFloat(){
-        $this->field_config['verifies'][] = 'float';
-        return $this;
-    }
-
-    /**
      * 数字
      * @return $this
      */
     public function verifyNumber(){
         $this->field_config['verifies'][] = 'number';
+        return $this;
+    }
+
+    /**
+     * 数组
+     * @return $this
+     */
+    public function verifyArray(){
+        $this->field_config['verifies'][] = 'array';
         return $this;
     }
 
@@ -538,8 +545,18 @@ class ClMigrate
     }
 
     /**
+     * 可检索
+     * @return $this
+     */
+     public function isReadOnly(){
+        $this->field_config['is_read_only'] = 1;
+        $this->verifyIsRequire();
+        return $this;
+    }
+
+    /**
      * 预定义的静态变量的值
-     * @param array $values
+     * @param array $values [['man', 1, '男']]会自动生成 const V_FIELD_MAN = 1;备注是第三个参数
      * @return $this
      */
     public function constValues($values = []){
@@ -548,20 +565,15 @@ class ClMigrate
     }
 
     /**
-     * 存储类型，默认是普通类型
-     * @return $this
-     */
-    public function storeTypeJson(){
-        $this->field_config['store_type'] = 'json';
-        return $this;
-    }
-
-    /**
      * 获取字段名定义
+     * @param $name 字段名称
      * @return string
      */
-    public function fetchField(){
-        return json_encode($this->field_config, JSON_UNESCAPED_UNICODE);
+    public function fetchField($name){
+        $this->field_config['name'] = $name;
+        $result = json_encode($this->field_config, JSON_UNESCAPED_UNICODE);
+        $this->field_config = [];
+        return $result;
     }
 
 }

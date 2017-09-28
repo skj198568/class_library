@@ -26,7 +26,7 @@ class ClDate
      */
     public static function getRemainderTime($one_time, $two_time, $format_array = ['年', '个月', '天', '小时', '分', '秒'])
     {
-        if (!(ClVerify::isInt($one_time) && ClVerify::isInt($two_time))) {
+        if (!(is_numeric($one_time) && is_numeric($two_time))) {
             return false;
         }
         $remainder_seconds = abs($one_time - $two_time);

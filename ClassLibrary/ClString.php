@@ -596,47 +596,45 @@ class ClString
      */
     public static function toString(){
         $args = func_get_args();
-        if (!empty($args)) {
-            $log_str = '';
-            foreach ($args as $each) {
-                if (is_array($each) || is_object($each)) {
-                    //转换
-                    array_walk_recursive($each, function (&$val) {
-                        if ($val === true) {
-                            $val = 'TRUE';
-                        } else if ($val === false) {
-                            $val = 'FALSE';
-                        } else if ($val === null) {
-                            $val = 'NULL';
-                        }
-                    });
-                    if ($log_str === '') {
-                        $log_str = print_r($each, true);
-                    } else {
-                        $log_str .= ', ' . print_r($each, true);
+        $str = '';
+        foreach ($args as $each) {
+            if (is_array($each) || is_object($each)) {
+                //转换
+                array_walk_recursive($each, function (&$val) {
+                    if ($val === true) {
+                        $val = 'TRUE';
+                    } else if ($val === false) {
+                        $val = 'FALSE';
+                    } else if ($val === null) {
+                        $val = 'NULL';
                     }
-                } else if (is_bool($each)) {
-                    if ($log_str === '') {
-                        $log_str = $each ? 'TRUE' : 'FALSE';
-                    } else {
-                        $log_str .= ', ' . ($each ? 'TRUE' : 'FALSE');
-                    }
-                } else if (is_null($each)) {
-                    if ($log_str === '') {
-                        $log_str = 'null';
-                    } else {
-                        $log_str .= ', null';
-                    }
+                });
+                if ($str === '') {
+                    $str = print_r($each, true);
                 } else {
-                    if ($log_str === '') {
-                        $log_str = $each;
-                    } else {
-                        $log_str .= ', ' . $each;
-                    }
+                    $str .= ', ' . print_r($each, true);
+                }
+            } else if (is_bool($each)) {
+                if ($str === '') {
+                    $str = $each ? 'TRUE' : 'FALSE';
+                } else {
+                    $str .= ', ' . ($each ? 'TRUE' : 'FALSE');
+                }
+            } else if (is_null($each)) {
+                if ($str === '') {
+                    $str = 'null';
+                } else {
+                    $str .= ', null';
+                }
+            } else {
+                if ($str === '') {
+                    $str = $each;
+                } else {
+                    $str .= ', ' . $each;
                 }
             }
-            return $log_str;
         }
+        return $str;
     }
 
 }

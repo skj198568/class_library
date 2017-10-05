@@ -16,11 +16,6 @@ class ClMergeResource
 {
 
     /**
-     * 压缩标志
-     */
-    private static $compressed_sign = '<!--compressed-->';
-
-    /**
      * 未找到的资源文件
      * @var array
      */
@@ -43,6 +38,7 @@ class ClMergeResource
         if (!empty($un_merge_module) && in_array(request()->controller(), $un_merge_module)) {
             return $content;
         }
+        $key = '';
         //非本地局域网请求
         if(!self::isLocalRequest()){
             $key = ClCache::getKey(ClString::toCrc32($content));
@@ -50,10 +46,6 @@ class ClMergeResource
             if($merge_content !== false){
                 return $merge_content;
             }
-        }
-        //是否已经压缩过
-        if (strpos($content, self::$compressed_sign) !== false) {
-            return $content;
         }
         //替换掉所有的版本控制
         $content = str_replace('?v=<?php echo VERSION;?>', '', $content);
@@ -144,13 +136,7 @@ class ClMergeResource
         }
         //处理资源的images base64处理
         $content = self::dealBase64Images($content);
-        //去除所有的注释
-        $content = self::delAnnotation($content);
-        //格式化内容
-        $content = self::format($content);
-        //添加压缩标志
-        $content .= self::$compressed_sign;
-        if(!self::isLocalRequest()){
+        if(!self::isLocalRequest() && !empty($key)){
             //写入缓存
             Cache::set($key, $content);
         }
@@ -348,32 +334,6 @@ class ClMergeResource
             self::$not_has_files[$relative_path_temp] = str_replace(DOCUMENT_ROOT_PATH, '', $absolute_path_true);
             return '';
         }
-    }
-
-    /**
-     * 去掉所有的注释
-     * @param $content
-     * @return mixed
-     */
-    private static function delAnnotation($content)
-    {
-        return $content;
-        $items = ClString::parseToArray($content, '<!--', '-->');
-        if (!empty($items)) {
-            $content = str_replace($items, array_fill(0, count($items), ''), $content);
-        }
-        return $content;
-    }
-
-    /**
-     * 格式化内容
-     * @param $content
-     * @return mixed
-     */
-    private static function format($content)
-    {
-        //去除4个空格，去除\t，去除\n
-        return str_replace(['    ', "\t", "\n"], ['', '', ''], $content);
     }
 
     /**

@@ -191,7 +191,8 @@ class ClCache
      */
     public static function dealInvalidDataByKey($key)
     {
-        if (strpos($key, self::$seg_str) === false) {
+        //没有子存储或者缓存不存在
+        if (strpos($key, self::$seg_str) === false || empty(cache($key))) {
             return false;
         }
         $father_key = explode(self::$seg_str, $key);

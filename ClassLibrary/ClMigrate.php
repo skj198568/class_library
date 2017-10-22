@@ -36,6 +36,12 @@ class ClMigrate
     protected $field_config = [];
 
     /**
+     * 表引擎
+     * @var string
+     */
+    protected $table_engine = 'InnoDB';
+
+    /**
      * 实例对象
      * @return ClMigrate|null
      */
@@ -54,9 +60,12 @@ class ClMigrate
      */
     public function fetchTable($table_name){
         $result = [
-            'comment' => json_encode(array_merge([
-                'name' => $table_name
-            ], $this->table_config), JSON_UNESCAPED_UNICODE)
+            'comment' => json_encode(
+                array_merge([
+                    'name' => $table_name
+                ], $this->table_config),
+                JSON_UNESCAPED_UNICODE),
+            'engine' => $this->table_engine
         ];
         $this->table_config = [];
         return $result;
@@ -85,6 +94,16 @@ class ClMigrate
      */
     public function tableUsingCache($duration = 3600){
         $this->table_config['is_cache'] = $duration;
+        return $this;
+    }
+
+    /**
+     * 设置表引擎，不设置，默认InnoDB
+     * @param string $engine
+     * @return $this
+     */
+    public function tableEngine($engine = 'MyISAM'){
+        $this->table_engine = $engine;
         return $this;
     }
 
@@ -317,7 +336,7 @@ class ClMigrate
      * @return $this
      */
     public function verifyIsPassword($min = 6, $max = 18){
-        $this->field_config['verifies'][] = ['password', $min, $max];
+        $this->field_config['verifies'][] = ['password', intval($min), intval($max)];
         return $this;
     }
 
@@ -338,7 +357,7 @@ class ClMigrate
      * @return $this
      */
     public function verifyIntInScope($min, $max){
-        $this->field_config['verifies'][] = ['in_scope', $min, $max];
+        $this->field_config['verifies'][] = ['in_scope', intval($min), intval($max)];
         return $this;
     }
 
@@ -348,17 +367,17 @@ class ClMigrate
      * @return $this
      */
     public function verifyIntMax($max){
-        $this->field_config['verifies'][] = ['max', $max];
+        $this->field_config['verifies'][] = ['max', intval($max)];
         return $this;
     }
 
     /**
-     * 最大
+     * 最小
      * @param $min
      * @return $this
      */
     public function verifyIntMin($min){
-        $this->field_config['verifies'][] = ['min', $min];
+        $this->field_config['verifies'][] = ['min', intval($min)];
         return $this;
     }
 
@@ -368,17 +387,17 @@ class ClMigrate
      * @return $this
      */
     public function verifyStringLengthMax($length){
-        $this->field_config['verifies'][] = ['length_max', $length];
+        $this->field_config['verifies'][] = ['length_max', intval($length)];
         return $this;
     }
 
     /**
-     * 字符串最长
+     * 字符串最短
      * @param $length
      * @return $this
      */
     public function verifyStringLengthMin($length){
-        $this->field_config['verifies'][] = ['length_min', $length];
+        $this->field_config['verifies'][] = ['length_min', intval($length)];
         return $this;
     }
 

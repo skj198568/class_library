@@ -194,8 +194,10 @@ class ClArray
         if(!is_array($array)){
             return $array;
         }
-        foreach($filters as $function){
-            array_walk_recursive($array, $function);
+        foreach($filters as $filter){
+            array_walk_recursive($array, function(&$each) use ($filter){
+                $each = call_user_func($filter, $each);
+            });
         }
         return $array;
     }

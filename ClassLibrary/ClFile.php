@@ -18,7 +18,7 @@ class ClFile
 
     /**
      * 无限新建文件夹，支持linux和windows目录
-     * @param $absolute_file_name 待创建的文件，例如：C:\workspace\PhpStorm\CC\WebSite\Application\Runtime\Logs/Home//DDD/14_08_07.log
+     * @param string $absolute_file_name 待创建的文件，例如：C:\workspace\PhpStorm\CC\WebSite\Application\Runtime\Logs/Home//DDD/14_08_07.log
      * @param bool $is_file 传入的是否是文件，如果是文件则不进行文件、文件夹的自动判断
      * @return string
      */
@@ -79,7 +79,7 @@ class ClFile
 
     /**
      * 获取父类文件夹
-     * @param $dir
+     * @param string $dir
      * @return string
      */
     public static function dirGetFather($dir)
@@ -89,7 +89,7 @@ class ClFile
 
     /**
      * 获取文件夹下面的所有文件
-     * @param $dir 文件夹目录绝对地址
+     * @param string $dir 文件夹目录绝对地址
      * @param array $file_types :文件类型array('pdf', 'doc')
      * @param array $ignore_dir_or_file : 忽略的文件或文件夹
      * @return array

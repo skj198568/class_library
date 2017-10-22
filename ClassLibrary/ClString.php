@@ -99,7 +99,7 @@ class ClString
      * @param string $key 加密密钥
      * @param int $expiry 加密失效时间
      *
-     * @return 成功返回string，失败返回''
+     * @return string 成功返回string，失败返回''
      */
     public static function authCode($string, $operation = 'DECODE', $key = 'WHO_AM_I', $expiry = 0)
     {
@@ -309,7 +309,6 @@ class ClString
         if ($split_here === false) {
             return $string;
         }
-        $parsed_string = '';
         if ($get_before) {
             if ($is_include_tag != false) {
                 $split_here = strpos($lc_str, $marker) + strlen($marker);
@@ -451,7 +450,7 @@ class ClString
 
     /**
      * 字符串截取，支持中文和其他编码
-     * @param $str 待截取的字符串
+     * @param string $str 待截取的字符串
      * @param int $start 开始位置
      * @param int $length 截取长度
      * @param bool $suffix 截断显示字符
@@ -635,6 +634,91 @@ class ClString
             }
         }
         return $str;
+    }
+
+    /**
+     * 格式化json
+     * @param $json
+     * @param bool $html
+     * @return string
+     */
+    public static function jsonFormat($json, $html = false) {
+        $tab_count = 0;
+        $result = '';
+        $in_quote = false;
+        $ignore_next = false;
+        if ($html) {
+            $tab = "&nbsp;&nbsp;&nbsp;&nbsp;";
+            $newline = "<br/>";
+        } else {
+            $tab = "\t";
+            $newline = "\n";
+        }
+        for($i = 0; $i < strlen($json); $i++) {
+            $char = $json[$i];
+            if ($ignore_next) {
+                $result .= $char;
+                $ignore_next = false;
+            } else {
+                switch($char) {
+                    case '{':
+                        $tab_count++;
+                        $result .= $char . $newline . str_repeat($tab, $tab_count);
+                        break;
+                    case '}':
+                        $tab_count--;
+                        $result = trim($result) . $newline . str_repeat($tab, $tab_count) . $char;
+                        break;
+                    case ',':
+                        $result .= $char . $newline . str_repeat($tab, $tab_count);
+                        break;
+                    case '"':
+                        $in_quote = !$in_quote;
+                        $result .= $char;
+                        break;
+                    case '\\':
+                        if ($in_quote) $ignore_next = true;
+                        $result .= $char;
+                        break;
+                    default:
+                        $result .= $char;
+                }
+            }
+        }
+        if($html){
+            $result = explode('<br/>', $result);
+            foreach($result as $k => $v){
+                //最后一个,号处理
+                if(substr($v, -1, 1) == ','){
+                    $v = rtrim($v, ',').'<i style="color: red;">,</i>';
+                }
+                if(strpos($v, ':') !== false){
+                    $pre = ClString::getBetween($v, '', ':', false);
+                    $left = trim(str_replace($pre, '', $v), ':');
+                    if($left == '[{'){
+                        $left = '<span style="color:red;">[</span><span style="color: blue;">{</span>';
+                    }elseif($left == '{'){
+                        $left = '<span style="color: blue;">{</span>';
+                    }
+                    $v = sprintf('%s:%s', sprintf('<span style="color: #92278f;">%s</span>', $pre), sprintf('<span style="color: #3ab54a;">%s</span>', $left));
+                }else if(str_replace('&nbsp;', '', $v) == '{'){
+                    $v = str_replace('{', '<span style="color: blue;">{</span>', $v);
+                }else if(str_replace('&nbsp;', '', $v) == '[{'){
+                    $v = str_replace(['[', '{'], ['<span style="color: blue;">[</span>', '<span style="color: red;">{</span>'], $v);
+                }else if(str_replace('&nbsp;', '', $v) == '}]'){
+                    $v = str_replace(['}', ']'], ['<span style="color: blue;">}</span>', '<span style="color: red;">]</span>'], $v);
+                }else if(str_replace('&nbsp;', '', $v) == '}'){
+                    $v = str_replace('}', '<span style="color: blue;">}</span>', $v);
+                }else if(str_replace('&nbsp;', '', $v) == ']'){
+                    $v = str_replace(']', '<span style="color: red;">]</span>', $v);
+                }else if(str_replace('&nbsp;', '', $v) == '['){
+                    $v = str_replace('[', '<span style="color: red;">[</span>', $v);
+                }
+                $result[$k] = $v;
+            }
+            $result = implode('<br/>', $result);
+        }
+        return $result;
     }
 
 }

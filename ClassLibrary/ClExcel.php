@@ -94,13 +94,17 @@ class ClExcel
 
     /**
      * csv to excel
-     * @param $csv_file csv绝对地址
+     * @param string $csv_file csv绝对地址
      * @param string $suffix 格式2003或2007
      * @param bool $is_delete 是否删除源文件
-     * @return mixed
+     * @return array|bool|string
      */
     public function csvToExcel($csv_file, $suffix = 'xls', $is_delete = false)
     {
+        if(!is_file($csv_file)){
+            le_info(sprintf('文件“%s”，不存在。', $csv_file));
+            return false;
+        }
         $object_csv = new \PHPExcel_Reader_CSV();
         $csv = $object_csv->load($csv_file);
         $object_writer = null;
@@ -129,10 +133,15 @@ class ClExcel
      * @param string $excel_file excel绝对地址
      * @param bool $is_delete_excel 是否删除源文件
      * @param bool $is_delete_csv 是否删除源文件
-     * @return array
+     * @param bool $auto_fixed 自动填充数据，用于excel有大小标题情况下处理
+     * @return array|bool|mixed
      */
-    public function excelToArray($excel_file, $is_delete_excel = false, $is_delete_csv = false)
+    public function excelToArray($excel_file, $is_delete_excel = false, $is_delete_csv = false, $auto_fixed = false)
     {
+        if(!is_file($excel_file)){
+            le_info(sprintf('文件“%s”，不存在。', $excel_file));
+            return false;
+        }
         $suffix = ClFile::getSuffix($excel_file);
         $obj_reader = null;
         if ($suffix == 'xlsx') {
@@ -141,74 +150,113 @@ class ClExcel
             $obj_reader = new \PHPExcel_Reader_Excel5();
         }
         $excel = $obj_reader->load($excel_file);
+        $count = $excel->getSheetCount();
         $obj_writer = new \PHPExcel_Writer_CSV($excel);
+        $return_array = [];
         //保存csv格式
-        $csv_file = explode('.', $excel_file);
-        $csv_file[count($csv_file) - 1] = 'csv';
-        $csv_file = implode('.', $csv_file);
-        $obj_writer->save($csv_file);
-        $return = [];
-        //标题
-        $titles = [];
-        //内容
-        $item = [];
-        //格式化数据
-        $f_handle = fopen($csv_file, 'r');
-        $content = '';
-        $temp_content_array = [];
-        while(!feof($f_handle)){
-            $content = trim(fgets($f_handle));
-            if(empty($content)){
-                continue;
-            }
-            $temp_content_array = ClString::toArray($content);
-            while($temp_content_array[count($temp_content_array)-1] !== '"' && !feof($f_handle)){
-                //如果换行，则接着读取数据
-                $content .= trim(fgets($f_handle));
+        for($sheet_index=0; $sheet_index<$count; $sheet_index++){
+            $csv_file = explode('.', $excel_file);
+            $csv_file[count($csv_file) - 1] = sprintf('_%s.csv', $sheet_index);
+            $csv_file = implode('.', $csv_file);
+            $obj_writer->setSheetIndex($sheet_index);
+            $obj_writer->save($csv_file);
+            $return = [];
+            //标题
+            $titles = [];
+            //内容
+            $item = [];
+            //格式化数据
+            $f_handle = fopen($csv_file, 'r');
+            $content = '';
+            $temp_content_array = [];
+            while(!feof($f_handle)){
+                $content = trim(fgets($f_handle));
+                if(empty($content)){
+                    continue;
+                }
                 $temp_content_array = ClString::toArray($content);
-            }
-            $item = explode(',', $content);
-            //去除两端"
-            foreach($item as $k => $v){
-                $item[$k] = trim(trim($v, '"'));
-            }
-            //处理标题
-            if(empty($titles)){
-                $titles = $item;
-                foreach($titles as $k => $v){
-                    if(empty($v)){
-                        unset($titles[$k]);
+                while($temp_content_array[count($temp_content_array)-1] !== '"' && !feof($f_handle)){
+                    //如果换行，则接着读取数据
+                    $content .= trim(fgets($f_handle));
+                    $temp_content_array = ClString::toArray($content);
+                }
+                $item = explode(',', $content);
+                //去除两端"
+                foreach($item as $k => $v){
+                    $item[$k] = trim(trim($v, '"'));
+                }
+                //处理标题
+                if(empty($titles)){
+                    $titles = $item;
+                }
+                //删除多余数据
+                foreach ($item as $k => $v){
+                    if($k+1 > count($titles)){
+                        unset($item[$k]);
                     }
                 }
-            }
-            //删除多余数据
-            foreach ($item as $k => $v){
-                if($k+1 > count($titles)){
-                    unset($item[$k]);
+                //判断空数据的行
+                $temp_content_array = $item;
+                for($i = count($temp_content_array)-1; $i >= 0; $i--){
+                    if(empty(ClString::spaceTrim($temp_content_array[$i]))){
+                        unset($temp_content_array[$i]);
+                    }
+                }
+                if(!empty($temp_content_array)){
+                    $return[] = $item;
                 }
             }
-            //判断空数据的行
-            $temp_content_array = $item;
-            for($i = count($temp_content_array)-1; $i >= 0; $i--){
-                if(empty(ClString::spaceTrim($temp_content_array[$i]))){
-                    unset($temp_content_array[$i]);
-                }
+            fclose($f_handle);
+            if($is_delete_csv){
+                //删除csv
+                unlink($csv_file);
             }
-            if(!empty($temp_content_array)){
-                $return[] = $item;
-            }
+            $return_array[] = $return;
         }
-        fclose($f_handle);
         unset($obj_writer);
         unset($obj_reader);
         if ($is_delete_excel) {
             unlink($excel_file);
         }
-        if($is_delete_csv){
-            //删除csv
-            unlink($csv_file);
+        //处理显示问题多余空格问题
+        $max_index = 0;
+        foreach($return_array as $k => $item){
+            $max_index = 0;
+            //获取最大的index
+            foreach($item as $v_son){
+                foreach($v_son as $k_k => $v_v_son){
+                    if(!empty($v_v_son) && $k_k > $max_index){
+                        $max_index = $k_k;
+                    }
+                }
+            }
+            //最大的index之外数据均删除
+            foreach($item as $k_son => $v_son){
+                foreach($v_son as $k_k_son => $v_v_son){
+                    if($k_k_son > $max_index){
+                        unset($return_array[$k][$k_son][$k_k_son]);
+                    }
+                }
+            }
         }
-        return $return;
+        //处理标题归类问题
+        if($auto_fixed){
+            foreach($return_array as $k => $item){
+                foreach($item as $k_son => $v_son){
+                    $has_field = false;
+                    foreach($v_son as $k_k_son => $v_v_son){
+                        if(empty($v_v_son) && !$has_field){
+                            if(isset($return_array[$k][$k_son-1][$k_k_son]) && !empty($return_array[$k][$k_son-1][$k_k_son])){
+                                $return_array[$k][$k_son][$k_k_son] = $return_array[$k][$k_son-1][$k_k_son];
+                            }
+                        }else{
+                            $has_field = true;
+                        }
+                    }
+                }
+            }
+        }
+        return count($return_array) == 1 ? $return_array[0] : $return_array;
     }
 
 }

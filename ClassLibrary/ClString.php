@@ -197,10 +197,10 @@ class ClString
      */
     public static function spaceTrim($string)
     {
-        if(strlen($string) > 0){
+        if (strlen($string) > 0) {
             $str_array = ClString::toArray($string);
-            foreach($str_array as $k => $each){
-                if(ord($each) == 194){
+            foreach ($str_array as $k => $each) {
+                if (ord($each) == 194) {
                     unset($str_array[$k]);
                 }
             }
@@ -217,10 +217,10 @@ class ClString
      */
     public static function spaceManyToOne($string, $separator = ' ')
     {
-        if(strlen($string) > 0){
+        if (strlen($string) > 0) {
             $str_array = ClString::toArray($string);
-            foreach($str_array as $k => $each){
-                if(ord($each) == 194){
+            foreach ($str_array as $k => $each) {
+                if (ord($each) == 194) {
                     unset($str_array[$k]);
                 }
             }
@@ -249,11 +249,12 @@ class ClString
      * @param $s
      * @return string
      */
-    public static function getChinese($s){
+    public static function getChinese($s)
+    {
         $array = self::toArray($s);
         $str = '';
-        foreach($array as $each){
-            if(ClVerify::isChinese($each)){
+        foreach ($array as $each) {
+            if (ClVerify::isChinese($each)) {
                 $str .= $each;
             }
         }
@@ -562,9 +563,10 @@ class ClString
      * @param $html
      * @return mixed
      */
-    public static function stripAmp($html){
+    public static function stripAmp($html)
+    {
         //无限循环去除&amp;多次格式化问题
-        while (strpos($html, '&amp;') !== false && strpos($html, '&lt;') === false){
+        while (strpos($html, '&amp;') !== false && strpos($html, '&lt;') === false) {
             $html = str_replace('&amp;', '&', $html);
         }
         //特殊字符处理
@@ -593,7 +595,8 @@ class ClString
      * 任何格式转为string
      * @return mixed|string
      */
-    public static function toString(){
+    public static function toString()
+    {
         $args = func_get_args();
         $str = '';
         foreach ($args as $each) {
@@ -642,7 +645,8 @@ class ClString
      * @param bool $html
      * @return string
      */
-    public static function jsonFormat($json, $html = false) {
+    public static function jsonFormat($json, $html = false)
+    {
         $tab_count = 0;
         $result = '';
         $in_quote = false;
@@ -654,13 +658,13 @@ class ClString
             $tab = "\t";
             $newline = "\n";
         }
-        for($i = 0; $i < strlen($json); $i++) {
+        for ($i = 0; $i < strlen($json); $i++) {
             $char = $json[$i];
             if ($ignore_next) {
                 $result .= $char;
                 $ignore_next = false;
             } else {
-                switch($char) {
+                switch ($char) {
                     case '{':
                         $tab_count++;
                         $result .= $char . $newline . str_repeat($tab, $tab_count);
@@ -685,33 +689,33 @@ class ClString
                 }
             }
         }
-        if($html){
+        if ($html) {
             $result = explode('<br/>', $result);
-            foreach($result as $k => $v){
+            foreach ($result as $k => $v) {
                 //最后一个,号处理
-                if(substr($v, -1, 1) == ','){
-                    $v = rtrim($v, ',').'<i style="color: red;">,</i>';
+                if (substr($v, -1, 1) == ',') {
+                    $v = rtrim($v, ',') . '<i style="color: red;">,</i>';
                 }
-                if(strpos($v, ':') !== false){
+                if (strpos($v, ':') !== false) {
                     $pre = ClString::getBetween($v, '', ':', false);
                     $left = trim(str_replace($pre, '', $v), ':');
-                    if($left == '[{'){
+                    if ($left == '[{') {
                         $left = '<span style="color:red;">[</span><span style="color: blue;">{</span>';
-                    }elseif($left == '{'){
+                    } elseif ($left == '{') {
                         $left = '<span style="color: blue;">{</span>';
                     }
                     $v = sprintf('%s:%s', sprintf('<span style="color: #92278f;">%s</span>', $pre), sprintf('<span style="color: #3ab54a;">%s</span>', $left));
-                }else if(str_replace('&nbsp;', '', $v) == '{'){
+                } else if (str_replace('&nbsp;', '', $v) == '{') {
                     $v = str_replace('{', '<span style="color: blue;">{</span>', $v);
-                }else if(str_replace('&nbsp;', '', $v) == '[{'){
+                } else if (str_replace('&nbsp;', '', $v) == '[{') {
                     $v = str_replace(['[', '{'], ['<span style="color: blue;">[</span>', '<span style="color: red;">{</span>'], $v);
-                }else if(str_replace('&nbsp;', '', $v) == '}]'){
+                } else if (str_replace('&nbsp;', '', $v) == '}]') {
                     $v = str_replace(['}', ']'], ['<span style="color: blue;">}</span>', '<span style="color: red;">]</span>'], $v);
-                }else if(str_replace('&nbsp;', '', $v) == '}'){
+                } else if (str_replace('&nbsp;', '', $v) == '}') {
                     $v = str_replace('}', '<span style="color: blue;">}</span>', $v);
-                }else if(str_replace('&nbsp;', '', $v) == ']'){
+                } else if (str_replace('&nbsp;', '', $v) == ']') {
                     $v = str_replace(']', '<span style="color: red;">]</span>', $v);
-                }else if(str_replace('&nbsp;', '', $v) == '['){
+                } else if (str_replace('&nbsp;', '', $v) == '[') {
                     $v = str_replace('[', '<span style="color: red;">[</span>', $v);
                 }
                 $result[$k] = $v;

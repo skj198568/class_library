@@ -301,7 +301,7 @@ class ClString
      */
     public static function split($string, $separator_tag, $get_before = true, $is_include_tag = true)
     {
-        if (empty($separator_tag)) {
+        if ($separator_tag === '') {
             return $string;
         }
         $lc_str = strtolower($string);
@@ -335,7 +335,7 @@ class ClString
     public static function getBetween($string, $begin_tag, $end_tag = '', $is_include_tag = true)
     {
         $temp = self::split($string, $begin_tag, false, $is_include_tag);
-        return empty($end_tag) ? $temp : self::split($temp, $end_tag, true, $is_include_tag);
+        return $end_tag === '' ? $temp : self::split($temp, $end_tag, true, $is_include_tag);
     }
 
     /**

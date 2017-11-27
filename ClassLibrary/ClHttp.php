@@ -8,6 +8,7 @@
  */
 
 namespace ClassLibrary;
+
 use think\Exception;
 
 /**
@@ -57,8 +58,8 @@ class ClHttp
      * fastcgi_send_timeout 30000; #nginx进程向fastcgi进程发送request的整个过程的超时时间
      * fastcgi_read_timeout 30000; #fastcgi进程向nginx进程发送response的整个过程的超时时间
      * proxy_ignore_client_abort on; #不允许代理端主动关闭连接
-     * @param $ip 服务器ip地址 192.168.1.168
-     * @param $url 请求url http://www.sda1.test/Index/delay
+     * @param string $ip 服务器ip地址 192.168.1.168
+     * @param string $url 请求url http://www.sda1.test/Index/delay
      * @param array $params 参数数组 array('name' => '张三')
      * @param int $timeout 超时时间
      * @return bool
@@ -132,7 +133,7 @@ class ClHttp
 
     /**
      * http请求
-     * @param $url 请求地址
+     * @param string $url 请求地址
      * @param array $params 请求参数数组
      * @param int $duration 缓存时间
      * @param bool $is_debug 是否是debug模式
@@ -141,11 +142,15 @@ class ClHttp
      */
     public static function http($url, $params = array(), $duration = 0, $is_debug = false, $result_type = 'json')
     {
+        $config = ['post' => $params];
+        if($result_type == 'json'){
+            $config['content_type'] = 'application/json';
+        }
         $key = ClCache::getKey($duration, $url, $params);
         if (!empty($key)) {
             $result = cache($key);
             if ($result === false) {
-                $result = self::fsockopenDownload($url, array('post' => $params));
+                $result = self::fsockopenDownload($url, $config);
                 if (strtolower($result_type) == 'json') {
                     $result = json_decode($result, true);
                 }
@@ -153,7 +158,7 @@ class ClHttp
                 cache($key, $result, $duration);
             }
         } else {
-            $result = self::fsockopenDownload($url, array('post' => $params));
+            $result = self::fsockopenDownload($url, $config);
             if (strtolower($result_type) == 'json') {
                 $result = json_decode($result, true);
             }
@@ -214,7 +219,7 @@ class ClHttp
     /**
      * 模拟登录
      * @param $url
-     * @param $cookie_create_key 生成唯一cookie文件的key值
+     * @param string $cookie_create_key 生成唯一cookie文件的key值
      * @param $params
      * @param bool $is_post 是否是post请求
      * @return mixed
@@ -238,9 +243,10 @@ class ClHttp
     /**
      * 模拟http请求
      * @param $url
-     * @param $cookie 生成唯一cookie文件的key值或者是coockie内容
+     * @param string $cookie 生成唯一cookie文件的key值或者是coockie内容
      * @param $params
      * @param bool $is_post
+     * @param string $referer
      * @param bool $is_debug
      * @return mixed
      */
@@ -477,24 +483,23 @@ class ClHttp
 
     /**
      * 分析返回用户网页浏览器名称
-     * @return string 返回的数组第一个为浏览器名称，第二个是版本号。
      * @param string $user_agent
-     * @return array
+     * @return array 返回的数组第一个为浏览器名称，第二个是版本号。
      */
     public static function getBrowser($user_agent = '')
     {
         $sys = empty($user_agent) ? $_SERVER['HTTP_USER_AGENT'] : $user_agent;
         $exp = array();
-        if(stripos($sys, 'MQQBrowser')){
+        if (stripos($sys, 'MQQBrowser')) {
             $exp[0] = "MQQBrowser";
             $exp[1] = "";
-        }elseif(stripos($sys, 'QQBrowser')){
+        } elseif (stripos($sys, 'QQBrowser')) {
             $exp[0] = "QQBrowser";
             $exp[1] = "";
         } elseif (stripos($sys, "Opera") > 0 || stripos($sys, "OPR/") > 0) {
             $exp[0] = "Opera";
             $exp[1] = "";
-        }else if (stripos($sys, "Safari/") > 0) {
+        } else if (stripos($sys, "Safari/") > 0) {
             $exp[0] = "Safari";
             $exp[1] = "";
         } else if (stripos($sys, "NetCaptor") > 0) {
@@ -508,10 +513,10 @@ class ClHttp
             preg_match('/MAXTHON\s+([^;)]+)+/i', $sys, $b);
             preg_match('/MSIE\s+([^;)]+)+/i', $sys, $ie);
             // $exp = $b[0]." (IE".$ie[1].")";
-            if(empty($b) || empty($ie)){
+            if (empty($b) || empty($ie)) {
                 $exp[0] = "未知浏览器";
                 $exp[1] = "";
-            }else{
+            } else {
                 $exp[0] = $b[0] . " (IE" . $ie[1] . ")";
                 $exp[1] = $ie[1];
             }
@@ -519,7 +524,7 @@ class ClHttp
             preg_match('/MSIE([^;)]+)+/i', $sys, $ie);
             //$exp = "Internet Explorer ".$ie[1];
             //dump($sys);
-            if(empty($ie)){
+            if (empty($ie)) {
                 var_dump($user_agent, $ie);
             }
             $exp[0] = "Internet Explorer";
@@ -527,7 +532,7 @@ class ClHttp
         } elseif (stripos($sys, "Netscape") > 0) {
             $exp[0] = "Netscape";
             $exp[1] = "";
-        }elseif (stripos($sys, 'Edge')) {
+        } elseif (stripos($sys, 'Edge')) {
             $exp[0] = "Edge";
             $exp[1] = '';
         } elseif (stripos($sys, "Chrome") > 0) {
@@ -550,7 +555,6 @@ class ClHttp
      * @access public
      * @param string $remote 远程文件名
      * @param string $local_absolute_file 本地保存文件名
-     * @return mixed
      */
     public static function downloadCurl($remote, $local_absolute_file)
     {
@@ -579,7 +583,7 @@ class ClHttp
      *        bool   block 是否阻塞访问,默认为true
      * @return mixed
      */
-    static public function fsockopenDownload($url, $conf = array())
+    public static function fsockopenDownload($url, $conf = array())
     {
         $return = '';
         if (!is_array($conf)) return $return;
@@ -600,6 +604,7 @@ class ClHttp
             'ip' => '',
             'timeout' => 15,
             'block' => TRUE,
+            'content_type' => 'application/x-www-form-urlencoded'
         );
         $conf_arr = array_merge($conf_arr, $conf);
         $user_agent = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36 Core/1.47.640.400 QQBrowser/9.4.8309.400';
@@ -612,6 +617,7 @@ class ClHttp
         $ip = $conf_arr['ip'];
         $timeout = $conf_arr['timeout'];
         $block = $conf_arr['block'];
+        $content_type = $conf_arr['content_type'];
         if ($post) {
             if (is_array($post)) {
                 $post = http_build_query($post);
@@ -620,7 +626,7 @@ class ClHttp
             $out .= "Accept: */*\r\n";
             //$out .= "Referer: $boardurl\r\n";
             $out .= "Accept-Language: zh-cn\r\n";
-            $out .= "Content-Type: application/x-www-form-urlencoded\r\n";
+            $out .= "Content-Type: $content_type\r\n";
             $out .= "User-Agent: $user_agent\r\n";
             $out .= "Host: $host\r\n";
             $out .= 'Content-Length: ' . strlen($post) . "\r\n";
@@ -672,7 +678,7 @@ class ClHttp
      * 下载文件
      * 可以指定下载显示的文件名，并自动发送相应的Header信息
      * 如果指定了content参数，则下载该参数的内容
-     * @param $file_absolute 下载文件绝对地址
+     * @param string $file_absolute 下载文件绝对地址
      * @param string $show_name 下载显示的文件名
      * @param string $content 下载的内容
      * @param int $expire 下载内容浏览器缓存时间
@@ -719,8 +725,9 @@ class ClHttp
      * 是否是局域网请求
      * @return bool
      */
-    public static function isLocalRequest(){
-        if(in_array(strtok(request()->ip(), '.'), ['0', '10', '127', '168', '192'])){
+    public static function isLocalRequest()
+    {
+        if (in_array(strtok(request()->ip(), '.'), ['0', '10', '127', '168', '192'])) {
             return true;
         }
         return false;

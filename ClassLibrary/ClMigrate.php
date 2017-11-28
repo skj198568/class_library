@@ -9,6 +9,8 @@
 
 namespace ClassLibrary;
 
+use app\index\model\BaseModel;
+
 /**
  * database migrate
  * Class ClMigrate
@@ -47,7 +49,7 @@ class ClMigrate
      */
     public static function instance()
     {
-        if(self::$instance == null){
+        if (self::$instance == null) {
             self::$instance = new self();
         }
         return self::$instance;
@@ -58,7 +60,8 @@ class ClMigrate
      * @param $table_name
      * @return array
      */
-    public function fetchTable($table_name){
+    public function fetchTable($table_name)
+    {
         $result = [
             'comment' => json_encode(
                 array_merge([
@@ -78,7 +81,8 @@ class ClMigrate
      * @param string $this_field 默认为空，不为空，则改变匹配的本表的字段，例如：c_uid，select name form user where id == c_uid，建议留空，程序自动处理
      * @return $this
      */
-    public function tableAddElseShowFields($else_field_name, $relation_table_field, $this_field = ''){
+    public function tableAddElseShowFields($else_field_name, $relation_table_field, $this_field = '')
+    {
         $this->table_config['else_show_fields'][] = [
             $else_field_name,
             $relation_table_field,
@@ -92,7 +96,8 @@ class ClMigrate
      * @param int $duration
      * @return $this
      */
-    public function tableUsingCache($duration = 3600){
+    public function tableUsingCache($duration = 3600)
+    {
         $this->table_config['is_cache'] = $duration;
         return $this;
     }
@@ -102,7 +107,8 @@ class ClMigrate
      * @param string $engine
      * @return $this
      */
-    public function tableEngine($engine = 'MyISAM'){
+    public function tableEngine($engine = 'MyISAM')
+    {
         $this->table_engine = $engine;
         return $this;
     }
@@ -112,7 +118,8 @@ class ClMigrate
      * @param int $show_type 1/modal弹出框, 2/page单个页面
      * @return $this
      */
-    public function tableCreateView($show_type = 1){
+    public function tableCreateView($show_type = 1)
+    {
         $this->table_config['show_type'] = $show_type;
         return $this;
     }
@@ -121,7 +128,8 @@ class ClMigrate
      * 页面是否显示
      * @return $this
      */
-    public function viewIsForPage(){
+    public function viewIsForPage()
+    {
         $this->field_config['view']['is_show_page'] = 1;
         return $this;
     }
@@ -130,7 +138,8 @@ class ClMigrate
      * 页面表格是否显示
      * @return $this
      */
-    public function viewIsForTable(){
+    public function viewIsForTable()
+    {
         $this->field_config['view']['is_show_table'] = 1;
         return $this;
     }
@@ -139,7 +148,8 @@ class ClMigrate
      * 表单是否显示
      * @return $this
      */
-    public function viewIsShowForm(){
+    public function viewIsShowForm()
+    {
         $this->field_config['view']['is_show_form'] = 1;
         return $this;
     }
@@ -148,7 +158,8 @@ class ClMigrate
      * 添加的时候可编辑
      * @return $this
      */
-    public function viewEditableAdd(){
+    public function viewEditableAdd()
+    {
         $this->field_config['view']['editable'][] = 'add';
         return $this;
     }
@@ -157,7 +168,8 @@ class ClMigrate
      * 修改的时候可编辑
      * @return $this
      */
-    public function viewEditableUpdate(){
+    public function viewEditableUpdate()
+    {
         $this->field_config['view']['editable'][] = 'update';
         return $this;
     }
@@ -166,7 +178,8 @@ class ClMigrate
      * 类型
      * @return $this
      */
-    public function viewTypeText(){
+    public function viewTypeText()
+    {
         $this->field_config['view']['type'] = 'text';
         return $this;
     }
@@ -175,7 +188,8 @@ class ClMigrate
      * 类型
      * @return $this
      */
-    public function viewTypePassword(){
+    public function viewTypePassword()
+    {
         $this->field_config['view']['type'] = 'password';
         return $this;
     }
@@ -184,7 +198,8 @@ class ClMigrate
      * 类型
      * @return $this
      */
-    public function viewTypeTextArea(){
+    public function viewTypeTextArea()
+    {
         $this->field_config['view']['type'] = 'textarea';
         return $this;
     }
@@ -194,7 +209,8 @@ class ClMigrate
      * @param array $values 类似['name' => '', 'value' => '', 'checked' => 0]
      * @return $this
      */
-    public function viewTypeCheckbox($values = []){
+    public function viewTypeCheckbox($values = [])
+    {
         $this->field_config['view']['type'] = ['checkbox', ClArray::itemFilters($values)];
         return $this;
     }
@@ -204,7 +220,8 @@ class ClMigrate
      * @param array $values 类似['name' => '', 'value' => '', 'checked' => 0]
      * @return $this
      */
-    public function viewTypeRadio($values = []){
+    public function viewTypeRadio($values = [])
+    {
         $this->field_config['view']['type'] = ['radio', ClArray::itemFilters($values)];
         return $this;
     }
@@ -214,7 +231,8 @@ class ClMigrate
      * @param array $values 类似['name' => '', 'value' => '', 'checked' => 0]
      * @return $this
      */
-    public function viewTypeSelect($values = []){
+    public function viewTypeSelect($values = [])
+    {
         $this->field_config['view']['type'] = ['select', ClArray::itemFilters($values)];
         return $this;
     }
@@ -224,7 +242,8 @@ class ClMigrate
      * @param string $format
      * @return $this
      */
-    public function viewTypeDate($format = 'Ymd'){
+    public function viewTypeDate($format = 'Ymd')
+    {
         $this->field_config['view']['type'] = [
             'date',
             $format
@@ -236,7 +255,8 @@ class ClMigrate
      * 类型
      * @return $this
      */
-    public function viewTypeDatetime(){
+    public function viewTypeDatetime()
+    {
         $this->field_config['view']['type'] = 'datetime';
         return $this;
     }
@@ -247,7 +267,8 @@ class ClMigrate
      * @param array $valid_types 空则不限制，否则进行文件类型限制，例如: ['pdf', 'doc']
      * @return $this
      */
-    public function viewTypeFile($file_max_size = 1, $valid_types = []){
+    public function viewTypeFile($file_max_size = 1, $valid_types = [])
+    {
         $this->field_config['view']['type'] = ['file', $file_max_size, ClArray::itemFilters($valid_types)];
         return $this;
     }
@@ -258,7 +279,8 @@ class ClMigrate
      * @param array $valid_types 空则不限制，否则进行文件类型限制，例如: ['pdf', 'doc']
      * @return $this
      */
-    public function viewTypeFiles($file_max_size = 1, $valid_types = []){
+    public function viewTypeFiles($file_max_size = 1, $valid_types = [])
+    {
         $this->field_config['view']['type'] = ['files', $file_max_size, ClArray::itemFilters($valid_types)];
         return $this;
     }
@@ -267,7 +289,8 @@ class ClMigrate
      * 类型
      * @return $this
      */
-    public function viewTypeAvatar(){
+    public function viewTypeAvatar()
+    {
         $this->field_config['view']['type'] = 'avatar';
         return $this;
     }
@@ -279,7 +302,8 @@ class ClMigrate
      * @param array $valid_types
      * @return $this
      */
-    public function viewTypeImage($width = 600, $height = 400, $valid_types = ['jpg', 'png']){
+    public function viewTypeImage($width = 600, $height = 400, $valid_types = ['jpg', 'png'])
+    {
         $this->field_config['view']['type'] = ['image', $width, $height, ClArray::itemFilters($valid_types)];
         return $this;
     }
@@ -289,7 +313,8 @@ class ClMigrate
      * @param string $content
      * @return $this
      */
-    public function viewPlaceholder($content = ''){
+    public function viewPlaceholder($content = '')
+    {
         $this->field_config['view']['placeholder'] = $content;
         return $this;
     }
@@ -299,7 +324,8 @@ class ClMigrate
      * @param string $content
      * @return $this
      */
-    public function viewHelpContent($content = ''){
+    public function viewHelpContent($content = '')
+    {
         $this->field_config['view']['help_content'] = $content;
         return $this;
     }
@@ -309,7 +335,8 @@ class ClMigrate
      * @param array $filters 例如，['trim', 'intval']
      * @return $this
      */
-    public function filters($filters = ['trim']){
+    public function filters($filters = ['trim'])
+    {
         $this->field_config['filters'] = ClArray::itemFilters($filters);
         return $this;
     }
@@ -318,11 +345,12 @@ class ClMigrate
      * 必须填写
      * @return $this
      */
-    public function verifyIsRequire(){
-        if(!isset($this->field_config['verifies'])){
+    public function verifyIsRequire()
+    {
+        if (!isset($this->field_config['verifies'])) {
             $this->field_config['verifies'][] = 'is_required';
-        }else{
-            if(!in_array('is_required', $this->field_config['verifies'])){
+        } else {
+            if (!in_array('is_required', $this->field_config['verifies'])) {
                 $this->field_config['verifies'][] = 'is_required';
             }
         }
@@ -335,7 +363,8 @@ class ClMigrate
      * @param int $max
      * @return $this
      */
-    public function verifyIsPassword($min = 6, $max = 18){
+    public function verifyIsPassword($min = 6, $max = 18)
+    {
         $this->field_config['verifies'][] = ['password', intval($min), intval($max)];
         return $this;
     }
@@ -345,7 +374,8 @@ class ClMigrate
      * @param array $valid_values
      * @return $this
      */
-    public function verifyInArray($valid_values = []){
+    public function verifyInArray($valid_values = [])
+    {
         $this->field_config['verifies'][] = ['in_array', ClArray::itemFilters($valid_values)];
         return $this;
     }
@@ -356,7 +386,8 @@ class ClMigrate
      * @param $max
      * @return $this
      */
-    public function verifyIntInScope($min, $max){
+    public function verifyIntInScope($min, $max)
+    {
         $this->field_config['verifies'][] = ['in_scope', intval($min), intval($max)];
         return $this;
     }
@@ -366,7 +397,8 @@ class ClMigrate
      * @param $max
      * @return $this
      */
-    public function verifyIntMax($max){
+    public function verifyIntMax($max)
+    {
         $this->field_config['verifies'][] = ['max', intval($max)];
         return $this;
     }
@@ -376,7 +408,8 @@ class ClMigrate
      * @param $min
      * @return $this
      */
-    public function verifyIntMin($min){
+    public function verifyIntMin($min)
+    {
         $this->field_config['verifies'][] = ['min', intval($min)];
         return $this;
     }
@@ -386,7 +419,8 @@ class ClMigrate
      * @param $length
      * @return $this
      */
-    public function verifyStringLengthMax($length){
+    public function verifyStringLengthMax($length)
+    {
         $this->field_config['verifies'][] = ['length_max', intval($length)];
         return $this;
     }
@@ -396,7 +430,8 @@ class ClMigrate
      * @param $length
      * @return $this
      */
-    public function verifyStringLengthMin($length){
+    public function verifyStringLengthMin($length)
+    {
         $this->field_config['verifies'][] = ['length_min', intval($length)];
         return $this;
     }
@@ -405,7 +440,8 @@ class ClMigrate
      * 邮件
      * @return $this
      */
-    public function verifyEmail(){
+    public function verifyEmail()
+    {
         $this->field_config['verifies'][] = 'email';
         return $this;
     }
@@ -414,7 +450,8 @@ class ClMigrate
      * 手机
      * @return $this
      */
-    public function verifyMobile(){
+    public function verifyMobile()
+    {
         $this->field_config['verifies'][] = 'mobile';
         return $this;
     }
@@ -423,7 +460,8 @@ class ClMigrate
      * ip地址
      * @return $this
      */
-    public function verifyIp(){
+    public function verifyIp()
+    {
         $this->field_config['verifies'][] = 'ip';
         return $this;
     }
@@ -432,7 +470,8 @@ class ClMigrate
      * 邮政编码校验
      * @return $this
      */
-    public function verifyPostcode(){
+    public function verifyPostcode()
+    {
         $this->field_config['verifies'][] = 'postcode';
         return $this;
     }
@@ -441,7 +480,8 @@ class ClMigrate
      * 身份证
      * @return $this
      */
-    public function verifyIdCard(){
+    public function verifyIdCard()
+    {
         $this->field_config['verifies'][] = 'id_card';
         return $this;
     }
@@ -450,7 +490,8 @@ class ClMigrate
      * 汉字
      * @return $this
      */
-    public function verifyChinese(){
+    public function verifyChinese()
+    {
         $this->field_config['verifies'][] = 'chinese';
         return $this;
     }
@@ -459,7 +500,8 @@ class ClMigrate
      * 汉字、字母
      * @return $this
      */
-    public function verifyChineseAlpha(){
+    public function verifyChineseAlpha()
+    {
         $this->field_config['verifies'][] = 'chinese_alpha';
         return $this;
     }
@@ -468,7 +510,8 @@ class ClMigrate
      * 汉字、字母、数字
      * @return $this
      */
-    public function verifyChineseAlphaNum(){
+    public function verifyChineseAlphaNum()
+    {
         $this->field_config['verifies'][] = 'chinese_alpha_num';
         return $this;
     }
@@ -477,7 +520,8 @@ class ClMigrate
      * 汉字、字母、数字、下划线_、破折号-
      * @return $this
      */
-    public function verifyChineseAlphaNumDash(){
+    public function verifyChineseAlphaNumDash()
+    {
         $this->field_config['verifies'][] = 'chinese_alpha_num_dash';
         return $this;
     }
@@ -486,7 +530,8 @@ class ClMigrate
      * 字母
      * @return $this
      */
-    public function verifyAlpha(){
+    public function verifyAlpha()
+    {
         $this->field_config['verifies'][] = 'alpha';
         return $this;
     }
@@ -495,7 +540,8 @@ class ClMigrate
      * 字母和数字
      * @return $this
      */
-    public function verifyAlphaNum(){
+    public function verifyAlphaNum()
+    {
         $this->field_config['verifies'][] = 'alpha_num';
         return $this;
     }
@@ -504,7 +550,8 @@ class ClMigrate
      * 字母、数字，下划线_、破折号-
      * @return $this
      */
-    public function verifyAlphaNumDash(){
+    public function verifyAlphaNumDash()
+    {
         $this->field_config['verifies'][] = 'alpha_num_dash';
         return $this;
     }
@@ -513,7 +560,8 @@ class ClMigrate
      * 网址
      * @return $this
      */
-    public function verifyUrl(){
+    public function verifyUrl()
+    {
         $this->field_config['verifies'][] = 'url';
         return $this;
     }
@@ -522,7 +570,8 @@ class ClMigrate
      * 数字
      * @return $this
      */
-    public function verifyNumber(){
+    public function verifyNumber()
+    {
         $this->field_config['verifies'][] = 'number';
         return $this;
     }
@@ -531,7 +580,8 @@ class ClMigrate
      * 数组
      * @return $this
      */
-    public function verifyArray(){
+    public function verifyArray()
+    {
         $this->field_config['verifies'][] = 'array';
         return $this;
     }
@@ -540,8 +590,19 @@ class ClMigrate
      * 固话
      * @return $this
      */
-    public function verifyTel(){
+    public function verifyTel()
+    {
         $this->field_config['verifies'][] = 'tel';
+        return $this;
+    }
+
+    /**
+     * 唯一值
+     * @return $this
+     */
+    public function verifyUnique()
+    {
+        $this->field_config['verifies'][] = 'unique';
         return $this;
     }
 
@@ -549,7 +610,8 @@ class ClMigrate
      * 可排序
      * @return $this
      */
-    public function isSortable(){
+    public function isSortable()
+    {
         $this->field_config['is_sortable'] = 1;
         return $this;
     }
@@ -558,7 +620,8 @@ class ClMigrate
      * 可检索
      * @return $this
      */
-    public function isSearchable(){
+    public function isSearchable()
+    {
         $this->field_config['is_searchable'] = 1;
         return $this;
     }
@@ -567,7 +630,8 @@ class ClMigrate
      * 可检索
      * @return $this
      */
-     public function isReadOnly(){
+    public function isReadOnly()
+    {
         $this->field_config['is_read_only'] = 1;
         $this->verifyIsRequire();
         return $this;
@@ -578,21 +642,436 @@ class ClMigrate
      * @param array $values [['man', 1, '男']]会自动生成 const V_FIELD_MAN = 1;备注是第三个参数
      * @return $this
      */
-    public function constValues($values = []){
+    public function constValues($values = [])
+    {
         $this->field_config['const_values'] = ClArray::itemFilters($values);
         return $this;
     }
 
     /**
      * 获取字段名定义
-     * @param $name 字段名称
+     * @param string $name 字段名称
      * @return string
      */
-    public function fetchField($name){
+    public function fetchField($name)
+    {
         $this->field_config['name'] = $name;
         $result = json_encode($this->field_config, JSON_UNESCAPED_UNICODE);
         $this->field_config = [];
         return $result;
+    }
+
+    /**
+     * 校验字段值
+     * @param $fields
+     * @param array $fields_verifies
+     * @param string $type
+     * @param BaseModel $instance
+     */
+    public static function verifyFields($fields, $fields_verifies = [], $type = 'insert', $instance = null)
+    {
+        $error_msg = '';
+        foreach ($fields_verifies as $k_field => $each_verify) {
+            foreach ($each_verify as $v_verify) {
+                if (is_array($v_verify)) {
+                    switch ($v_verify[0]) {
+                        case 'password':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isPassword($each_value, $v_verify[1], $v_verify[2])) {
+                                            $error_msg = sprintf('%s:%s 密码长度%s~%s', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1], $v_verify[2]);
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isPassword($fields[$k_field], $v_verify[1], $v_verify[2])) {
+                                        $error_msg = sprintf('%s:%s 密码长度%s~%s', $k_field, $fields[$k_field], $v_verify[1], $v_verify[2]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'in_array':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!in_array($each_value, $v_verify[1])) {
+                                            $error_msg = sprintf('%s:%s 不在%s范围内', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!in_array($fields[$k_field], $v_verify[1])) {
+                                        $error_msg = sprintf('%s:%s 不在%s范围内', $k_field, $fields[$k_field], json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
+                                    }
+                                }
+                            }
+                            break;
+                        case 'in_scope':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if ($each_value < $v_verify[1] || $each_value > $v_verify[2]) {
+                                            $error_msg = sprintf('%s:%s 不在[%s, %s]区间内', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1], $v_verify[2]);
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if ($fields[$k_field] < $v_verify[1] || $fields[$k_field] > $v_verify[2]) {
+                                        $error_msg = sprintf('%s:%s 不在[%s, %s]区间内', $k_field, $fields[$k_field], $v_verify[1], $v_verify[2]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'max':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if ($each_value > $v_verify[1]) {
+                                            $error_msg = sprintf('%s:%s 最大值%s', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if ($fields[$k_field] > $v_verify[1]) {
+                                        $error_msg = sprintf('%s:%s 最大值%s', $k_field, $fields[$k_field], $v_verify[1]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'min':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if ($each_value < $v_verify[1]) {
+                                            $error_msg = sprintf('%s:%s 最小值%s', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if ($fields[$k_field] < $v_verify[1]) {
+                                        $error_msg = sprintf('%s:%s 最小值%s', $k_field, $fields[$k_field], $v_verify[1]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'length_max':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClString::getLength($each_value) > $v_verify[1]) {
+                                            $error_msg = sprintf('%s:%s 最大长度%s', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!ClString::getLength($fields[$k_field]) > $v_verify[1]) {
+                                        $error_msg = sprintf('%s:%s 最大长度%s', $k_field, $fields[$k_field], $v_verify[1]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'length_min':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClString::getLength($each_value) < $v_verify[1]) {
+                                            $error_msg = sprintf('%s:%s 最小长度%s', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!ClString::getLength($fields[$k_field]) < $v_verify[1]) {
+                                        $error_msg = sprintf('%s:%s 最小长度%s', $k_field, $fields[$k_field], $v_verify[1]);
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                } else {
+                    switch ($v_verify) {
+                        case 'is_required':
+                            //更新不必判断是否必须，必须字段是在新增的时候判断
+                            if ($type != 'update') {
+                                if (!isset($fields[$k_field]) || (isset($fields[$k_field]) && !is_numeric($fields[$k_field]) && empty($fields[$k_field]))) {
+                                    $error_msg = sprintf('%s为必填项', $k_field);
+                                }
+                            } else {
+                                if (isset($fields[$k_field]) && !is_numeric($fields[$k_field]) && empty($fields[$k_field])) {
+                                    $error_msg = sprintf('%s不可为空', $k_field);
+                                }
+                            }
+                            break;
+                        case 'email':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isEmail($each_value)) {
+                                            $error_msg = sprintf('%s:%s 邮箱格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isEmail($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 邮箱格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'mobile':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isMobile($each_value)) {
+                                            $error_msg = sprintf('%s:%s 手机号码格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isMobile($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 手机号码格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'ip':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isIp($each_value)) {
+                                            $error_msg = sprintf('%s:%s ip格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isIp($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s ip格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'postcode':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isPostcode($each_value)) {
+                                            $error_msg = sprintf('%s:%s 邮编格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isPostcode($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 邮编格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'id_card':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isIdCard($each_value)) {
+                                            $error_msg = sprintf('%s:%s 身份证格式错误', $k_field, $fields[$k_field]);
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isIdCard($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 身份证格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'chinese':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isChinese($each_value)) {
+                                            $error_msg = sprintf('%s:%s 中文格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isChinese($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 中文格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'chinese_alpha':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isChineseAlpha($each_value)) {
+                                            $error_msg = sprintf('%s:%s 中文、英文格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isChineseAlpha($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 中文、英文格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'chinese_alpha_num':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isChineseAlphaNum($each_value)) {
+                                            $error_msg = sprintf('%s:%s 中文、英文、数字格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isChineseAlphaNum($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 中文、英文、数字格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'chinese_alpha_num_dash':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isChineseAlphaNumDash($each_value)) {
+                                            $error_msg = sprintf('%s:%s 中文、英文、数字、-、_格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isChineseAlphaNumDash($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 中文、英文、数字、-、_格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'alpha':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isAlpha($each_value)) {
+                                            $error_msg = sprintf('%s:%s 英文格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isAlpha($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 英文格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'alpha_num':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isAlphaNum($each_value)) {
+                                            $error_msg = sprintf('%s:%s 英文、数字格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isAlphaNum($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 英文、数字格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'alpha_num_dash':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isAlphaNumDash($each_value)) {
+                                            $error_msg = sprintf('%s:%s 英文、数字、-、_格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isAlphaNumDash($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 英文、数字、-、_格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'url':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isUrl($each_value)) {
+                                            $error_msg = sprintf('%s:%s url格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isUrl($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s url格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'number':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!is_numeric($each_value)) {
+                                            $error_msg = sprintf('%s:%s 数字格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                        }
+                                    }
+                                } else {
+                                    if (!is_numeric($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 数字格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'tel':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isTel($each_value)) {
+                                            $error_msg = sprintf('%s:%s 固话格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isTel($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 固话格式错误', $k_field, $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'array':
+                            if (isset($fields[$k_field])) {
+                                if (!is_array($fields[$k_field])) {
+                                    $error_msg = sprintf('%s:%s 数组格式错误', $k_field, $fields[$k_field]);
+                                }
+                            }
+                            break;
+                        case 'unique':
+                            if (isset($fields[$k_field]) && !is_null($instance)) {
+                                if ($instance->where([
+                                        $k_field => $fields[$k_field]
+                                    ])->count() > 0) {
+                                    $error_msg = sprintf('%s:%s 该值为unique，不可重复', $k_field, $fields[$k_field]);
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+            if (!empty($error_msg)) {
+                $msg = json_encode([
+                    'status' => -1,
+                    'message' => $error_msg,
+                    'data' => $fields
+                ], JSON_UNESCAPED_UNICODE);
+                $value = strtolower($_SERVER['HTTP_X_REQUESTED_WITH']);
+                if (strpos($value, 'xmlhttprequest') !== false) {
+                    //输出结果并退出
+                    header('Content-Type:application/json; charset=utf-8');
+                }
+                echo($msg);
+                exit;
+            }
+        }
     }
 
 }

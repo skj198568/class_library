@@ -120,6 +120,9 @@ class ClApiParams extends ClMigrate
                     case 'array':
                         $filters_desc[] = '数组';
                         break;
+                    case 'unique':
+                        $filters_desc[] = '唯一值';
+                        break;
                 }
             }
         }

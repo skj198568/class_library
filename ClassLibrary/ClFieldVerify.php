@@ -1,22 +1,21 @@
 <?php
 /**
  * Created by PhpStorm.
- * User =>SongKejing
- * QQ =>597481334
- * Date =>2017/8/12
- * Time =>10:26
+ * User: SongKejing
+ * QQ: 597481334
+ * Date: 2017/11/30
+ * Time: 9:35
  */
 
 namespace ClassLibrary;
-
 use app\index\model\BaseModel;
 
 /**
- * database migrate
- * Class ClMigrate
+ * 字段校验
+ * Class ClFieldVerify
  * @package ClassLibrary
  */
-class ClMigrate
+class ClFieldVerify
 {
 
     /**
@@ -26,26 +25,14 @@ class ClMigrate
     private static $instance = null;
 
     /**
-     * 表配置
-     * @var array
-     */
-    private $table_config = [];
-
-    /**
      * 字段配置
      * @var array
      */
     protected $field_config = [];
 
     /**
-     * 表引擎
-     * @var string
-     */
-    protected $table_engine = 'InnoDB';
-
-    /**
      * 实例对象
-     * @return ClMigrate|null
+     * @return ClFieldVerify|null
      */
     public static function instance()
     {
@@ -53,281 +40,6 @@ class ClMigrate
             self::$instance = new self();
         }
         return self::$instance;
-    }
-
-    /**
-     * 获取表名定义
-     * @param $table_name
-     * @return array
-     */
-    public function fetchTable($table_name)
-    {
-        $result = [
-            'comment' => json_encode(
-                array_merge([
-                    'name' => $table_name
-                ], $this->table_config),
-                JSON_UNESCAPED_UNICODE),
-            'engine' => $this->table_engine
-        ];
-        $this->table_config = [];
-        return $result;
-    }
-
-    /**
-     * 新增显示的字段，用于页面显示需求
-     * @param string $else_field_name 新增的字段名，建议为当前field+'_show'，例如:create_uid_show
-     * @param string $relation_table_field 关联的表和字段，例如：'user.name'，会自动获取：select name form user where id == create_uid
-     * @param string $this_field 默认为空，不为空，则改变匹配的本表的字段，例如：c_uid，select name form user where id == c_uid，建议留空，程序自动处理
-     * @return $this
-     */
-    public function tableAddElseShowFields($else_field_name, $relation_table_field, $this_field = '')
-    {
-        $this->table_config['else_show_fields'][] = [
-            $else_field_name,
-            $relation_table_field,
-            $this_field
-        ];
-        return $this;
-    }
-
-    /**
-     * 是否启用缓存
-     * @param int $duration
-     * @return $this
-     */
-    public function tableUsingCache($duration = 3600)
-    {
-        $this->table_config['is_cache'] = $duration;
-        return $this;
-    }
-
-    /**
-     * 设置表引擎，不设置，默认InnoDB
-     * @param string $engine
-     * @return $this
-     */
-    public function tableEngine($engine = 'MyISAM')
-    {
-        $this->table_engine = $engine;
-        return $this;
-    }
-
-    /**
-     * 是否创建视图层
-     * @param int $show_type 1/modal弹出框, 2/page单个页面
-     * @return $this
-     */
-    public function tableCreateView($show_type = 1)
-    {
-        $this->table_config['show_type'] = $show_type;
-        return $this;
-    }
-
-    /**
-     * 页面是否显示
-     * @return $this
-     */
-    public function viewIsForPage()
-    {
-        $this->field_config['view']['is_show_page'] = 1;
-        return $this;
-    }
-
-    /**
-     * 页面表格是否显示
-     * @return $this
-     */
-    public function viewIsForTable()
-    {
-        $this->field_config['view']['is_show_table'] = 1;
-        return $this;
-    }
-
-    /**
-     * 表单是否显示
-     * @return $this
-     */
-    public function viewIsShowForm()
-    {
-        $this->field_config['view']['is_show_form'] = 1;
-        return $this;
-    }
-
-    /**
-     * 添加的时候可编辑
-     * @return $this
-     */
-    public function viewEditableAdd()
-    {
-        $this->field_config['view']['editable'][] = 'add';
-        return $this;
-    }
-
-    /**
-     * 修改的时候可编辑
-     * @return $this
-     */
-    public function viewEditableUpdate()
-    {
-        $this->field_config['view']['editable'][] = 'update';
-        return $this;
-    }
-
-    /**
-     * 类型
-     * @return $this
-     */
-    public function viewTypeText()
-    {
-        $this->field_config['view']['type'] = 'text';
-        return $this;
-    }
-
-    /**
-     * 类型
-     * @return $this
-     */
-    public function viewTypePassword()
-    {
-        $this->field_config['view']['type'] = 'password';
-        return $this;
-    }
-
-    /**
-     * 类型
-     * @return $this
-     */
-    public function viewTypeTextArea()
-    {
-        $this->field_config['view']['type'] = 'textarea';
-        return $this;
-    }
-
-    /**
-     * 类型
-     * @param array $values 类似['name' => '', 'value' => '', 'checked' => 0]
-     * @return $this
-     */
-    public function viewTypeCheckbox($values = [])
-    {
-        $this->field_config['view']['type'] = ['checkbox', ClArray::itemFilters($values)];
-        return $this;
-    }
-
-    /**
-     * 类型
-     * @param array $values 类似['name' => '', 'value' => '', 'checked' => 0]
-     * @return $this
-     */
-    public function viewTypeRadio($values = [])
-    {
-        $this->field_config['view']['type'] = ['radio', ClArray::itemFilters($values)];
-        return $this;
-    }
-
-    /**
-     * 类型
-     * @param array $values 类似['name' => '', 'value' => '', 'checked' => 0]
-     * @return $this
-     */
-    public function viewTypeSelect($values = [])
-    {
-        $this->field_config['view']['type'] = ['select', ClArray::itemFilters($values)];
-        return $this;
-    }
-
-    /**
-     * 日期
-     * @param string $format
-     * @return $this
-     */
-    public function viewTypeDate($format = 'Ymd')
-    {
-        $this->field_config['view']['type'] = [
-            'date',
-            $format
-        ];
-        return $this;
-    }
-
-    /**
-     * 类型
-     * @return $this
-     */
-    public function viewTypeDatetime()
-    {
-        $this->field_config['view']['type'] = 'datetime';
-        return $this;
-    }
-
-    /**
-     * 类型
-     * @param int $file_max_size 文件大小，单位为M
-     * @param array $valid_types 空则不限制，否则进行文件类型限制，例如: ['pdf', 'doc']
-     * @return $this
-     */
-    public function viewTypeFile($file_max_size = 1, $valid_types = [])
-    {
-        $this->field_config['view']['type'] = ['file', $file_max_size, ClArray::itemFilters($valid_types)];
-        return $this;
-    }
-
-    /**
-     * 多文件上传
-     * @param int $file_max_size 文件大小，单位为M
-     * @param array $valid_types 空则不限制，否则进行文件类型限制，例如: ['pdf', 'doc']
-     * @return $this
-     */
-    public function viewTypeFiles($file_max_size = 1, $valid_types = [])
-    {
-        $this->field_config['view']['type'] = ['files', $file_max_size, ClArray::itemFilters($valid_types)];
-        return $this;
-    }
-
-    /**
-     * 类型
-     * @return $this
-     */
-    public function viewTypeAvatar()
-    {
-        $this->field_config['view']['type'] = 'avatar';
-        return $this;
-    }
-
-    /**
-     * 类型
-     * @param int $width
-     * @param int $height
-     * @param array $valid_types
-     * @return $this
-     */
-    public function viewTypeImage($width = 600, $height = 400, $valid_types = ['jpg', 'png'])
-    {
-        $this->field_config['view']['type'] = ['image', $width, $height, ClArray::itemFilters($valid_types)];
-        return $this;
-    }
-
-    /**
-     * 内容提醒
-     * @param string $content
-     * @return $this
-     */
-    public function viewPlaceholder($content = '')
-    {
-        $this->field_config['view']['placeholder'] = $content;
-        return $this;
-    }
-
-    /**
-     * 帮助文本
-     * @param string $content
-     * @return $this
-     */
-    public function viewHelpContent($content = '')
-    {
-        $this->field_config['view']['help_content'] = $content;
-        return $this;
     }
 
     /**
@@ -607,58 +319,107 @@ class ClMigrate
     }
 
     /**
-     * 可排序
-     * @return $this
-     */
-    public function isSortable()
-    {
-        $this->field_config['is_sortable'] = 1;
-        return $this;
-    }
-
-    /**
-     * 可检索
-     * @return $this
-     */
-    public function isSearchable()
-    {
-        $this->field_config['is_searchable'] = 1;
-        return $this;
-    }
-
-    /**
-     * 可检索
-     * @return $this
-     */
-    public function isReadOnly()
-    {
-        $this->field_config['is_read_only'] = 1;
-        $this->verifyIsRequire();
-        return $this;
-    }
-
-    /**
-     * 预定义的静态变量的值
-     * @param array $values [['man', 1, '男']]会自动生成 const V_FIELD_MAN = 1;备注是第三个参数
-     * @return $this
-     */
-    public function constValues($values = [])
-    {
-        $this->field_config['const_values'] = ClArray::itemFilters($values);
-        return $this;
-    }
-
-    /**
-     * 获取字段名定义
-     * @param string $name 字段名称
+     * 获取描述名称
+     * @param $filters
      * @return string
      */
-    public function fetchField($name)
-    {
-        $this->field_config['name'] = $name;
-        $result = json_encode($this->field_config, JSON_UNESCAPED_UNICODE);
+    public static function getNamesStringByVerifies($filters){
+        $filters_desc = [];
+        foreach ($filters as $v_verify) {
+            if (is_array($v_verify)) {
+                switch ($v_verify[0]) {
+                    case 'password':
+                        $filters_desc[] = sprintf('密码长度%s~%s', $v_verify[1], $v_verify[2]);
+                        break;
+                    case 'in_array':
+                        $filters_desc[] = sprintf('在%s范围内', json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
+                        break;
+                    case 'in_scope':
+                        $filters_desc[] = sprintf('不在[%s, %s]区间内', $v_verify[1], $v_verify[2]);
+                        break;
+                    case 'max':
+                        $filters_desc[] = sprintf('最大值%s', $v_verify[1]);
+                        break;
+                    case 'min':
+                        $filters_desc[] = sprintf('最小值%s', $v_verify[1]);
+                        break;
+                    case 'length_max':
+                        $filters_desc[] = sprintf('最大长度%s', $v_verify[1]);
+                        break;
+                    case 'length_min':
+                        $filters_desc[] = sprintf('最小长度%s', $v_verify[1]);
+                        break;
+                }
+            } else {
+                switch ($v_verify) {
+                    case 'is_required':
+                        $filters_desc[] = '必填';
+                        break;
+                    case 'email':
+                        $filters_desc[] = '邮箱格式';
+                        break;
+                    case 'mobile':
+                        $filters_desc[] = '手机号';
+                        break;
+                    case 'ip':
+                        $filters_desc[] = 'ip地址';
+                        break;
+                    case 'postcode':
+                        $filters_desc[] = '邮编';
+                        break;
+                    case 'id_card':
+                        $filters_desc[] = '身份证';
+                        break;
+                    case 'chinese':
+                        $filters_desc[] = '中文';
+                        break;
+                    case 'chinese_alpha':
+                        $filters_desc[] = '中文或英文';
+                        break;
+                    case 'chinese_alpha_num':
+                        $filters_desc[] = '中文、英文、数字';
+                        break;
+                    case 'chinese_alpha_num_dash':
+                        $filters_desc[] = '中文、英文、数字、-、_';
+                        break;
+                    case 'alpha':
+                        $filters_desc[] = '英文';
+                        break;
+                    case 'alpha_num':
+                        $filters_desc[] = '英文或数字';
+                        break;
+                    case 'alpha_num_dash':
+                        $filters_desc[] = '英文、数字、-、_格式';
+                        break;
+                    case 'url':
+                        $filters_desc[] = 'url';
+                        break;
+                    case 'number':
+                        $filters_desc[] = '数字';
+                        break;
+                    case 'tel':
+                        $filters_desc[] = '固话';
+                        break;
+                    case 'array':
+                        $filters_desc[] = '数组';
+                        break;
+                    case 'unique':
+                        $filters_desc[] = '唯一值';
+                        break;
+                }
+            }
+        }
+        return implode('; ', $filters_desc);
+    }
+
+    /**
+     * 获取校验
+     * @return mixed
+     */
+    public function fetchVerifies(){
+        $verifies = $this->field_config['verifies'];
         $this->field_config = [];
-        return $result;
+        return $verifies;
     }
 
     /**

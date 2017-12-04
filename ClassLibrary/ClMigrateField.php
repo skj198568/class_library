@@ -78,6 +78,27 @@ class ClMigrateField extends ClFieldVerify
     }
 
     /**
+     * 展现时映射其他表字段，该字段必须为其他表的主键
+     * @param array $map_fields 映射表字段数组：[['其他表字段', '显示名称', '字段说明'], ['user.name', 'name_show', '用户名'], ['user.age', 'value_show', '年龄']]
+     * @return $this
+     */
+    public function showMapFields($map_fields = []){
+        $this->field_config['show_map_fields'] = $map_fields;
+        return $this;
+    }
+
+    /**
+     * 展现格式化
+     * @param mixed $format 例如：date('Y-m-d H:i:s', %s)
+     * @param string $alias_append 别名，如果不为空，则自动拼接生成新字段，如果为空，则覆盖当前字段
+     * @return $this
+     */
+    public function showFormat($format, $alias_append = '_show'){
+        $this->field_config['show_format'][] = [$format, $alias_append];
+        return $this;
+    }
+
+    /**
      * 获取字段名定义
      * @param string $name 字段名称
      * @return string
@@ -85,6 +106,15 @@ class ClMigrateField extends ClFieldVerify
     public function fetch($name)
     {
         $this->field_config['name'] = $name;
+        //静态变量
+        if(isset($this->field_config['const_values']) && !empty($this->field_config['const_values'])){
+            $format = [];
+            foreach($this->field_config['const_values'] as $each){
+                $format[] = [$each[1], $each[2]];
+            }
+            //添加格式化
+            $this->showFormat($format, '_show');
+        }
         $result = json_encode($this->field_config, JSON_UNESCAPED_UNICODE);
         $this->field_config = [];
         return $result;

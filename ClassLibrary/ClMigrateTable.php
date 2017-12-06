@@ -66,23 +66,6 @@ class ClMigrateTable
     }
 
     /**
-     * 新增显示的字段，用于页面显示需求
-     * @param string $else_field_name 新增的字段名，建议为当前field+'_show'，例如:create_uid_show
-     * @param string $relation_table_field 关联的表和字段，例如：'user.name'，会自动获取：select name form user where id == create_uid
-     * @param string $this_field 默认为空，不为空，则改变匹配的本表的字段，例如：c_uid，select name form user where id == c_uid，建议留空，程序自动处理
-     * @return $this
-     */
-    public function addElseShowFields($else_field_name, $relation_table_field, $this_field = '')
-    {
-        $this->table_config['else_show_fields'][] = [
-            $else_field_name,
-            $relation_table_field,
-            $this_field
-        ];
-        return $this;
-    }
-
-    /**
      * 是否启用缓存
      * @param int $duration
      * @return $this
@@ -112,6 +95,15 @@ class ClMigrateTable
     public function createView($show_type = 1)
     {
         $this->table_config['show_type'] = $show_type;
+        return $this;
+    }
+
+    /**
+     * 不创建api，默认创建
+     * @return $this
+     */
+    public function notCreateApi(){
+        $this->table_config['create_api'] = false;
         return $this;
     }
 

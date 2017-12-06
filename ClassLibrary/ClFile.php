@@ -108,15 +108,15 @@ class ClFile
                 if (in_array($file, $ignore_dir_or_file)) {
                     continue;
                 }
-                if (is_dir($dir . '/' . $file)) {
-                    $data = array_merge($data, self::dirGetFiles($dir . '/' . $file, $file_types, $ignore_dir_or_file));
+                if (is_dir($dir . DIRECTORY_SEPARATOR . $file)) {
+                    $data = array_merge($data, self::dirGetFiles($dir . DIRECTORY_SEPARATOR . $file, $file_types, $ignore_dir_or_file));
                 } else {
                     if (empty($file_types)) {
-                        $data[] = $dir . '/' . $file;
+                        $data[] = $dir . DIRECTORY_SEPARATOR . $file;
                     } else {
                         //判断类型
                         if (in_array(self::getSuffix($file), $file_types)) {
-                            $data[] = $dir . '/' . $file;
+                            $data[] = $dir . DIRECTORY_SEPARATOR . $file;
                         }
                     }
                 }

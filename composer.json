@@ -22,5 +22,14 @@
     "psr-4": {
       "ClassLibrary\\": "ClassLibrary"
     }
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "php -r \"echo 'post-install-cmd';\"",
+      "php create_files.php"
+    ],
+    "post-update-cmd": [
+      "php -r \"echo 'post-update-cmd';\""
+    ]
   }
 }

@@ -29,6 +29,9 @@
     ],
     "post-update-cmd": [
       "php create_files.php"
+    ],
+    "post-package-update": [
+      "php create_files.php"
     ]
   }
 }

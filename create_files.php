@@ -11,7 +11,6 @@ include_once "ClassLibrary/ClFile.php";
 include_once "ClassLibrary/ClSystem.php";
 
 $files = \ClassLibrary\ClFile::dirGetFiles(__DIR__.DIRECTORY_SEPARATOR.'scripts');
-var_dump(__DIR__);
 //往上3个目录
 $document_root_dir = explode(DIRECTORY_SEPARATOR, __DIR__);
 $document_root_dir = array_slice($document_root_dir, 0, count($document_root_dir)-3);

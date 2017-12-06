@@ -3,7 +3,7 @@
   "description": "tp5框架常用类库",
   "type": "library",
   "license": "MIT",
-  "version": "0.64",
+  "version": "0.65",
   "authors": [
     {
       "name": "宋可敬",
@@ -28,9 +28,6 @@
       "php create_files.php"
     ],
     "post-update-cmd": [
-      "php create_files.php"
-    ],
-    "post-package-update": [
       "php create_files.php"
     ]
   }

@@ -824,12 +824,12 @@ class ClFieldVerify
                     'message' => $error_msg,
                     'data' => $fields
                 ], JSON_UNESCAPED_UNICODE);
-                $value = strtolower($_SERVER['HTTP_X_REQUESTED_WITH']);
+                $value = isset($_SERVER['HTTP_X_REQUESTED_WITH']) ? strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) : '';
                 if (strpos($value, 'xmlhttprequest') !== false) {
                     //输出结果并退出
                     header('Content-Type:application/json; charset=utf-8');
                 }
-                echo($msg);
+                echo($msg.PHP_EOL);
                 exit;
             }
         }

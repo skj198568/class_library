@@ -7,7 +7,7 @@
  * Time: 10:23
  */
 
-namespace app\console;
+//namespace app\console;
 
 use ClassLibrary\ClFieldVerify;
 use ClassLibrary\ClFile;

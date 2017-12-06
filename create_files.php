@@ -24,4 +24,9 @@ foreach($files as $file){
     //覆盖文件
     echo 'copy file: '.$target_file.PHP_EOL;
     copy($file, $target_file);
+    $file_content = file_get_contents($target_file);
+    //替换命名空间
+    $file_content = str_replace('//namespace ', 'namespace ', $file_content);
+    //回写文件
+    file_put_contents($target_file, $file_content);
 }

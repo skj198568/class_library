@@ -7,7 +7,7 @@
  * Time: 17:37
  */
 
-namespace app\console;
+//namespace app\console;
 
 use think\console\Command;
 use think\console\Input;

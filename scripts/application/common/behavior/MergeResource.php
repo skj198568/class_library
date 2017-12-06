@@ -6,7 +6,7 @@
  * Time: 10:07
  */
 
-namespace app\common\behavior;
+//namespace app\common\behavior;
 
 use ClassLibrary\ClMergeResource;
 

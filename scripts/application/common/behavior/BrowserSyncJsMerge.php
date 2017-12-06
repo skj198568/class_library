@@ -7,7 +7,7 @@
  * Time: 16:30
  */
 
-namespace app\common\behavior;
+//namespace app\common\behavior;
 
 
 use app\console\BrowserSync;

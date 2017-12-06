@@ -244,7 +244,6 @@ class ClFile
         $path = ClString::encoding($path, 'UTF-8');
         $path = str_replace('\\', '/', $path);
         $path = preg_replace('/\/+/', '/', $path);
-        $suffix = '';
         if (strpos($path, '/') === false) {
             $suffix = self::getSuffix($path);
             return ClString::hasChinese($path) ? (!empty($suffix) ? (ClString::toCrc32(trim($path, '.' . $suffix))) . '.' . $suffix : ClString::toCrc32($path)) : $path;
@@ -268,7 +267,6 @@ class ClFile
     public static function getMimeType($filename)
     {
         $path_info = pathinfo($filename);
-        $mime_type = '';
         switch ($path_info['extension']) {
             case 'htm':
                 $mime_type = 'text/html';
@@ -420,7 +418,7 @@ class ClFile
 
     /**
      * 抓取远程文件（支持大文件）
-     * @param $remote_file_url 远程文件地址
+     * @param string $remote_file_url 远程文件地址
      * @param string $local_absolute_file 本地文件绝对地址
      * @return bool|string 下载的文件绝对地址
      */

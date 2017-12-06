@@ -21,7 +21,6 @@ class MergeResource
     /**
      * 执行
      * @param $content
-     * @return bool
      */
     public function run(&$content){
         $content = ClMergeResource::merge($content);

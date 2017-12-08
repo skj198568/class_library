@@ -30,10 +30,10 @@ class ClGeo
 
     /**
      * 计算两点间的距离
-     * @param $a_wei a点纬度
-     * @param $a_jing a点经度
-     * @param $b_wei b点纬度
-     * @param $b_jing b点经度
+     * @param integer $a_wei a点纬度
+     * @param integer $a_jing a点经度
+     * @param integer $b_wei b点纬度
+     * @param integer $b_jing b点经度
      * @return float
      */
     public static function getDistance($a_wei, $a_jing, $b_wei, $b_jing)
@@ -51,13 +51,14 @@ class ClGeo
     }
 
     /**
-     * 依据地址获取经纬度
-     * @param $address
-     * @return mixed
+     * 依据地址获取经纬度，建议缓存查询结果
+     * @param string $address 地址
+     * @param string $key qq开发者key
+     * @return bool
      */
-    public static function getByAddress($address)
+    public static function getByAddress($address, $key = '')
     {
-        $r = ClHttp::http(sprintf('http://apis.map.qq.com/ws/geocoder/v1/?address=%s&key=%s', urlencode($address), self::$qq_key));
+        $r = ClHttp::http(sprintf('http://apis.map.qq.com/ws/geocoder/v1/?address=%s&key=%s', urlencode($address), empty($key) ? self::$qq_key : $key));
         return isset($r['result']['location']) ? $r['result']['location'] : false;
     }
 }

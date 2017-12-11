@@ -45,6 +45,10 @@ $files = [
 foreach($files as $file){
     //替换目录分隔符
     $file = str_replace('/', DIRECTORY_SEPARATOR, $file);
+    if(!is_file($file)){
+        echo $file.' not exist'.PHP_EOL;
+        continue;
+    }
     echo 'chown file: '.$target_file.PHP_EOL;
     $file_content = file_get_contents($file);
     $file_content_array = explode("\n", $file_content);

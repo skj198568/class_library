@@ -73,5 +73,5 @@ foreach($files as $file){
 }
 //linux环境下根目录权限修改
 if(strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN'){
-    exec(sprintf('chown %s www:www -R', $document_root_dir));
+    exec(sprintf('chown www:www %s -R', $document_root_dir));
 }

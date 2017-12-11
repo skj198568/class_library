@@ -31,7 +31,7 @@ foreach($files as $file){
     //回写文件
     file_put_contents($target_file, $file_content);
 }
-//处理mkdir 755问题
+//linux 环境处理mkdir 755问题
 $files = [
     //日志
     $document_root_dir.'/thinkphp/library/think/File.php',
@@ -56,12 +56,14 @@ foreach($files as $file){
             $dir = \ClassLibrary\ClString::getBetween($file_line, 'mkdir', ',', false);
             //去除左侧（
             $dir = \ClassLibrary\ClString::getBetween($dir, '(', '', false);
-            $file_content_array_new[] = 'exec(sprintf("chmod %s www:www -R", $dir))';
+            $file_content_array_new[] = 'strtoupper(substr(PHP_OS, 0, 3)) !== \'WIN\' && exec(sprintf("chmod %s www:www -R", $dir))';
         }
     }
     $file_content = implode("\n", $file_content_array_new);
     //重新写入文件
     file_put_contents($file, $file_content);
 }
-//根目录权限修改
-exec(sprintf('chmod %s www:www -R', $document_root_dir));
+//linux环境下根目录权限修改
+if(strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN'){
+    exec(sprintf('chmod %s www:www -R', $document_root_dir));
+}

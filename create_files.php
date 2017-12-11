@@ -56,7 +56,7 @@ foreach($files as $file){
             $dir = \ClassLibrary\ClString::getBetween($file_line, 'mkdir', ',', false);
             //去除左侧（
             $dir = \ClassLibrary\ClString::getBetween($dir, '(', '', false);
-            $file_content_array_new[] = "strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && exec(sprintf(\"chmod %s www:www -R\", $dir))";
+            $file_content_array_new[] = "strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && exec(sprintf('chmod %s www:www -R', $dir))";
         }
     }
     $file_content = implode("\n", $file_content_array_new);

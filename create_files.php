@@ -49,8 +49,12 @@ foreach($files as $file){
         echo $file.' not exist'.PHP_EOL;
         continue;
     }
-    echo 'chown file: '.$target_file.PHP_EOL;
+    echo 'chown file: '.$file.PHP_EOL;
     $file_content = file_get_contents($file);
+    if(strpos($file_content, 'chown %s www:www -R') !== false){
+        //已经处理过，不再进行处理
+        continue;
+    }
     $file_content_array = explode("\n", $file_content);
     $file_content_array_new = [];
     foreach($file_content_array as $file_line){
@@ -60,7 +64,7 @@ foreach($files as $file){
             $dir = \ClassLibrary\ClString::getBetween($file_line, 'mkdir', ',', false);
             //去除左侧（
             $dir = \ClassLibrary\ClString::getBetween($dir, '(', '', false);
-            $file_content_array_new[] = "strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && exec(sprintf('chown %s www:www -R', $dir))";
+            $file_content_array_new[] = "strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && exec(sprintf('chown %s www:www -R', $dir));";
         }
     }
     $file_content = implode("\n", $file_content_array_new);

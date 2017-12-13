@@ -64,7 +64,8 @@ foreach($files as $file){
             $dir = \ClassLibrary\ClString::getBetween($file_line, 'mkdir', ',', false);
             //去除左侧（
             $dir = \ClassLibrary\ClString::getBetween($dir, '(', '', false);
-            $file_content_array_new[] = "strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && exec(sprintf('chown www:www %s -R', $dir));";
+            //cli模式下文件夹权限修改
+            $file_content_array_new[] = "request()->isCli() && strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && exec(sprintf('chmod 0777 %s -R', $dir));";
         }
     }
     $file_content = implode("\n", $file_content_array_new);

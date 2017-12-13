@@ -72,7 +72,3 @@ foreach($files as $file){
     //重新写入文件
     file_put_contents($file, $file_content);
 }
-//linux环境下根目录权限修改
-if(strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN'){
-    exec(sprintf('chown www:www %s -R', $document_root_dir));
-}

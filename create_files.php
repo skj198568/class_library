@@ -51,7 +51,7 @@ foreach($files as $file){
     }
     echo 'chown file: '.$file.PHP_EOL;
     $file_content = file_get_contents($file);
-    if(strpos($file_content, 'chown www:www %s -R') !== false){
+    if(strpos($file_content, 'chmod 0777 %s -R') !== false){
         //已经处理过，不再进行处理
         continue;
     }

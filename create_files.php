@@ -21,17 +21,12 @@ $document_root_dir = implode(DIRECTORY_SEPARATOR, $document_root_dir);
 foreach($files as $file){
     $target_file = $document_root_dir.str_replace(__DIR__.DIRECTORY_SEPARATOR.'scripts', '', $file);
     //替换文件名
-    $target_file = str_replace('.php.tpl', '.php', $file);
+    $target_file = str_replace('.php.tpl', '.php', $target_file);
     //如果目标文件不存在，则新建
     \ClassLibrary\ClFile::dirCreate($target_file);
     //覆盖文件
     echo 'copy file: '.$target_file.PHP_EOL;
     copy($file, $target_file);
-    $file_content = file_get_contents($target_file);
-    //替换命名空间
-    $file_content = str_replace(['//namespace ', '// namespace '], ['namespace ', 'namespace '], $file_content);
-    //回写文件
-    file_put_contents($target_file, $file_content);
 }
 //linux 环境处理mkdir 755问题
 $files = [

@@ -6,7 +6,7 @@
  * Time: 17:33
  */
 
-//namespace app\console;
+namespace app\console;
 
 
 use ClassLibrary\ClFieldVerify;

@@ -52,6 +52,12 @@ class {$table_name}BaseApiController extends ApiController
 
     /**
      * 创建
+     * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
      */
     public function create()
     {
@@ -66,6 +72,12 @@ class {$table_name}BaseApiController extends ApiController
 
     /**
      * 更新
+     * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\BindParamException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     * @throws \think\exception\PDOException
      */
     public function update()
     {

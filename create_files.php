@@ -20,6 +20,8 @@ $document_root_dir = implode(DIRECTORY_SEPARATOR, $document_root_dir);
 //循环覆盖文件
 foreach($files as $file){
     $target_file = $document_root_dir.str_replace(__DIR__.DIRECTORY_SEPARATOR.'scripts', '', $file);
+    //替换文件名
+    $target_file = str_replace('.php.tpl', '.php', $file);
     //如果目标文件不存在，则新建
     \ClassLibrary\ClFile::dirCreate($target_file);
     //覆盖文件

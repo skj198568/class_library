@@ -7,7 +7,7 @@
  * Time: 18:22
  */
 
-//namespace app\api\controller;
+namespace app\api\controller;
 
 
 use app\index\model\BaseModel;
@@ -57,9 +57,25 @@ class ApiController extends Controller
     protected function ar($code, $data = [], $example = '', $is_log = false)
     {
         $status = sprintf('%s-%s-%s-%s', request()->module(), request()->controller(), request()->action(), $code);
+        $data = is_array($data) ? $data : [$data];
+        //是否包含
+        $api_include_example = get_param('api_include_example', ClFieldVerify::instance()->verifyNumber()->verifyInArray([0, 1])->fetchVerifies(), '返回值是否包含例子', 0);
+        if($api_include_example != 0){
+            if(!empty($example)){
+                $example = trim($example);
+                $example = str_replace(["\t", "\n"], ['', ''], $example);
+            }
+            //解码为数组
+            $example = json_decode($example, true);
+            if(!isset($data['example'])){
+                $data['example'] = $example;
+            }else{
+                $data['example_'.rand(1, 99)] = $example;
+            }
+        }
         return json_return(array_merge([
             'status' => $status,
-        ], is_array($data) ? $data : [$data]), $is_log);
+        ], $data), $is_log);
     }
 
     /**

@@ -6,7 +6,7 @@
  * Time: 18:31
  */
 
-//namespace app\index\model;
+namespace app\index\model;
 
 use ClassLibrary\ClCache;
 use ClassLibrary\ClFieldVerify;

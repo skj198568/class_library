@@ -50,7 +50,7 @@ class ApiDoc extends Command
         $api = [];
         foreach($files as $each_file){
             $output->info($each_file);
-//            if(strpos($each_file, 'Jobs') === false){
+//            if(strpos($each_file, 'Area') === false){
 //                continue;
 //            }
             //获取所有函数，包括所有继承的父类
@@ -77,10 +77,10 @@ class ApiDoc extends Command
             foreach($functions as $k => $each_function){
                 list($each_file_temp, $each_function) = $each_function;
 //                le_info($k);
-//                if(strpos($each_file_temp, 'GroupMajorCoverageAndFreedomBas') === false){
+//                if(strpos($each_file_temp, 'AreaBase') === false){
 //                    continue;
 //                }
-//                if($k !== 'create'){
+//                if($k !== 'getList'){
 //                    continue;
 //                }
                 $desc = $this->getDescByFunctionContent($each_function);
@@ -172,6 +172,9 @@ class ApiDoc extends Command
      * @return array|mixed
      */
     private function getAllFunctions($file_absolute_url, $function_name = '', $function_types = ['public']){
+//        if(strpos($file_absolute_url, 'AreaBase') === false){
+//            return [];
+//        }
         $content = file_get_contents($file_absolute_url);
         $return = [];
         $all_functions = [];
@@ -210,10 +213,10 @@ class ApiDoc extends Command
         if(!empty($temp)){
             foreach($all_functions as $each_function){
                 if(strpos($temp, $each_function) !== false){
-                    //去除多余的最后一个}
-                    $temp_array = explode("\n", trim($temp));
-                    array_pop($temp_array);
-                    $temp = implode("\n", $temp_array);
+//                    //去除多余的最后一个}
+//                    $temp_array = explode("\n", trim($temp));
+//                    array_pop($temp_array);
+//                    $temp = implode("\n", $temp_array);
                     //去除所有注释
                     if(strpos($temp, '/**') !== false){
                         $temp = str_replace(ClString::getBetween($temp, '/**', '*/'), '', $temp);
@@ -507,7 +510,7 @@ class ApiDoc extends Command
      * @return array
      */
     private function getAjaxReturnByFunctionContent($function_content){
-        $ar_functions = ClString::parseToArray($function_content, '->ar', '\);');
+        $ar_functions = ClString::parseToArray($function_content, '->ar', "}\n");
         $ar_return = [];
         foreach($ar_functions as $each){
             $function_name = $this->getFunctionName($function_content);

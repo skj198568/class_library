@@ -43,7 +43,7 @@ class {$table_name}BaseApiController extends ApiController
      */
     public function get()
     {
-        $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '主键id或id数组');
+        $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id或id数组');
         $info = {$table_name}Model::getById($id);
         //拼接额外字段 & 格式化相关字段
         $info = {$table_name}Model::showFormat({$table_name}Model::showMapFields($info));
@@ -53,11 +53,6 @@ class {$table_name}BaseApiController extends ApiController
     /**
      * 创建
      * @return \think\response\Json|\think\response\Jsonp
-     * @throws \think\db\exception\BindParamException
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     * @throws \think\exception\PDOException
      */
     public function create()
     {
@@ -73,15 +68,10 @@ class {$table_name}BaseApiController extends ApiController
     /**
      * 更新
      * @return \think\response\Json|\think\response\Jsonp
-     * @throws \think\db\exception\BindParamException
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     * @throws \think\exception\PDOException
      */
     public function update()
     {
-        $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '主键id或id数组');
+        $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id或id数组');
         $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields());
         //更新
         {$table_name}Model::instance()->where([
@@ -101,7 +91,7 @@ class {$table_name}BaseApiController extends ApiController
      */
     public function delete()
     {
-        $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '主键id或id数组');
+        $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id或id数组');
         //删除
         {$table_name}Model::instance()->where([
             {$table_name}Model::F_ID => is_array($id) ? ['in', $id] : $id

@@ -7,7 +7,7 @@
 <notempty name="params">
 
 ##### params
-名称|过滤条件|描述
+名称|校验条件|描述
 ---|---|---
 <foreach name="params" item="vo">
 {$vo['name']}|{$vo['filters']}|<?php echo ($vo['remark']."\n"); ?>

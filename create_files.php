@@ -24,9 +24,18 @@ foreach($files as $file){
     $target_file = str_replace('.php.tpl', '.php', $target_file);
     //如果目标文件不存在，则新建
     \ClassLibrary\ClFile::dirCreate($target_file);
-    //覆盖文件
-    echo 'copy file: '.$target_file.PHP_EOL;
-    copy($file, $target_file);
+    //ApiController.php文件特殊处理
+    if(strpos($target_file, 'ApiController.php') !== false){
+        if(!is_file($target_file)){
+            //如果文件不存在，则覆盖文件，存在则忽略
+            echo 'copy file: '.$target_file.PHP_EOL;
+            copy($file, $target_file);
+        }
+    }else{
+        //覆盖文件
+        echo 'copy file: '.$target_file.PHP_EOL;
+        copy($file, $target_file);
+    }
 }
 //linux 环境处理mkdir 755问题
 $files = [

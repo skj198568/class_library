@@ -133,7 +133,7 @@ class ApiDoc extends Command
         $api_content = $this->view->fetch($api_item_template, [
             'api_items' => $api_items,
             'create_time' => date('Y-m-d H:i:s'),
-            'api_count' => $item_index+1,
+            'api_count' => $item_index,
             'menu' => array_values($menu)
         ]);
         //处理api

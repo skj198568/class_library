@@ -97,6 +97,8 @@ class ApiDoc extends Command
         $api_item_template = __DIR__ . '/api_doc_templates/api_item.html';
         $id = 0;
 //        le_info($api);
+        $item_index = 0;
+        $menu = [];
         foreach($api as $request_url => $each_content){
             $id++;
             foreach ($each_content[1] as $param_key => $param_item){
@@ -104,18 +106,35 @@ class ApiDoc extends Command
                     $each_content[1][$param_key]['filters'] = str_replace(';', '<span style="color: blue;">; </span>', $param_item['filters']);
                 }
             }
+            $a_name = 'name'.str_replace('/', '_', $request_url);
             $api_items .=  $this->view->fetch($api_item_template, [
                     'id' => $id,
                     'api_desc' => $each_content[0]."\n",
                     'url' => str_replace('/', '<span style="color: blue;">/</span>', $request_url)."\n",
                     'params' => $each_content[1],
-                    'ar_returns' => $each_content[2]
+                    'ar_returns' => $each_content[2],
+                    'a_name' => $a_name,
+                    'item_index' => $item_index
                 ]);
+            $item_index++;
+            $request_url_array = explode('/', trim($request_url, '/'));
+            if(!isset($menu[$request_url_array[1]])){
+                $menu[$request_url_array[1]]['name'] = ClString::getBetween($each_content[0], '', '/', false);
+                $menu[$request_url_array[1]]['controller'] = $request_url_array[1];
+                $menu[$request_url_array[1]]['sons'] = [];
+            }
+            $menu[$request_url_array[1]]['sons'][] = [
+                'id' => $item_index,
+                'name' => $each_content[0],
+                'href' => $a_name
+            ];
         }
         $api_item_template = __DIR__ . '/api_doc_templates/api.html';
         $api_content = $this->view->fetch($api_item_template, [
             'api_items' => $api_items,
-            'create_time' => date('Y-m-d H:i:s')
+            'create_time' => date('Y-m-d H:i:s'),
+            'api_count' => $item_index+1,
+            'menu' => array_values($menu)
         ]);
         //处理api
         $file_absolute_url = sprintf(DOCUMENT_ROOT_PATH.'/doc/api/%s.html', date('y.m.d.H.i'));

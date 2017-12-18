@@ -36,7 +36,7 @@ class SmartInit extends Command
     protected function configure()
     {
         $this->setName('smart_init')
-            ->addOption('--table_name', '-t', Option::VALUE_REQUIRED, '不带前缀的数据库表名，例如：user_goods，如果参数为，init_all_tables，则创建所有表')
+            ->addOption('--table_name', '-t', Option::VALUE_REQUIRED, '不带前缀的数据库表名，例如：user_goods，如果参数为空则创建所有表')
             ->setDescription('依据数据库表自动创建Model模型、ApiController接口');
     }
 
@@ -76,10 +76,6 @@ class SmartInit extends Command
     {
         $table_name = $input->getOption('table_name');
         if (empty($table_name)) {
-            $output->highlight('the input --table_name isn\'t empty');
-            return false;
-        }
-        if ($table_name == 'init_all_tables') {
             //创建所有的
             $table_names = $this->getAllTables();
         } else {
@@ -331,10 +327,6 @@ class SmartInit extends Command
         ClMysql::init(config('database.hostname'), config('database.hostport'), config('database.username'), config('database.password'), config('database.database'));
         $table_name = $input->getOption('table_name');
         if (empty($table_name)) {
-            $output->highlight('the input --table_name isn\'t empty');
-            return false;
-        }
-        if ($table_name == 'init_all_tables') {
             //创建所有的
             $table_names = $this->getAllTables();
         } else {

@@ -357,7 +357,7 @@ class BaseModel extends Query
      */
     public function cache($key = true, $expire = null, $tag = null)
     {
-        if(empty($expire)){
+        if(is_null($expire)){
             $key = false;
         }else{
             $key = call_user_func_array(['ClCache', 'getKey'], $key);

@@ -9,7 +9,6 @@
 
 namespace app\api\base;
 use app\index\model\BaseModel;
-use ClassLibrary\ClCache;
 use ClassLibrary\ClFieldVerify;
 use think\Controller;
 
@@ -70,13 +69,13 @@ class BaseApiController extends Controller
      * @param $where
      * @param string $call_back 回调函数
      * @param int $limit 每页显示数
-     * @param int $duration 缓存时间
+     * @param null $duration 缓存时间，秒数
      * @return array
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    protected function paging(BaseModel $model_instance, $where, $call_back = '', $limit = PAGES_NUM, $duration = 0)
+    protected function paging(BaseModel $model_instance, $where, $call_back = '', $limit = PAGES_NUM, $duration = null)
     {
         $limit = get_param('limit', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '每页显示数量', $limit);
         $total = get_param('total', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '总数，默认为0', 0);
@@ -89,7 +88,7 @@ class BaseApiController extends Controller
             'total' => $total
         ];
         $return['rows'] = $model_instance
-            ->cache(ClCache::getKey($model_instance->getTable(), $where, $order, $page, $limit, 'rows'), $duration)
+            ->cache([$model_instance->getTable(), $where, $order, $page, $limit, 'rows'], $duration)
             ->where($where)
             ->order([
                 $sort => $order
@@ -102,7 +101,7 @@ class BaseApiController extends Controller
         }
         if (empty($total)) {
             $return['total'] = $model_instance
-                ->cache(ClCache::getKey($model_instance->getTable(), $where, $order, $page, $limit, 'total'), $duration)
+                ->cache([$model_instance->getTable(), $where, $order, $page, $limit, 'total'], $duration)
                 ->where($where)
                 ->count();
         }

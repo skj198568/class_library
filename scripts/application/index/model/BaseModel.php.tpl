@@ -348,4 +348,22 @@ class BaseModel extends Query
 
     }
 
+    /**
+     * 重写cache方法，用于控制缓存的key
+     * @param bool|mixed|array $key
+     * @param null $expire
+     * @param null $tag
+     * @return $this
+     */
+    public function cache($key = true, $expire = null, $tag = null)
+    {
+        if(empty($expire)){
+            $key = false;
+        }else{
+            $key = call_user_func_array(['ClCache', 'getKey'], $key);
+        }
+        parent::cache($key, $expire, $tag);
+        return $this;
+    }
+
 }

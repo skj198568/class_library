@@ -85,7 +85,7 @@ class {$table_name}Map extends BaseModel
                 }
                 return $items;
             }
-            $info = static::instance()->cache(ClCache::getKey($id), $duration)->where([
+            $info = static::instance()->cache([$id], $duration)->where([
                 self::F_ID => $id
             ])->find();
             if(empty($info)){

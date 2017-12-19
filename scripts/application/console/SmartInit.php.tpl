@@ -211,7 +211,7 @@ class SmartInit extends Command
                 if(!$has_verify_length_max){
                     $max_length = ClString::getBetween($each['Type'], '(', ')', false);
                     if(is_numeric($max_length) && $max_length > 0){
-                        $field_comment['verifies'] = ClFieldVerify::instance()->verifyStringLengthMax($max_length)->fetchVerifies();
+                        $field_comment['verifies'] = array_merge($field_comment['verifies'], ClFieldVerify::instance()->verifyStringLengthMax($max_length)->fetchVerifies());
                     }
                 }
             }else{

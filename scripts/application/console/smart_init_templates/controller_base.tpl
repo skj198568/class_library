@@ -21,6 +21,9 @@ class {$table_name}BaseApiController extends ApiController
     /**
      * 列表
      * @return \think\response\Json|\think\response\Jsonp
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public function getList()
     {

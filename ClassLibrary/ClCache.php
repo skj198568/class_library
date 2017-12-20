@@ -103,7 +103,10 @@ class ClCache
      */
     public static function getKey()
     {
-        $function = self::getFunctionHistory(4);
+        $function = self::getFunctionHistory(2);
+        if($function == 'call_user_func_array'){
+            $function = self::getFunctionHistory(4);
+        }
         $args = func_get_args();
         if (count($args) > 0) {
             $function .= self::createKeyByParams($args);

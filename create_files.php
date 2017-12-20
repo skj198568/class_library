@@ -25,7 +25,7 @@ foreach($files as $file){
     //如果目标文件不存在，则新建
     \ClassLibrary\ClFile::dirCreate($target_file);
     //不可直接覆盖的文件特殊处理
-    if(in_array(target_file, ['ApiController.php', 'task_run.ini'])){
+    if(in_array($target_file, ['ApiController.php', 'task_run.ini'])){
         if(!is_file($target_file)){
             //如果文件不存在，则覆盖文件，存在则忽略
             echo 'copy file: '.$target_file.PHP_EOL;

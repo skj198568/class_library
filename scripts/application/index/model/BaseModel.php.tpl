@@ -360,7 +360,7 @@ class BaseModel extends Query
         if(is_null($expire)){
             $key = false;
         }else{
-            $key = call_user_func_array(['ClCache', 'getKey'], $key);
+            $key = call_user_func_array(['\ClassLibrary\ClCache', 'getKey'], $key);
         }
         parent::cache($key, $expire, $tag);
         return $this;

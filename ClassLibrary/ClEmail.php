@@ -9,6 +9,7 @@
 
 namespace ClassLibrary;
 
+use PHPMailer\PHPMailer\PHPMailer;
 use think\Exception;
 
 /**
@@ -70,9 +71,9 @@ class ClEmail
 
     /**
      * 初始化
-     * @param $smtp_user 账号
-     * @param $smtp_password 密码
-     * @param $smtp_host SMTP 服务器
+     * @param string $smtp_user 账号
+     * @param string $smtp_password 密码
+     * @param string $smtp_host SMTP 服务器
      * @param int $smtp_port SMTP 端口
      * @param string $from_email 发件人邮箱
      * @param string $from_name 发件人姓名
@@ -93,13 +94,12 @@ class ClEmail
 
     /**
      * 获取实例
-     * @return \PHPMailer
+     * @return null|PHPMailer
      */
     private static function getInstance()
     {
         if (self::$model_instance == null) {
-            include_once "PHPMailer/PHPMailerAutoload.php";
-            self::$model_instance = new \PHPMailer();
+            self::$model_instance = new PHPMailer();
         }
         return self::$model_instance;
     }
@@ -112,6 +112,7 @@ class ClEmail
      * @param array $attachment 附件列表
      * @return boolean
      * @throws Exception
+     * @throws \PHPMailer\PHPMailer\Exception
      */
     public static function send($to_email_info, $title = '', $body = '', $attachment = [])
     {
@@ -120,12 +121,11 @@ class ClEmail
         }
         self::getInstance()->CharSet = 'UTF-8'; //设定邮件编码，默认ISO-8859-1，如果发中文此项必须设置，否则乱码
         self::getInstance()->IsSMTP();  // 设定使用SMTP服务
-        self::getInstance()->SMTPAuth = true;
         self::getInstance()->SMTPDebug = 0;                     // 关闭SMTP调试功能
         // 1 = errors and messages
         // 2 = messages only
         self::getInstance()->SMTPAuth = true;                  // 启用 SMTP 验证功能
-        self::getInstance()->SMTPSecure = '';                 // 使用安全协议
+        self::getInstance()->SMTPSecure = self::$smtp_port == 25 ? '' : 'ssl';                 // 使用安全协议
         self::getInstance()->Host = self::$smtp_host;  // SMTP 服务器
         self::getInstance()->Port = self::$smtp_port;  // SMTP服务器的端口号
         self::getInstance()->Username = self::$smtp_user;  // SMTP服务器用户名

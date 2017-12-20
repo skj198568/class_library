@@ -8,7 +8,6 @@
  */
 
 namespace ClassLibrary;
-use think\Cache;
 
 /**
  * class library cache
@@ -104,7 +103,7 @@ class ClCache
      */
     public static function getKey()
     {
-        $function = self::getFunctionHistory(2);
+        $function = self::getFunctionHistory(4);
         $args = func_get_args();
         if (count($args) > 0) {
             $function .= self::createKeyByParams($args);
@@ -135,7 +134,7 @@ class ClCache
         }else{
             self::$get_remove_keys[] = $function;
         }
-        foreach ([$function, $function . self::$seg_str . 'clCacheKeys'] as $key_each) {
+        foreach ([$function, $function . self::$seg_str . 'k'] as $key_each) {
             cache($key_each, null);
         }
         return true;
@@ -161,8 +160,6 @@ class ClCache
         }
         $father_key = explode(self::$seg_str, $key);
         $key_father_temp = '';
-        $key_temp = '';
-        $map = [];
         $father_key_count = count($father_key) - 1;
         for ($i = 0; $i < $father_key_count; $i++) {
             if ($key_father_temp == '') {
@@ -171,13 +168,13 @@ class ClCache
                 $key_father_temp = $key_father_temp . self::$seg_str . $father_key[$i];
             }
             $key_temp = $key_father_temp . self::$seg_str . $father_key[$i + 1];
-            $map = cache($key_father_temp . self::$seg_str . 'clCacheKeys');
+            $map = cache($key_father_temp . self::$seg_str . 'k');
             if (empty($map)) {
-                cache($key_father_temp . self::$seg_str . 'clCacheKeys', [$key_temp]);
+                cache($key_father_temp . self::$seg_str . 'k', [$key_temp]);
             } else {
                 if (!in_array($key_temp, $map)) {
                     $map[] = $key_temp;
-                    cache($key_father_temp . self::$seg_str . 'clCacheKeys', $map);
+                    cache($key_father_temp . self::$seg_str . 'k', $map);
                 }
             }
         }
@@ -197,8 +194,6 @@ class ClCache
         }
         $father_key = explode(self::$seg_str, $key);
         $key_father_temp = '';
-        $key_temp = '';
-        $map = [];
         $father_key_count = count($father_key) - 1;
         for ($i = 0; $i < $father_key_count; $i++) {
             if ($key_father_temp == '') {
@@ -207,7 +202,7 @@ class ClCache
                 $key_father_temp = $key_father_temp . self::$seg_str . $father_key[$i];
             }
             $key_temp = $key_father_temp . self::$seg_str . $father_key[$i + 1];
-            $map = cache($key_father_temp . self::$seg_str . 'clCacheKeys');
+            $map = cache($key_father_temp . self::$seg_str . 'k');
             //map不存在，或者是不在map里，均认为该key对应的value，不是最新的值
             if (!(is_array($map) && in_array($key_temp, $map))) {
                 //该key对应的value为无效数据，进行删除操作

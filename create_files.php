@@ -31,6 +31,47 @@ foreach($files as $file){
             echo 'copy file: '.$target_file.PHP_EOL;
             copy($file, $target_file);
         }
+    }else if($target_file == 'tags.php'){
+        if(!is_file($target_file)){
+            //直接复制
+            echo 'copy file: '.$target_file.PHP_EOL;
+            copy($file, $target_file);
+        }else{
+            //更改内容
+            $file_content = file_get_contents($target_file);
+            $str = \ClassLibrary\ClString::getBetween($file_content, 'view_filter', ']');
+            //再次获取
+            $str_params = \ClassLibrary\ClString::getBetween($str, '[', ']');
+            if(empty($str_params)){
+                //直接添加
+                $str_target = str_replace($str_params, "['app\\common\\behavior\\MergeResource', 'app\\common\\behavior\\BrowserSyncJsMerge']", $str);
+                //替换
+                $file_content = str_replace($str, $str_target, $file_content);
+                //回写
+                file_put_contents($target_file, $file_content);
+                echo 'modify file: '.$target_file.PHP_EOL;
+            }else{
+                if(strpos($str_params, 'MergeResource') === false && strpos($str_params, 'BrowserSyncJsMerge') === false){
+                    //拼接添加
+                    $str_target = str_replace($str_params, trim($str_params, ']').", 'app\\common\\behavior\\MergeResource', 'app\\common\\behavior\\BrowserSyncJsMerge']", $str);
+                    //替换
+                    $file_content = str_replace($str, $str_target, $file_content);
+                    //回写
+                    file_put_contents($target_file, $file_content);
+                    echo 'modify file: '.$target_file.PHP_EOL;
+                }
+            }
+        }
+    }else if($target_file == 'command.php'){
+        $file_content = file_get_contents($target_file);
+        foreach(['app\console\SmartInit', 'app\console\BrowserSync', 'app\console\TaskRun', 'app\console\ApiDoc'] as $each_command){
+            if(strpos($file_content, $each_command) === false){
+                $file_content = str_replace(']', "\t$each_command\n", $file_content);
+            }
+        }
+        //回写文件
+        file_put_contents($target_file, $file_content);
+        echo 'modify file: '.$target_file.PHP_EOL;
     }else{
         //覆盖文件
         echo 'copy file: '.$target_file.PHP_EOL;

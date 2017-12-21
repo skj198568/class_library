@@ -1,10 +1,11 @@
 # class_library
 tp5快速开发常用类库
 ### composer使用
+修改配置
 ```
-composer require "skj198568/class_library"
+"minimum-stability":"dev"
 ```
-### 修改框架composer.json文件
+修改执行脚本
 ```
 "scripts":{
     "post-update-cmd": [
@@ -12,8 +13,7 @@ composer require "skj198568/class_library"
     ]
 },
 ```
-### composer更新
+#### 执行命令
 ```
-composer update
+composer require "skj198568/class_library"
 ```
-执行完update，会创建相关文件夹和文件。

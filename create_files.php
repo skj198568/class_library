@@ -66,7 +66,7 @@ foreach($files as $file){
         $file_content = file_get_contents($target_file);
         foreach(['app\console\SmartInit', 'app\console\BrowserSync', 'app\console\TaskRun', 'app\console\ApiDoc'] as $each_command){
             if(strpos($file_content, $each_command) === false){
-                $file_content = str_replace(']', "\t$each_command\n", $file_content);
+                $file_content = str_replace('];', "\t$each_command\n];", $file_content);
             }
         }
         //回写文件
@@ -119,3 +119,28 @@ foreach($files as $file){
     //重新写入文件
     file_put_contents($file, $file_content);
 }
+//系统config文件修复
+$file = $document_root_dir.'/application/config.php';
+$file_content = file_get_contents($file);
+//控制器
+$search = \ClassLibrary\ClString::getBetween($file_content, 'controller_suffix', ',');
+$file_content = str_replace($search, "controller_suffix' => true,", $file_content);
+//模板
+$search = \ClassLibrary\ClString::getBetween($file_content, 'taglib_begin', ',');
+$file_content = str_replace($search, "taglib_begin' => '<',", $file_content);
+$search = \ClassLibrary\ClString::getBetween($file_content, 'taglib_end', ',');
+$file_content = str_replace($search, "taglib_end' => '>',", $file_content);
+//日志级别修改
+$search = \ClassLibrary\ClString::getBetween($file_content, 'level', ']');
+$replace = \ClassLibrary\ClString::getBetween($search, '[', ']', false);
+$log_level = ['\think\Log::ERROR', '\think\Log::NOTICE', '\think\Log::SQL', '\think\Log::LOG'];
+$replace = trim($replace, ',');
+foreach(['\think\Log::ERROR', '\think\Log::NOTICE', '\think\Log::SQL', '\think\Log::LOG'] as $each_level){
+    if(strpos($replace, $each_level) === false){
+        $replace .= ', '. $each_level;
+    }
+}
+$replace = trim($replace, ',');
+$file_content = str_replace($search, "level' => [$replace]", $file_content);
+//回写
+file_put_contents($file, $file_content);

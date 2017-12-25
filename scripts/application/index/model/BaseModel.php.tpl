@@ -313,7 +313,6 @@ class BaseModel extends Query
                     }else{
                         //数组式格式化
                         foreach($each_format_item[0] as $each_format_item_each){
-                            echo_info($each_format_item_each, $k_format_key);
                             if($each_format_item_each[0] == $item[$k_format_key]){
                                 $item[$k_format_key.$each_format_item[1]] = $each_format_item_each[1];
                             }

@@ -5,7 +5,7 @@ tp5快速开发常用类库
 ```
 "minimum-stability":"dev"
 ```
-修改执行脚本
+添加执行脚本
 ```
 "scripts":{
     "post-install-cmd": [

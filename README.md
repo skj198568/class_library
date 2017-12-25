@@ -8,6 +8,9 @@ tp5快速开发常用类库
 修改执行脚本
 ```
 "scripts":{
+    "post-install-cmd": [
+        "php vendor/skj198568/class_library/create_files.php"
+    ],
     "post-update-cmd": [
         "php vendor/skj198568/class_library/create_files.php"
     ]

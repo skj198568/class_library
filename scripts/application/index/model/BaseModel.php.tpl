@@ -262,9 +262,12 @@ class BaseModel extends Query
                         //考虑性能，对查询结果进行缓存
                         $key = sprintf('app\index\model\%s::getValueById(%s, %s)', $model, $each[$field], $fetch_field);
                         if(!isset($values[$key])){
-                            $each[$alias] = forward_static_call_array([sprintf('app\index\model\%s', $model), 'getValueById'], [$each[$field], $fetch_field]);
+                            $each[$alias] = call_user_func_array([sprintf('app\index\model\%s', $model), 'getValueById'], [$each[$field], $fetch_field]);
+                            //赋值
+                            $values[$key] = $each[$alias];
                         }
-                        $values[$key] = $each[$alias];
+                        //获取信息
+                        $each[$alias] = $values[$key];
                     }
                 }
                 $items[$k] = $each;

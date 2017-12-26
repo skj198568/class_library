@@ -14,7 +14,7 @@ tp5快速开发常用类库
     "post-update-cmd": [
         "php vendor/skj198568/class_library/create_files.php"
     ]
-},
+}
 ```
 #### 执行命令
 ```

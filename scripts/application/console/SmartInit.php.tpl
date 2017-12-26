@@ -389,11 +389,11 @@ class SmartInit extends Command
             }
         }
         $ar_get_json = [
-            'status' => sprintf('api-%s-get-1', $table_name_format),
+            'status' => strtolower(sprintf('api-%s-get-1', $table_name_format)),
             'info' => $info
         ];
         $ar_get_list_json = [
-            'status' => sprintf('api-%s-getList-1', $table_name_format),
+            'status' => strtolower(sprintf('api-%s-getList-1', $table_name_format)),
             'rows' => [$info]
         ];
         $map_template_file = __DIR__ . '/smart_init_templates/controller_base.tpl';

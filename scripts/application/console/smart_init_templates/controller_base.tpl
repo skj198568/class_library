@@ -60,7 +60,7 @@ class {$table_name}BaseApiController extends ApiController
         //创建
         {$table_name}Model::instance()->insert($fields);
         return $this->ar(1, ['id' => {$table_name}Model::instance()->getLastInsID()], '{
-    "status" : "api-{$table_name}-create-1",
+    "status" : "api-{:strtolower($table_name)}-create-1",
     "id" : "主键id"
 }');
     }
@@ -78,7 +78,7 @@ class {$table_name}BaseApiController extends ApiController
             {$table_name}Model::F_ID => $id
         ])->setField($fields);
         return $this->ar(1, ['id' => $id], '{
-    "status" : "api-{$table_name}-update-1",
+    "status" : "api-{:strtolower($table_name)}-update-1",
     "id" : "主键id"
 }');
     }
@@ -97,7 +97,7 @@ class {$table_name}BaseApiController extends ApiController
             {$table_name}Model::F_ID => is_array($id) ? ['in', $id] : $id
         ])->delete();
         return $this->ar(1, ['id' => $id], '{
-    "status" : "api-{$table_name}-delete-1",
+    "status" : "api-{:strtolower($table_name)}-delete-1",
     "id" : "主键id"
 }');
     }

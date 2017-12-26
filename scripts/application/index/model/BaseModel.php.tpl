@@ -357,9 +357,14 @@ class BaseModel extends Query
     public function cache($key = true, $expire = null, $tag = null)
     {
         if(is_null($expire)){
-            $key = false;
+            if(is_numeric($key)){
+                $key = call_user_func_array(['\ClassLibrary\ClCache', 'getKey'], []);
+                $expire = $key;
+            }else{
+                $key = false;
+            }
         }else{
-            $key = call_user_func_array(['\ClassLibrary\ClCache', 'getKey'], $key);
+            $key = call_user_func_array(['\ClassLibrary\ClCache', 'getKey'], !is_array($key) ? [$key] : $key);
         }
         parent::cache($key, $expire, $tag);
         return $this;

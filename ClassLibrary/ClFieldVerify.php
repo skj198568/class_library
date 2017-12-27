@@ -808,9 +808,10 @@ class ClFieldVerify
                             break;
                         case 'unique':
                             if (isset($fields[$k_field]) && !is_null($instance)) {
-                                if ($instance->where([
-                                        $k_field => $fields[$k_field]
-                                    ])->count() > 0) {
+                                //不可使用Query封装的查询方法，因为会影响其他执行条件，应当使用原生sql查询
+                                $sql = sprintf('SELECT COUNT(*) AS tp_count FROM `%s` WHERE  `%s` = \'%s\' LIMIT 1', $instance->getTable(), $k_field, $fields[$k_field]);
+                                $tp_count = $instance->query($sql);
+                                if ($tp_count[0]['tp_count'] > 0) {
                                     $error_msg = sprintf('%s:%s 该值为unique，不可重复', $k_field, $fields[$k_field]);
                                 }
                             }

@@ -30,7 +30,7 @@ class {$table_name}BaseApiController extends ApiController
         $where = [];
         return $this->ar(1, $this->paging({$table_name}Model::instance(), $where, function ($items) {
             //拼接额外字段 & 格式化相关字段
-            return {$table_name}Model::showFormat({$table_name}Model::showMapFields($items));
+            return {$table_name}Model::forShow($items);
         }), '{$ar_get_list_json}');
     }
 
@@ -46,7 +46,7 @@ class {$table_name}BaseApiController extends ApiController
         $id = get_param({$table_name}Model::F_ID, ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '主键id或id数组');
         $info = {$table_name}Model::getById($id);
         //拼接额外字段 & 格式化相关字段
-        $info = {$table_name}Model::showFormat({$table_name}Model::showMapFields($info));
+        $info = {$table_name}Model::forShow($info);
         return $this->ar(1, ['info' => $info], '{$ar_get_json}');
     }
 

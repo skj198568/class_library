@@ -227,16 +227,18 @@ class BaseModel extends Query
      * @param $items
      * @return array|mixed
      */
-    public static function showMapFields($items){
+    private static function showMapFields($items){
         if(empty($items)){
             return $items;
         }
         if(empty(static::$fields_show_map_fields)) {
             return $items;
         }
+        $is_linear_array = false;
         //一维数组，处理成多维数组
         if (count($items) === count($items, 1)) {
             $items = [$items];
+            $is_linear_array = true;
         }
         //查询结果值
         $values = [];
@@ -273,7 +275,7 @@ class BaseModel extends Query
                 $items[$k] = $each;
             }
         }
-        if(count($items) == 1){
+        if($is_linear_array){
             return $items[0];
         }else{
             return $items;
@@ -285,16 +287,18 @@ class BaseModel extends Query
      * @param $items
      * @return array|mixed
      */
-    public static function showFormat($items){
+    private static function showFormat($items){
         if(empty($items)){
             return $items;
         }
         if(empty(static::$fields_show_format)){
             return $items;
         }
+        $is_linear_array = false;
         //一维数组，处理成多维数组
         if (count($items) === count($items, 1)) {
             $items = [$items];
+            $is_linear_array = true;
         }
         foreach($items as $k => $item){
             foreach(static::$fields_show_format as $k_format_key => $each_format){
@@ -325,7 +329,7 @@ class BaseModel extends Query
             }
             $items[$k] = $item;
         }
-        if(count($items) == 1){
+        if($is_linear_array){
             return $items[0];
         }else{
             return $items;
@@ -371,6 +375,15 @@ class BaseModel extends Query
         }
         parent::cache($key, $expire, $tag);
         return $this;
+    }
+
+    /**
+     * 拼接额外字段 & 格式化字段
+     * @param $items
+     * @return array|mixed
+     */
+    public static function forShow($items){
+        return self::showFormat(self::showMapFields($items));
     }
 
 }

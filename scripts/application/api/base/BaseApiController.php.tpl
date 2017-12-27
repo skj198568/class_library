@@ -91,7 +91,7 @@ class BaseApiController extends Controller
             'total' => $total
         ];
         $return['items'] = $model_instance
-            ->cache(ClCache::getKey($model_instance->getTable(), $where, $order, $page, $limit, 'items'), $duration)
+            ->cache([$model_instance->getTable(), $where, $order, $page, $limit, 'items'], $duration)
             ->where($where)
             ->order([
                 $sort => $order
@@ -104,7 +104,7 @@ class BaseApiController extends Controller
         }
         if (empty($total)) {
             $return['total'] = $model_instance
-                ->cache(ClCache::getKey($model_instance->getTable(), $where, $order, $page, $limit, 'total'), $duration)
+                ->cache([$model_instance->getTable(), $where, $order, $page, $limit, 'total'], $duration)
                 ->where($where)
                 ->count();
         }

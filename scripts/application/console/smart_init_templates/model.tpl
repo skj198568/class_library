@@ -16,21 +16,28 @@ class {$table_name}Model extends {$table_name}Map
 {
 
     /**
-     * 实例对象
-     * @var null
+     * 实例对象存放数组
+     * @var array
      */
-    private static $instance = null;
+    private static $instances_array = [];
 
     /**
      * 实例对象
-     * @return null|static
+     * @param int $id -1/获取实例数量，-2/自动新增一个实例
+     * @return mixed|null|static
      */
-    public static function instance()
+    public static function instance($id = 0)
     {
-        if (is_null(self::$instance)) {
-            self::$instance = new self();
+        if($id >= 0){
+            if (!isset(self::$instances_array[$id])) {
+                self::$instances_array[$id] = new self();
+            }
+            return self::$instances_array[$id];
+        }else if($id == -1){
+            return count(self::$instances_array);
+        }else if($id == -2){
+            return self::instance(count(self::$instances_array));
         }
-        return self::$instance;
     }
 
     /**

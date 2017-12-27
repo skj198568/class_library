@@ -206,7 +206,7 @@ class BaseModel extends Query
     public function update(array $data = [])
     {
         //校验参数
-        ClFieldVerify::verifyFields($data, static::$fields_verifies, 'update', static::instance());
+        ClFieldVerify::verifyFields($data, static::$fields_verifies, 'update', static::instance(), static::instance(-2));
         //自动完成字段
         if (in_array('update_time', static::getAllFields())) {
             if (!isset($data['update_time']) || empty($data['update_time'])) {
@@ -338,9 +338,10 @@ class BaseModel extends Query
 
     /**
      * 实例对象
-     * @return null|static
+     * @param int $id
+     * @return null
      */
-    public static function instance()
+    public static function instance($id = 0)
     {
         return null;
     }

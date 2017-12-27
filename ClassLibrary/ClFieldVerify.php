@@ -428,8 +428,9 @@ class ClFieldVerify
      * @param array $fields_verifies
      * @param string $type
      * @param BaseModel $instance
+     * @param BaseModel $new_instance
      */
-    public static function verifyFields($fields, $fields_verifies = [], $type = 'insert', $instance = null)
+    public static function verifyFields($fields, $fields_verifies = [], $type = 'insert', $instance = null, $new_instance = null)
     {
         //去除无需校验的字段
         foreach($fields as $k => $each_field){
@@ -816,11 +817,26 @@ class ClFieldVerify
                             break;
                         case 'unique':
                             if (isset($fields[$k_field]) && !is_null($instance)) {
-                                //不可使用Query封装的查询方法，因为会影响其他执行条件，应当使用原生sql查询
-                                $sql = sprintf('SELECT COUNT(*) AS tp_count FROM `%s` WHERE  `%s` = \'%s\' LIMIT 1', $instance->getTable(), $k_field, $fields[$k_field]);
-                                $tp_count = $instance->query($sql);
-                                if ($tp_count[0]['tp_count'] > 0) {
-                                    $error_msg = sprintf('%s:%s 该值为unique，不可重复', $k_field, $fields[$k_field]);
+                                if($type == 'insert'){
+                                    //插入，则只需要判断是否存在
+                                    $count = $new_instance->where([
+                                        $k_field => $fields[$k_field]
+                                    ])->count();
+                                    if ($count > 0) {
+                                        $error_msg = sprintf('%s:%s 该值为unique，不可重复', $k_field, $fields[$k_field]);
+                                    }
+                                }else{
+                                    //更新，则要判断where条件
+                                    $field_id = $new_instance->where([$k_field => $fields[$k_field]])->value($new_instance->getPk());
+                                    if(!empty($field_id)){
+                                        //存在值的情况
+                                        $where = $instance->getOptions('where');
+                                        $where_id = $new_instance->where($where['AND'])->value($new_instance->getPk());
+                                        if($field_id != $where_id){
+                                            //两个结果记录不同，则不可更新
+                                            $error_msg = sprintf('%s:%s 该值为unique，不可重复，已经存在记录id=%s', $k_field, $fields[$k_field], $field_id);
+                                        }
+                                    }
                                 }
                             }
                             break;

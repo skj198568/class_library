@@ -84,6 +84,7 @@ class BaseModel extends Query
      * @param string $sql
      * @param array $bind
      * @return int
+     * @throws \Exception
      * @throws \think\db\exception\BindParamException
      * @throws \think\exception\PDOException
      */

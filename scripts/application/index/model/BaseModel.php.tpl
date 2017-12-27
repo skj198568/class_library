@@ -315,7 +315,7 @@ class BaseModel extends Query
                         $item[$k_format_key.$each_format_item[1]] = trim(call_user_func_array($function, $params), "''");
                     }else{
                         //数组式格式化
-                        foreach($each_format_item[0] as $each_format_item_each){
+                        foreach((array)$each_format_item[0] as $each_format_item_each){
                             if($each_format_item_each[0] == $item[$k_format_key]){
                                 $item[$k_format_key.$each_format_item[1]] = $each_format_item_each[1];
                             }

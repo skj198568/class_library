@@ -137,7 +137,7 @@ class BaseModel extends Query
     public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null)
     {
         //校验参数
-        ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', static::instance());
+        ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', static::instance(), static::instance(-2));
         //自动完成字段
         if (in_array('create_time', static::getAllFields())) {
             if (!isset($data['create_time']) || empty($data['create_time'])) {
@@ -171,7 +171,7 @@ class BaseModel extends Query
     {
         //校验参数
         foreach ($dataSet as $data) {
-            ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', static::instance());
+            ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', static::instance(), static::instance(-2));
         }
         //自动完成字段
         foreach ($dataSet as $k_data => $data) {
@@ -339,7 +339,7 @@ class BaseModel extends Query
     /**
      * 实例对象
      * @param int $id
-     * @return null
+     * @return mixed|null|static
      */
     public static function instance($id = 0)
     {

@@ -431,6 +431,14 @@ class ClFieldVerify
      */
     public static function verifyFields($fields, $fields_verifies = [], $type = 'insert', $instance = null)
     {
+        //去除无需校验的字段
+        foreach($fields as $k => $each_field){
+            if(is_array($each_field) && isset($each_field[0])){
+                if(in_array($each_field[0], ['exp', 'inc', 'dec'])){
+                    unset($fields[$k]);
+                }
+            }
+        }
         $error_msg = '';
         foreach ($fields_verifies as $k_field => $each_verify) {
             foreach ($each_verify as $v_verify) {

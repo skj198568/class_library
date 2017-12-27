@@ -72,13 +72,13 @@ class BaseApiController extends Controller
      * @param $where
      * @param string $call_back 回调函数
      * @param int $limit 每页显示数
-     * @param int $duration 缓存时间
+     * @param null|int $duration 缓存时间
      * @return array
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    protected function paging(BaseModel $model_instance, $where, $call_back = '', $limit = PAGES_NUM, $duration = 0)
+    protected function paging(BaseModel $model_instance, $where, $call_back = '', $limit = PAGES_NUM, $duration = null)
     {
         $limit = get_param('limit', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '每页显示数量', $limit);
         $total = get_param('total', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '总数，默认为0', 0);

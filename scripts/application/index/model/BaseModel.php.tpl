@@ -138,7 +138,7 @@ class BaseModel extends Query
     public function insert(array $data = [], $replace = false, $getLastInsID = false, $sequence = null)
     {
         //校验参数
-        ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', static::instance(), static::instance(-2));
+        ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', static::instance());
         //自动完成字段
         if (in_array('create_time', static::getAllFields())) {
             if (!isset($data['create_time']) || empty($data['create_time'])) {

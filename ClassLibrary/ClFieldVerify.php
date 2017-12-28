@@ -428,9 +428,8 @@ class ClFieldVerify
      * @param array $fields_verifies
      * @param string $type
      * @param BaseModel $instance
-     * @param BaseModel $new_instance
      */
-    public static function verifyFields($fields, $fields_verifies = [], $type = 'insert', $instance = null, $new_instance = null)
+    public static function verifyFields($fields, $fields_verifies = [], $type = 'insert', $instance = null)
     {
         //去除无需校验的字段
         foreach($fields as $k => $each_field){
@@ -817,6 +816,7 @@ class ClFieldVerify
                             break;
                         case 'unique':
                             if (isset($fields[$k_field]) && !is_null($instance)) {
+                                $new_instance = $instance::instance(-2);
                                 if($type == 'insert'){
                                     //插入，则只需要判断是否存在
                                     $count = $new_instance->where([

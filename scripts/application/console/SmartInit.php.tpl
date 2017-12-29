@@ -304,7 +304,7 @@ class SmartInit extends Command
         $table_names = [];
         foreach ($tables as $k => $table_name) {
             $table_name = array_pop($table_name);
-            if(strpos($table_name, config('database.prefix')) !== 0){
+            if(!empty(config('database.prefix')) && strpos($table_name, config('database.prefix')) !== 0){
                 continue;
             }
             $table_name = ClString::replaceOnce(config('database.prefix'), '', $table_name);

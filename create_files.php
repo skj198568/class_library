@@ -161,3 +161,24 @@ if(is_file($file)){
     //重命名
     rename($file, str_replace('Index.php', 'IndexController.php', $file));
 }
+//public/index.php 文件处理
+$file = $document_root_dir.'/public/index.php';
+if(is_file($file)){
+    $file_content = file_get_contents($file);
+    if(strpos($file_content, 'DOCUMENT_ROOT_PATH') === false){
+        //替换内容
+        $file_content = str_replace('// [ 应用入口文件 ]', "// [ 应用入口文件 ]\ndefine('DOCUMENT_ROOT_PATH', __DIR__);", $file_content);
+        $file_content = str_replace("__DIR__ . '/../application/'", "DOCUMENT_ROOT_PATH . '/../application/'", $file_content);
+        //回写
+        file_put_contents($file, $file_content);
+    }
+}
+// think 文件处理
+$file = $document_root_dir.'/think';
+if(is_file($file)){
+    $file_content = file_get_contents($file);
+    //替换内容
+    $file_content = str_replace("define('APP_PATH', __DIR__ . '/application/');", "define('DOCUMENT_ROOT_PATH', __DIR__);\ndefine('APP_PATH', DOCUMENT_ROOT_PATH . '/application/');", $file_content);
+    //回写
+    file_put_contents($file, $file_content);
+}

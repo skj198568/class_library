@@ -18,8 +18,8 @@ class ClCrypt
 
     /**
      * 加密字符串
-     * @param $string 待加密的字符串
-     * @param $key 加密key
+     * @param string $string 待加密的字符串
+     * @param string $key 加密key
      * @param int $expire 有效期（秒）
      * @return mixed
      */

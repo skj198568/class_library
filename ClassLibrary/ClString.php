@@ -87,66 +87,6 @@ class ClString
         return floatval($str);
     }
 
-    const V_AUTH_CODE_TYPE_DECODE = 'DECODE';
-
-    const V_AUTH_CODE_TYPE_ENCODE = 'ENCODE';
-
-    /**
-     * 加密解密函数
-     *
-     * @param string $string 加密字符串
-     * @param string $operation DECODE/解密，ENCODE/加密
-     * @param string $key 加密密钥
-     * @param int $expiry 加密失效时间
-     *
-     * @return string 成功返回string，失败返回''
-     */
-    public static function authCode($string, $operation = 'DECODE', $key = 'WHO_AM_I', $expiry = 0)
-    {
-        $ckey_length = 4;
-        $key = md5($key);
-        $keya = md5(substr($key, 0, 16));
-        $keyb = md5(substr($key, 16, 16));
-        $keyc = $ckey_length ? ($operation == 'DECODE' ? substr($string, 0, $ckey_length) :
-            substr(md5(microtime()), -$ckey_length)) : '';
-        $cryptkey = $keya . md5($keya . $keyc);
-        $key_length = strlen($cryptkey);
-        $string = $operation == 'DECODE' ? base64_decode(substr($string, $ckey_length)) :
-            sprintf('%010d', $expiry ? $expiry + time() : 0) . substr(md5($string . $keyb), 0, 16) . $string;
-        $string_length = strlen($string);
-        $result = '';
-        $box = range(0, 511);
-        $rndkey = array();
-        for ($i = 0; $i <= 511; $i++) {
-            $rndkey[$i] = ord($cryptkey[$i % $key_length]);
-        }
-        for ($j = $i = 0; $i < 512; $i++) {
-            $j = ($j + $box[$i] + $rndkey[$i]) % 512;
-            $tmp = $box[$i];
-            $box[$i] = $box[$j];
-            $box[$j] = $tmp;
-        }
-        for ($a = $j = $i = 0; $i < $string_length; $i++) {
-            $a = ($a + 1) % 512;
-            $j = ($j + $box[$a]) % 512;
-            $tmp = $box[$a];
-            $box[$a] = $box[$j];
-            $box[$j] = $tmp;
-            $result .= chr(ord($string[$i]) ^ ($box[($box[$a] + $box[$j]) % 512]));
-        }
-        if ($operation == 'DECODE') {
-            if ((substr($result, 0, 10) == 0 || substr($result, 0, 10) - time() > 0) &&
-                substr($result, 10, 16) == substr(md5(substr($result, 26) . $keyb), 0, 16)
-            ) {
-                return substr($result, 26);
-            } else {
-                return '';
-            }
-        } else {
-            return $keyc . str_replace('=', '', base64_encode($result));
-        }
-    }
-
     /**
      * 格式化金钱为万分单位分割
      * @param $money

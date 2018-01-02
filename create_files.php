@@ -64,11 +64,11 @@ foreach($files as $file){
         }
     }else if(strpos($target_file, 'command.php') !== false){
         $file_content = file_get_contents($target_file);
+        //处理换行
+        if(strpos($file_content, '[]') !== false){
+            $file_content = str_replace('];', "\n];", $file_content);
+        }
         foreach(['app\console\SmartInit', 'app\console\BrowserSync', 'app\console\TaskRun', 'app\console\ApiDoc'] as $each_command){
-            //处理换行
-            if($each_command == 'app\console\SmartInit'){
-                $file_content = str_replace('];', "\n];", $file_content);
-            }
             //判断是否存在
             if(strpos($file_content, $each_command) === false){
                 $file_content = str_replace('];', "\t'$each_command',\n];", $file_content);

@@ -59,10 +59,7 @@ class {$table_name}BaseApiController extends ApiController
         $fields = ClArray::getByKeys(input(), {$table_name}Model::getAllFields());
         //创建
         {$table_name}Model::instance()->insert($fields);
-        return $this->ar(1, ['id' => {$table_name}Model::instance()->getLastInsID()], '{
-    "status" : "api-{:strtolower($table_name)}-create-1",
-    "id" : "主键id"
-}');
+        return $this->ar(1, ['id' => {$table_name}Model::instance()->getLastInsID()], '{"status" : "api-{:strtolower($table_name)}-create-1","id" : "主键id"}');
     }
 
     /**
@@ -77,10 +74,7 @@ class {$table_name}BaseApiController extends ApiController
         {$table_name}Model::instance()->where([
             {$table_name}Model::F_ID => $id
         ])->setField($fields);
-        return $this->ar(1, ['id' => $id], '{
-    "status" : "api-{:strtolower($table_name)}-update-1",
-    "id" : "主键id"
-}');
+        return $this->ar(1, ['id' => $id], '{"status" : "api-{:strtolower($table_name)}-update-1","id" : "主键id"}');
     }
 
     /**
@@ -96,10 +90,7 @@ class {$table_name}BaseApiController extends ApiController
         {$table_name}Model::instance()->where([
             {$table_name}Model::F_ID => is_array($id) ? ['in', $id] : $id
         ])->delete();
-        return $this->ar(1, ['id' => $id], '{
-    "status" : "api-{:strtolower($table_name)}-delete-1",
-    "id" : "主键id"
-}');
+        return $this->ar(1, ['id' => $id], '{"status" : "api-{:strtolower($table_name)}-delete-1","id" : "主键id"}');
     }
 
 }

@@ -9,7 +9,6 @@
 
 namespace app\api\base;
 use app\index\model\BaseModel;
-use ClassLibrary\ClCache;
 use ClassLibrary\ClFieldVerify;
 use think\Controller;
 

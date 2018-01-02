@@ -172,7 +172,7 @@ class BaseModel extends Query
     {
         //校验参数
         foreach ($dataSet as $data) {
-            ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', static::instance(), static::instance(-2));
+            ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', static::instance());
         }
         //自动完成字段
         foreach ($dataSet as $k_data => $data) {
@@ -207,7 +207,7 @@ class BaseModel extends Query
     public function update(array $data = [])
     {
         //校验参数
-        ClFieldVerify::verifyFields($data, static::$fields_verifies, 'update', static::instance(), static::instance(-2));
+        ClFieldVerify::verifyFields($data, static::$fields_verifies, 'update', static::instance());
         //自动完成字段
         if (in_array('update_time', static::getAllFields())) {
             if (!isset($data['update_time']) || empty($data['update_time'])) {

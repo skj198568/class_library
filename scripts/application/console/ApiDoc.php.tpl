@@ -76,11 +76,11 @@ class ApiDoc extends Command
             $class_desc = $this->getClassDesc($each_file);
             foreach($functions as $k => $each_function){
                 list($each_file_temp, $each_function) = $each_function;
-//                le_info($k);
-//                if(strpos($each_file_temp, 'AreaBase') === false){
+//                if(strpos($each_file_temp, 'MajorController') === false){
 //                    continue;
 //                }
-//                if($k !== 'getList'){
+//                le_info($k);
+//                if($k !== 'recommend'){
 //                    continue;
 //                }
                 $desc = $this->getDescByFunctionContent($each_function);
@@ -194,6 +194,9 @@ class ApiDoc extends Command
 //        if(strpos($file_absolute_url, 'AreaBase') === false){
 //            return [];
 //        }
+        if(empty($file_absolute_url)){
+            return [];
+        }
         $content = file_get_contents($file_absolute_url);
         $return = [];
         $all_functions = [];
@@ -324,9 +327,9 @@ class ApiDoc extends Command
         //获取get_param方式参数
         $params = ClString::parseToArray($function_content, 'get_param', ';', false);
         foreach($params as $param){
-//                if(strpos($param, 'hx_score') === false){
-//                    continue;
-//                }
+//            if(strpos($param, 'subject_include_ids') === false){
+//                continue;
+//            }
             $param = ClString::spaceTrim($param);
             $param = trim($param);
             $param = ClString::spaceTrim($param);
@@ -363,6 +366,34 @@ class ApiDoc extends Command
             }
             //过滤器
             if(!empty($filters)){
+//                echo_info($filters);
+                $sub_filters = ClString::getBetween($filters, 'instance', 'fetchVerifies', false);
+                if(strpos($sub_filters, '::') !== false){
+                    $sub_filters = explode('::', $sub_filters);
+                    $classes = [];
+                    foreach($sub_filters as $each_sub_filters_class){
+                        $each_sub_filters_class = ClString::toArray($each_sub_filters_class);
+                        $sub_class = '';
+                        foreach ($each_sub_filters_class as $each_sub_character){
+                            if(preg_match('/^[A-Za-z0-9\\\_]+$/', $each_sub_character) === 1){
+                                $sub_class .= $each_sub_character;
+                            }else{
+                                $sub_class = '';
+                            }
+                        }
+                        if(!empty($sub_class) && !in_array($sub_class, $classes) && strpos($sub_class, '\\') === false){
+                            $classes[] = $sub_class;
+                        }
+                    }
+                    if(count($classes) > 0){
+                        $classes_replace = [];
+                        foreach($classes as $each_class){
+                            $classes_replace[] = $this->getWithNameSpace($class_file_absolute_url, $each_class);
+                        }
+                        //替换
+                        $filters = str_replace($classes, $classes_replace, $filters);
+                    }
+                }
                 $filters = '$filters = ClassLibrary\\'.$filters.";";
                 eval($filters);
                 //转换为数组
@@ -455,7 +486,20 @@ class ApiDoc extends Command
             //本类内存在该方法
             $return_array = array_merge($return_array, $this->getParamsByFunctionContent($class_file_absolute_url, $function_content));
         }
-        return $return_array;
+        //去重，避免多继承函数参数的重复问题
+        $true_return = [];
+        foreach($return_array as $each_param){
+            $is_include = false;
+            foreach($true_return as $each_true_param){
+                if($each_true_param['name'] == $each_param['name']){
+                    $is_include = true;
+                }
+            }
+            if(!$is_include){
+                $true_return[] = $each_param;
+            }
+        }
+        return $true_return;
     }
 
     /**

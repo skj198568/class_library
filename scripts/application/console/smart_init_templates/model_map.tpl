@@ -36,7 +36,14 @@ class {$table_name}Map extends BaseModel
     protected static $fields_read_only = [{$fields_read_only}];
 
     /**
+     * 不可见字段，去掉view层或接口中的字段
+     * @var array
+     */
+    protected static $fields_invisible = [{$fields_invisible}];
+
+    /**
      * 字段映射
+     * @var array
      */
     protected static $fields_show_map_fields = <empty name="fields_show_map_fields">[]<else/>[<foreach name="fields_show_map_fields" item="v">
         <php>echo "\n\t\t";</php>'{$key}' => {$v}<if condition="$v neq end($fields_show_map_fields)">,</if>
@@ -44,6 +51,7 @@ class {$table_name}Map extends BaseModel
 
     /**
      * 字段格式化
+     * @var array
      */
     protected static $fields_show_format = <empty name="fields_show_format">[]<else/>[<foreach name="fields_show_format" item="v"><php>echo "\n\t\t";</php>'{$key}' => {$v}<if condition="$v neq end($fields_show_format)">,</if></foreach><php>echo "\n\t";</php>]</empty>;
 

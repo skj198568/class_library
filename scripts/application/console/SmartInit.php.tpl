@@ -169,6 +169,10 @@ class SmartInit extends Command
         $fields_show_map_fields = [];
         //字段格式化
         $fields_show_format = [];
+        //只读字段
+        $fields_read_only = [];
+        //不可见字段
+        $fields_invisible = [];
         //校验器
         $fields_verifies = [];
         foreach ($table_info as $k => $each) {
@@ -227,6 +231,10 @@ class SmartInit extends Command
             if (isset($field_comment['is_read_only'])) {
                 $fields_read_only[] = 'self::F_' . strtoupper($each['Field']);
             }
+            //设置不可见字段
+            if(isset($field_comment['visible']) && $field_comment['visible'] == 0){
+                $fields_invisible[] = 'self::F_' . strtoupper($each['Field']);
+            }
             //设置额外显示字段
             if(isset($field_comment['show_map_fields'])){
                 $fields_show_map_fields[$each['Field']] = json_encode($field_comment['show_map_fields'], JSON_UNESCAPED_UNICODE);
@@ -255,6 +263,7 @@ class SmartInit extends Command
                 'all_fields_str' => implode(', ', $all_fields),
                 'fields_show_map_fields' => $fields_show_map_fields,
                 'fields_show_format' => $fields_show_format,
+                'fields_invisible' => empty($fields_invisible) ? '' : implode(', ', $fields_invisible)
             ]);
         $map_file = APP_PATH . 'index/map/' . $this->tableNameFormat($table_name) . 'Map.php';
         //创建文件夹
@@ -369,6 +378,10 @@ class SmartInit extends Command
                 if(empty($comment)){
                     $comment = ['name' => $comment];
                 }
+            }
+            //如果是不可见字段，则忽略
+            if(isset($comment['visible']) && $comment['visible'] == 0){
+                continue;
             }
             $info[$each['Field']] = empty($comment) ? ($each['Field'] == 'id' ? '主键id' : '未定义') : $comment['name'];
             //静态变量

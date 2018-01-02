@@ -60,12 +60,20 @@ class BaseModel extends Query
     protected static $fields_read_only = [];
 
     /**
+     * 不可见字段，去掉view层或接口中的字段
+     * @var array
+     */
+    protected static $fields_invisible = [];
+
+    /**
      * 字段映射
+     * @var array
      */
     protected static $fields_show_map_fields = [];
 
     /**
      * 字段格式化
+     * @var array
      */
     protected static $fields_show_format = [];
 
@@ -225,7 +233,7 @@ class BaseModel extends Query
 
     /**
      * 拼接额外展现字段
-     * @param $items
+     * @param array $items
      * @return array|mixed
      */
     private static function showMapFields($items){
@@ -284,8 +292,40 @@ class BaseModel extends Query
     }
 
     /**
+     * 不可见字段去除
+     * @param array $items
+     * @return array|mixed
+     */
+    private static function showInvisible($items){
+        if(empty($items)){
+            return $items;
+        }
+        if(empty(static::$fields_invisible)){
+            return $items;
+        }
+        $is_linear_array = false;
+        //一维数组，处理成多维数组
+        if (count($items) === count($items, 1)) {
+            $items = [$items];
+            $is_linear_array = true;
+        }
+        foreach($items as $k => $v){
+            foreach (static::$fields_invisible as $each_key){
+                if(array_key_exists($each_key, $v)){
+                    unset($items[$k][$each_key]);
+                }
+            }
+        }
+        if($is_linear_array){
+            return $items[0];
+        }else{
+            return $items;
+        }
+    }
+
+    /**
      * 字段格式化
-     * @param $items
+     * @param array $items
      * @return array|mixed
      */
     private static function showFormat($items){
@@ -385,7 +425,7 @@ class BaseModel extends Query
      * @return array|mixed
      */
     public static function forShow($items){
-        return self::showFormat(self::showMapFields($items));
+        return self::showFormat(self::showInvisible(self::showMapFields($items)));
     }
 
 }

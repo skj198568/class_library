@@ -24,7 +24,7 @@ class {$table_name}Model extends {$table_name}Map
     /**
      * 实例对象
      * @param int $id -1/获取实例数量，-2/自动新增一个实例
-     * @return mixed|null|static
+     * @return int|mixed|null|static
      */
     public static function instance($id = 0)
     {

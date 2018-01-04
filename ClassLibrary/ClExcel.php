@@ -29,7 +29,7 @@ class ClExcel
 
     /**
      * 获取列数
-     * @param $max_count 最大列数
+     * @param integer $max_count 最大列数
      * @return array
      */
     public function getLetters($max_count)
@@ -84,7 +84,8 @@ class ClExcel
      * @param array $values
      * @param string $suffix
      * @param bool $is_delete
-     * @return mixed
+     * @return array|bool|string
+     * @throws \PHPExcel_Reader_Exception
      */
     public function exportToExcel($titles, $values = [], $suffix = 'xls', $is_delete = false){
         $csv_file = $this->exportToCsv($titles, $values);
@@ -98,6 +99,7 @@ class ClExcel
      * @param string $suffix 格式2003或2007
      * @param bool $is_delete 是否删除源文件
      * @return array|bool|string
+     * @throws \PHPExcel_Reader_Exception
      */
     public function csvToExcel($csv_file, $suffix = 'xls', $is_delete = false)
     {
@@ -130,11 +132,12 @@ class ClExcel
 
     /**
      * excel to array
-     * @param string $excel_file excel绝对地址
-     * @param bool $is_delete_excel 是否删除源文件
-     * @param bool $is_delete_csv 是否删除源文件
-     * @param bool $auto_fixed 自动填充数据，用于excel有大小标题情况下处理
+     * @param $excel_file
+     * @param bool $is_delete_excel
+     * @param bool $is_delete_csv
+     * @param bool $auto_fixed
      * @return array|bool|mixed
+     * @throws \PHPExcel_Writer_Exception
      */
     public function excelToArray($excel_file, $is_delete_excel = false, $is_delete_csv = false, $auto_fixed = false)
     {

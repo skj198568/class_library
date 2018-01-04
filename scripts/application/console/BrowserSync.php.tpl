@@ -244,6 +244,7 @@ class BrowserSync extends Command
         clearstatcache();
         $last_scan_files = $this->scan_files;
         $files_types = $this->input_object->getOption('file_types');
+        $files_types = trim($files_types, '"');
         if (empty($files_types)) {
             $this->output('<error>请输入监听文件files的类型</error>');
             return false;

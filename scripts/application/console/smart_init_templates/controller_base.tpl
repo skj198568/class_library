@@ -17,6 +17,7 @@ use ClassLibrary\ClArray;
  */
 class {$table_name}BaseApiController extends ApiController
 {
+<if condition="in_array('getList', $create_api)">
 
     /**
      * 列表
@@ -33,6 +34,8 @@ class {$table_name}BaseApiController extends ApiController
             return {$table_name}Model::forShow($items);
         }), '{$ar_get_list_json}');
     }
+</if>
+<if condition="in_array('get', $create_api)">
 
     /**
      * 单个信息
@@ -49,6 +52,8 @@ class {$table_name}BaseApiController extends ApiController
         $info = {$table_name}Model::forShow($info);
         return $this->ar(1, ['info' => $info], '{$ar_get_json}');
     }
+</if>
+<if condition="in_array('create', $create_api)">
 
     /**
      * 创建
@@ -61,6 +66,8 @@ class {$table_name}BaseApiController extends ApiController
         {$table_name}Model::instance()->insert($fields);
         return $this->ar(1, ['id' => {$table_name}Model::instance()->getLastInsID()], '{"status":"api-{:strtolower($table_name)}-create-1","id":"主键id"}');
     }
+</if>
+<if condition="in_array('update', $create_api)">
 
     /**
      * 更新
@@ -76,6 +83,8 @@ class {$table_name}BaseApiController extends ApiController
         ])->setField($fields);
         return $this->ar(1, ['id' => $id], '{"status":"api-{:strtolower($table_name)}-update-1","id":"主键id"}');
     }
+</if>
+<if condition="in_array('delete', $create_api)">
 
     /**
      * 删除
@@ -92,5 +101,6 @@ class {$table_name}BaseApiController extends ApiController
         ])->delete();
         return $this->ar(1, ['id' => $id], '{"status":"api-{:strtolower($table_name)}-delete-1","id":"主键id"}');
     }
+</if>
 
 }

@@ -360,9 +360,6 @@ class SmartInit extends Command
     private function dealControllerApiBase($table_name, Output $output){
         //如果不创建api，则忽略
         $table_comment = $this->getTableComment($table_name);
-        if(isset($table_comment['create_api']) && empty($table_comment['create_api'])){
-            return false;
-        }
         $table_info = ClMysql::query('SHOW FULL FIELDS FROM `' . $this->getTableNameWithPrefix($table_name) . '`');
         if (empty($table_info)) {
             $output->highlight(sprintf('table name:%s is not exist.', $table_name));
@@ -416,7 +413,8 @@ class SmartInit extends Command
                 'table_name' => $table_name_format,
                 'table_comment' => $this->getTableComment($table_name),
                 'ar_get_json' => json_encode($ar_get_json, JSON_UNESCAPED_UNICODE),
-                'ar_get_list_json' => json_encode($ar_get_list_json, JSON_UNESCAPED_UNICODE)
+                'ar_get_list_json' => json_encode($ar_get_list_json, JSON_UNESCAPED_UNICODE),
+                'create_api' => $table_comment['create_api']
             ]);
         if(!empty($content)){
             $base_name_file = APP_PATH . 'api/base/' . $this->tableNameFormat($table_name) . 'BaseApiController.php';
@@ -444,10 +442,6 @@ class SmartInit extends Command
         }
         $map_template_file = __DIR__ . '/smart_init_templates/controller.tpl';
         $table_comment = $this->getTableComment($table_name);
-        //如果不创建api，则忽略
-        if(isset($table_comment['create_api']) && empty($table_comment['create_api'])){
-            return false;
-        }
         $table_comment['name'] .= "\n";
         $content = "<?php\n" . $this->view->fetch($map_template_file, [
                 'date' => date('Y/m/d') . "\n",

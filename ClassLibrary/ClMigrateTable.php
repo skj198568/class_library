@@ -22,11 +22,25 @@ class ClMigrateTable
      */
     private static $instance = null;
 
+    const V_CREATE_API_GET_LIST = 'getList';
+    const V_CREATE_API_GET = 'get';
+    const V_CREATE_API_CREATE = 'create';
+    const V_CREATE_API_DELETE = 'delete';
+    const V_CREATE_API_UPDATE = 'update';
+
     /**
      * 表配置
      * @var array
      */
-    private $table_config = [];
+    private $table_config = [
+        'create_api' => [
+            self::V_CREATE_API_GET_LIST,
+            self::V_CREATE_API_GET,
+            self::V_CREATE_API_CREATE,
+            self::V_CREATE_API_DELETE,
+            self::V_CREATE_API_UPDATE
+        ]
+    ];
 
     /**
      * 表引擎
@@ -99,11 +113,18 @@ class ClMigrateTable
     }
 
     /**
-     * 不创建api，默认创建
+     * 不创建api的函数，默认全部创建
+     * @param array $functions
      * @return $this
      */
-    public function notCreateApi(){
-        $this->table_config['create_api'] = false;
+    public function createApi($functions = [
+        ClMigrateTable::V_CREATE_API_GET_LIST,
+        ClMigrateTable::V_CREATE_API_GET,
+        ClMigrateTable::V_CREATE_API_CREATE,
+        ClMigrateTable::V_CREATE_API_DELETE,
+        ClMigrateTable::V_CREATE_API_UPDATE
+    ]){
+        $this->table_config['create_api'] = $functions;
         return $this;
     }
 

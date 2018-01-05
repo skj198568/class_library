@@ -18,6 +18,7 @@ class {$table_name}Map extends BaseModel
 {
 
     /**
+     * 当前数据表名称（含前缀）
      * @var string
      */
     protected $table = '{$table_name_with_prefix}';

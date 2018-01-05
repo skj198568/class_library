@@ -43,12 +43,6 @@ class ClMigrateTable
     ];
 
     /**
-     * 表引擎
-     * @var string
-     */
-    protected $table_engine = 'InnoDB';
-
-    /**
      * 实例对象
      * @return ClMigrateTable|null
      */
@@ -62,19 +56,16 @@ class ClMigrateTable
 
     /**
      * 获取表名定义
-     * @param $table_name
+     * @param $comment_name
      * @return array
      */
-    public function fetch($table_name)
+    public function fetch($comment_name)
     {
-        $result = [
-            'comment' => json_encode(
-                array_merge([
-                    'name' => $table_name
-                ], $this->table_config),
-                JSON_UNESCAPED_UNICODE),
-            'engine' => $this->table_engine
-        ];
+        $result = json_encode(
+            array_merge([
+                'name' => $comment_name
+            ], $this->table_config),
+            JSON_UNESCAPED_UNICODE);
         $this->table_config = [];
         return $result;
     }
@@ -87,17 +78,6 @@ class ClMigrateTable
     public function usingCache($duration = 3600)
     {
         $this->table_config['is_cache'] = $duration;
-        return $this;
-    }
-
-    /**
-     * 设置表引擎，不设置，默认InnoDB
-     * @param string $engine
-     * @return $this
-     */
-    public function engine($engine = 'MyISAM')
-    {
-        $this->table_engine = $engine;
         return $this;
     }
 
@@ -126,6 +106,23 @@ class ClMigrateTable
     ]){
         $this->table_config['create_api'] = $functions;
         return $this;
+    }
+
+    /**
+     * 获取更新Comment SQL
+     * @param $table
+     * @param $comment_name
+     * @return string
+     */
+    public function getUpdateCommentSql($table, $comment_name){
+        $sql = sprintf("ALTER TABLE `%s` COMMENT='%s'", config('database.prefix').$table, json_encode(
+            array_merge([
+                'name' => $comment_name
+            ], $this->table_config),
+            JSON_UNESCAPED_UNICODE)
+        );
+        $this->table_config = [];
+        return $sql;
     }
 
 }

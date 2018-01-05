@@ -323,6 +323,7 @@ class ApiDoc extends Command
      * @return array
      */
     private function getParamsByFunctionContent($class_file_absolute_url, $function_content){
+//        echo_info($function_content);
         $return_array = [];
         //获取get_param方式参数
         $params = ClString::parseToArray($function_content, 'get_param', ';', false);
@@ -334,6 +335,9 @@ class ApiDoc extends Command
             $param = trim($param);
             $param = ClString::spaceTrim($param);
             $filters = ClString::getBetween($param, 'ClFieldVerify', 'fetchVerifies()');
+            if(strpos($filters, 'ClFieldVerify') === false){
+                continue;
+            }
             $param = str_replace($filters, '', $param);
             $param = str_replace([',,', '\''], [',', '"'], $param);
             $param = trim($param, ')');
@@ -366,7 +370,6 @@ class ApiDoc extends Command
             }
             //过滤器
             if(!empty($filters)){
-//                echo_info($filters);
                 $sub_filters = ClString::getBetween($filters, 'instance', 'fetchVerifies', false);
                 if(strpos($sub_filters, '::') !== false){
                     $sub_filters = explode('::', $sub_filters);
@@ -394,6 +397,14 @@ class ApiDoc extends Command
                         $filters = str_replace($classes, $classes_replace, $filters);
                     }
                 }
+                //去除带参数的校验器
+                $filters = explode('->', $filters);
+                foreach($filters as $k_each_filter => $v_each_filter){
+                    if(strpos($v_each_filter, '$') !== false){
+                        unset($filters[$k_each_filter]);
+                    }
+                }
+                $filters = implode('->', $filters);
                 $filters = '$filters = ClassLibrary\\'.$filters.";";
                 eval($filters);
                 //转换为数组

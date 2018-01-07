@@ -209,10 +209,8 @@ class ClString
      */
     public static function sprintf($str, array $value_array)
     {
-        //合并参数
-        $value_array = array_merge(array($str), $value_array);
-        //执行
-        return eval('return sprintf(' . implode("','", $value_array) . ');');
+        array_unshift($value_array, $str);
+        return call_user_func_array('sprintf', $value_array);
     }
 
     /**

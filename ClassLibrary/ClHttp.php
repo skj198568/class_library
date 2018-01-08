@@ -727,10 +727,7 @@ class ClHttp
      */
     public static function isLocalRequest()
     {
-        if (in_array(strtok(request()->ip(), '.'), ['0', '10', '127', '168', '192'])) {
-            return true;
-        }
-        return false;
+        return ClVerify::isIpLocal();
     }
 
 }

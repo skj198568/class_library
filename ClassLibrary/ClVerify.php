@@ -160,7 +160,7 @@ class ClVerify
 
     /**
      * 是否是ip地址
-     * @param $str
+     * @param string $str
      * @return bool|int
      */
     public static function isIp($str)
@@ -169,7 +169,25 @@ class ClVerify
         if (empty($v)) {
             return false;
         }
+        if(self::isIpLocal($str)){
+            return true;
+        }
         return preg_match('/^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$/', $v);
+    }
+
+    /**
+     * 是否是局域网ip
+     * @param string $str
+     * @return bool
+     */
+    public static function isIpLocal($str = ''){
+        if(empty($str)){
+            $str = request()->ip();
+        }
+        if (in_array(strtok($str, '.'), ['0', '10', '127', '168', '192'])) {
+            return true;
+        }
+        return false;
     }
 
     /**

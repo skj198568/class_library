@@ -56,6 +56,15 @@ class ClMigrateField extends ClFieldVerify
     }
 
     /**
+     * 不可见
+     * @return $this
+     */
+    public function invisible(){
+        $this->field_config['visible'] = 0;
+        return $this;
+    }
+
+    /**
      * 只读字段
      * @return $this
      */

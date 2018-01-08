@@ -21,7 +21,7 @@ class ClIp
      * 百度key
      * @var string
      */
-    private static $bai_du_key = 'B57ddde27d7b2603d4387ba49f708b4d';
+    private static $baidu_key = 'B57ddde27d7b2603d4387ba49f708b4d';
 
     /**
      * 错误码
@@ -50,7 +50,7 @@ class ClIp
         301 => '配额超限，如果想增加配额请联系我们',
         302 => '配额超限，如果想增加配额请联系我们',
         401 => '并发控制超限，请控制并发量请联系我们',
-        402 => '当前并发量已经超过约定并发配额，并且服务总并发量也已经超过设定的总并发配额，限制访问并发控制超限，请控制并发量请联系我们'
+        402 => '当前并发量已经超过约定并发配额，并且服务总并发量也已经超过设定的总并发配额，限制访问	并发控制超限，请控制并发量请联系我们'
     ];
 
     /**
@@ -63,7 +63,7 @@ class ClIp
         if(!ClVerify::isIp($ip)){
             return 'ip地址错误：'.$ip;
         }
-        $r = ClHttp::http(sprintf('http://api.map.baidu.com/location/ip?ip=%s&ak=%s&coor=bd09ll', $ip, self::$bai_du_key));
+        $r = ClHttp::http(sprintf('http://api.map.baidu.com/location/ip?ip=%s&ak=%s&coor=bd09ll', $ip, self::$baidu_key));
         if ($r['status'] == 0) {
             return $r['content'];
         } else {

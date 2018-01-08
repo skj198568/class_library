@@ -32,7 +32,7 @@ class ClGeo
      * 百度key
      * @var string
      */
-    private static $bai_du_key = 'B57ddde27d7b2603d4387ba49f708b4d';
+    private static $baidu_key = 'B57ddde27d7b2603d4387ba49f708b4d';
 
     /**
      * 计算两点间的距离
@@ -75,7 +75,7 @@ class ClGeo
      * @return bool|mixed
      */
     public static function getByAddressWithBaiDu($address, $key = ''){
-        $r = ClHttp::http(sprintf('http://api.map.baidu.com/geocoder/v2/?address=%s&output=json&ak=%s', urlencode($address), empty($key) ? self::$bai_du_key : $key));
+        $r = ClHttp::http(sprintf('http://api.map.baidu.com/geocoder/v2/?address=%s&output=json&ak=%s', urlencode($address), empty($key) ? self::$baidu_key : $key));
         return $r['status'] == 0 ? $r['result'] : false;
     }
 }

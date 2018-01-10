@@ -78,6 +78,12 @@ class BaseModel extends Query
     protected static $fields_show_format = [];
 
     /**
+     * 字段存储格式
+     * @var array
+     */
+    protected static $fields_store_format = [];
+
+    /**
      * 获取所有的字段
      * @param array $exclude_fields 不包含的字段
      * @return array
@@ -153,6 +159,26 @@ class BaseModel extends Query
                 $data['create_time'] = time();
             }
         }
+        //存储格式处理
+        if(!empty(static::$fields_store_format)){
+            foreach(static::$fields_store_format as $k_field => $each_field_store_format){
+                if(isset($data[$k_field])){
+                    if(is_array($each_field_store_format)){
+                        switch ($each_field_store_format[0]){
+                            case 'password':
+                                $data[$k_field] = md5($data[$k_field].$each_field_store_format[1]);
+                                break;
+                        }
+                    }else{
+                        switch ($each_field_store_format){
+                            case 'json':
+                                $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
+                                break;
+                        }
+                    }
+                }
+            }
+        }
         $result = parent::insert($data, $replace, $getLastInsID, $sequence);
         //执行
         if (count($data) !== count($data, 1)) {
@@ -182,11 +208,32 @@ class BaseModel extends Query
         foreach ($dataSet as $data) {
             ClFieldVerify::verifyFields($data, static::$fields_verifies, 'insert', static::instance());
         }
-        //自动完成字段
+        //字段处理
         foreach ($dataSet as $k_data => $data) {
+            //自动完成字段
             if (in_array('create_time', static::getAllFields())) {
                 if (!isset($data['create_time']) || empty($data['create_time'])) {
                     $dataSet[$k_data]['create_time'] = time();
+                }
+            }
+            //存储格式处理
+            if(!empty(static::$fields_store_format)){
+                foreach(static::$fields_store_format as $k_field => $each_field_store_format){
+                    if(isset($data[$k_field])){
+                        if(is_array($each_field_store_format)){
+                            switch ($each_field_store_format[0]){
+                                case 'password':
+                                    $data[$k_field] = md5($data[$k_field].$each_field_store_format[1]);
+                                    break;
+                            }
+                        }else{
+                            switch ($each_field_store_format){
+                                case 'json':
+                                    $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
+                                    break;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -214,12 +261,33 @@ class BaseModel extends Query
      */
     public function update(array $data = [])
     {
+        log_info($data);
         //校验参数
         ClFieldVerify::verifyFields($data, static::$fields_verifies, 'update', static::instance());
         //自动完成字段
         if (in_array('update_time', static::getAllFields())) {
             if (!isset($data['update_time']) || empty($data['update_time'])) {
                 $data['update_time'] = time();
+            }
+        }
+        //存储格式处理
+        if(!empty(static::$fields_store_format)){
+            foreach(static::$fields_store_format as $k_field => $each_field_store_format){
+                if(isset($data[$k_field])){
+                    if(is_array($each_field_store_format)){
+                        switch ($each_field_store_format[0]){
+                            case 'password':
+                                $data[$k_field] = md5($data[$k_field].$each_field_store_format[1]);
+                                break;
+                        }
+                    }else{
+                        switch ($each_field_store_format){
+                            case 'json':
+                                $data[$k_field] = json_encode($data[$k_field], JSON_UNESCAPED_UNICODE);
+                                break;
+                        }
+                    }
+                }
             }
         }
         //去除只读字段
@@ -426,6 +494,128 @@ class BaseModel extends Query
      */
     public static function forShow($items){
         return self::showFormat(self::showInvisible(self::showMapFields($items)));
+    }
+
+    /**
+     * 重写select
+     * @param null $data
+     * @return array|false|null|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function select($data = null)
+    {
+        $data = parent::select($data);
+        if(is_array($data)){
+            //存储格式处理
+            if(!empty(static::$fields_store_format)){
+                foreach($data as $k => $each){
+                    foreach(static::$fields_store_format as $k_field => $each_field_store_format){
+                        if(isset($each[$k_field])){
+                            if(is_string($each_field_store_format)){
+                                switch ($each_field_store_format){
+                                    case 'json':
+                                        $data[$k][$k_field] = json_decode($each[$k_field], true);
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * 重写find
+     * @param null $data
+     * @return array|false|null|\PDOStatement|string|\think\Model
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function find($data = null)
+    {
+        $data = parent::find($data);
+        //存储格式处理
+        if(!empty(static::$fields_store_format)){
+            foreach(static::$fields_store_format as $k_field => $each_field_store_format){
+                if(isset($data[$k_field])){
+                    if(is_string($each_field_store_format)){
+                        switch ($each_field_store_format){
+                            case 'json':
+                                $data[$k_field] = json_decode($data[$k_field], true);
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * 重写value
+     * @param string $field
+     * @param null $default
+     * @param bool $force
+     * @return mixed
+     */
+    public function value($field, $default = null, $force = false)
+    {
+        $value = parent::value($field, $default, $force);
+        if(!empty(static::$fields_store_format) && array_key_exists($field, static::$fields_store_format)){
+            if(is_string(static::$fields_store_format[$field])){
+                switch (static::$fields_store_format[$field]){
+                    case 'json':
+                        $value = json_decode($value, true);
+                        break;
+                }
+            }
+        }
+        return $value;
+    }
+
+    /**
+     * 重写column
+     * @param string $field
+     * @param string $key
+     * @return array
+     */
+    public function column($field, $key = '')
+    {
+        $data = parent::column($field, $key);
+        if(!empty(static::$fields_store_format) && array_key_exists($field, static::$fields_store_format)){
+            foreach($data as $key => $value){
+                if(is_string(static::$fields_store_format[$field])){
+                    switch (static::$fields_store_format[$field]){
+                        case 'json':
+                            $data[$key] = json_decode($value, true);
+                            break;
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * 校验密码的正确性
+     * @param string $db_store_password 数据库存储的真实密码
+     * @param string $user_input_password 用户输入的待校验的密码
+     * @return bool
+     */
+    public static function verifyPassword($db_store_password, $user_input_password){
+        foreach(static::$fields_store_format as $each_field => $each_field_store_format){
+            if(is_array($each_field_store_format) && $each_field_store_format[0] == 'password'){
+                if($db_store_password == md5($user_input_password.$each_field_store_format[1])){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

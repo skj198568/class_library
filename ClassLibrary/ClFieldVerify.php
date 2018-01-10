@@ -131,6 +131,17 @@ class ClFieldVerify
      * @param $length
      * @return $this
      */
+    public function verifyStringLength($length)
+    {
+        $this->field_config['verifies'][] = ['length', intval($length)];
+        return $this;
+    }
+
+    /**
+     * 字符串最长
+     * @param $length
+     * @return $this
+     */
     public function verifyStringLengthMax($length)
     {
         $this->field_config['verifies'][] = ['length_max', intval($length)];
@@ -343,6 +354,9 @@ class ClFieldVerify
                     case 'min':
                         $filters_desc[] = sprintf('最小值%s', $v_verify[1]);
                         break;
+                    case 'length':
+                        $filters_desc[] = sprintf('长度为%s', $v_verify[1]);
+                        break;
                     case 'length_max':
                         $filters_desc[] = sprintf('最大长度%s', $v_verify[1]);
                         break;
@@ -524,17 +538,33 @@ class ClFieldVerify
                                 }
                             }
                             break;
+                        case 'length':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (ClString::getLength($each_value) != $v_verify[1]) {
+                                            $error_msg = sprintf('%s:%s 长度为%s', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    if (ClString::getLength($fields[$k_field]) != $v_verify[1]) {
+                                        $error_msg = sprintf('%s:%s 长度为%s', $k_field, $fields[$k_field], $v_verify[1]);
+                                    }
+                                }
+                            }
+                            break;
                         case 'length_max':
                             if (isset($fields[$k_field])) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
-                                        if (!ClString::getLength($each_value) > $v_verify[1]) {
+                                        if (ClString::getLength($each_value) > $v_verify[1]) {
                                             $error_msg = sprintf('%s:%s 最大长度%s', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
                                             break;
                                         }
                                     }
                                 } else {
-                                    if (!ClString::getLength($fields[$k_field]) > $v_verify[1]) {
+                                    if (ClString::getLength($fields[$k_field]) > $v_verify[1]) {
                                         $error_msg = sprintf('%s:%s 最大长度%s', $k_field, $fields[$k_field], $v_verify[1]);
                                     }
                                 }
@@ -544,13 +574,13 @@ class ClFieldVerify
                             if (isset($fields[$k_field])) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
-                                        if (!ClString::getLength($each_value) < $v_verify[1]) {
+                                        if (ClString::getLength($each_value) < $v_verify[1]) {
                                             $error_msg = sprintf('%s:%s 最小长度%s', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
                                             break;
                                         }
                                     }
                                 } else {
-                                    if (!ClString::getLength($fields[$k_field]) < $v_verify[1]) {
+                                    if (ClString::getLength($fields[$k_field]) < $v_verify[1]) {
                                         $error_msg = sprintf('%s:%s 最小长度%s', $k_field, $fields[$k_field], $v_verify[1]);
                                     }
                                 }

@@ -169,7 +169,7 @@ class ClVerify
         if (empty($v)) {
             return false;
         }
-        if(self::isIpLocal($str)){
+        if(self::isLocalIp($str)){
             return true;
         }
         return preg_match('/^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$/', $v);
@@ -180,7 +180,7 @@ class ClVerify
      * @param string $str
      * @return bool
      */
-    public static function isIpLocal($str = ''){
+    public static function isLocalIp($str = ''){
         if(empty($str)){
             $str = request()->ip();
         }

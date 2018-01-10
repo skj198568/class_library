@@ -80,7 +80,7 @@ class ApiDoc extends Command
 //                    continue;
 //                }
 //                le_info($k);
-//                if($k !== 'recommend'){
+//                if($k !== 'verifyMobile'){
 //                    continue;
 //                }
                 $desc = $this->getDescByFunctionContent($each_function);
@@ -584,7 +584,7 @@ class ApiDoc extends Command
      * @return array
      */
     private function getAjaxReturnByFunctionContent($function_content){
-        $ar_functions = ClString::parseToArray($function_content, '->ar', "}\n");
+        $ar_functions = ClString::parseToArray($function_content, '->ar', "}'");
         $ar_return = [];
         foreach($ar_functions as $each){
             $function_name = $this->getFunctionName($function_content);

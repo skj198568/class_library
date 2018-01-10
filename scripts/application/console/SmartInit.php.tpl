@@ -169,6 +169,8 @@ class SmartInit extends Command
         $fields_show_map_fields = [];
         //字段格式化
         $fields_show_format = [];
+        //字段存储格式
+        $fields_store_format = [];
         //只读字段
         $fields_read_only = [];
         //不可见字段
@@ -237,11 +239,15 @@ class SmartInit extends Command
             }
             //设置额外显示字段
             if(isset($field_comment['show_map_fields'])){
-                $fields_show_map_fields[$each['Field']] = json_encode($field_comment['show_map_fields'], JSON_UNESCAPED_UNICODE);
+                $fields_show_map_fields['self::F_' . strtoupper($each['Field'])] = json_encode($field_comment['show_map_fields'], JSON_UNESCAPED_UNICODE);
             }
             //设置字段格式化
             if(isset($field_comment['show_format'])){
-                $fields_show_format[$each['Field']] = json_encode($field_comment['show_format'], JSON_UNESCAPED_UNICODE);
+                $fields_show_format['self::F_' . strtoupper($each['Field'])] = json_encode($field_comment['show_format'], JSON_UNESCAPED_UNICODE);
+            }
+            //设置字段存储格式
+            if(isset($field_comment['store_format'])){
+                $fields_store_format['self::F_' . strtoupper($each['Field'])] = json_encode($field_comment['store_format'], JSON_UNESCAPED_UNICODE);
             }
         }
         //校验器
@@ -263,6 +269,7 @@ class SmartInit extends Command
                 'all_fields_str' => implode(', ', $all_fields),
                 'fields_show_map_fields' => $fields_show_map_fields,
                 'fields_show_format' => $fields_show_format,
+                'fields_store_format' => $fields_store_format,
                 'fields_invisible' => empty($fields_invisible) ? '' : implode(', ', $fields_invisible)
             ]);
         $map_file = APP_PATH . 'index/map/' . $this->tableNameFormat($table_name) . 'Map.php';
@@ -400,7 +407,7 @@ class SmartInit extends Command
         }
         $ar_get_json = [
             'status' => strtolower(sprintf('api-%s-get-1', $table_name_format)),
-            'item' => $info
+            'info' => $info
         ];
         $ar_get_list_json = [
             'status' => strtolower(sprintf('api-%s-getList-1', $table_name_format)),

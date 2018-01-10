@@ -721,13 +721,4 @@ class ClHttp
         exit();
     }
 
-    /**
-     * 是否是局域网请求
-     * @return bool
-     */
-    public static function isLocalRequest()
-    {
-        return ClVerify::isIpLocal();
-    }
-
 }

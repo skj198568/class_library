@@ -108,6 +108,25 @@ class ClMigrateField extends ClFieldVerify
     }
 
     /**
+     * 存储格式为json
+     * @return $this
+     */
+    public function storageFormatJson(){
+        $this->field_config['store_format'] = 'json';
+        return $this;
+    }
+
+    /**
+     * 存储格式为密码
+     * @param string $salt
+     * @return $this
+     */
+    public function storageFormatPassword($salt = ''){
+        $this->field_config['store_format'] = ['password', $salt];
+        return $this;
+    }
+
+    /**
      * 获取字段名定义
      * @param string $name 字段名称
      * @return string

@@ -20,8 +20,8 @@ class ClImage
 
     /**
      * 居中剪裁图片
-     * @param $img_url 图片绝对地址
-     * @param $cut_width 裁剪宽度
+     * @param string $img_url 图片绝对地址
+     * @param string $cut_width 裁剪宽度
      * @param integer $cut_height 裁剪高度，默认自动计算
      * @param string $save_img_url 保存的图片绝对地址，如果为'',则覆盖掉原图片
      * @param bool $is_delete 当save_img_url不为空时，是否删掉原始img
@@ -145,6 +145,7 @@ class ClImage
      * @param array $background_color 背景颜色
      * @param array $foreground_color 前景颜色
      * @return string
+     * @throws \Endroid\QrCode\Exception\InvalidPathException
      */
     public static function qrCode($str, $qr_width = 100, $logo_absolute_file = '', $force = false, $background_color = ['r' => 255, 'g' => 255, 'b' => 255], $foreground_color = ['r' => 0, 'g' => 0, 'b' => 0])
     {
@@ -611,8 +612,8 @@ class ClImage
 
     /**
      * 合并图片
-     * @param $source_absolute_img 源图片绝对地址
-     * @param $with_absolute_img 拼接的图片地址
+     * @param string $source_absolute_img 源图片绝对地址
+     * @param string $with_absolute_img 拼接的图片地址
      * @param int $x 拼接图片相对于源文件偏移量
      * @param int $y 拼接图片相对于源文件偏移量
      * @param string $save_absolute_file 另存为

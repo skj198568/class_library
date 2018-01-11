@@ -363,7 +363,7 @@ class ApiDoc extends Command
                 //静态变量
                 $name_array = explode('::', $name);
                 $name = $this->getWithNameSpace($class_file_absolute_url, $name_array[0]);
-                eval(sprintf('$name = %s::%s;', $name, $name_array[1]));
+                eval(sprintf('$name = %s::%s;', $name, trim($name_array[1], '.')));
             }
             if(strpos($name, '/') !== false){
                 $name = ClString::getBetween($name, '', '/', false);
@@ -433,6 +433,7 @@ class ApiDoc extends Command
         foreach($function_content_array as $each_line){
             if(strpos($each_line, '::getAllFields') !== false){
                 $each_line_array = ClString::parseToArray(str_replace('=', ',', $each_line), ',', '\)');
+//                echo_info($each_line_array);
                 $params_functions = '';
                 foreach ($each_line_array as $each_line_item){
                     if(strpos($each_line_item, '::getAllFields') !== false){
@@ -440,9 +441,10 @@ class ApiDoc extends Command
                         break;
                     }
                 }
-                while(strpos($params_functions, ',') !== false){
-                    $params_functions = ClString::getBetween($params_functions, ',', '', false);
-                }
+//                while(strpos($params_functions, ',') !== false){
+//                    $params_functions = ClString::getBetween($params_functions, ',', '', false);
+//                }
+//                echo_info('1', $params_functions);
                 $class_name = ClString::getBetween($params_functions, '', '::', false);
                 $class_name_with_namespace = $this->getWithNameSpace($class_file_absolute_url, $class_name);
                 $class_const_file_absolute_url = $this->getFileAbsoluteUrlByNamespace($class_name_with_namespace);
@@ -461,6 +463,7 @@ class ApiDoc extends Command
                 $class_const_content = array_values($class_const_content);
 //                    le_info($class_const_content);
                 $params_functions = str_replace($class_name, $class_name_with_namespace, $params_functions);
+//                echo_info(sprintf('$params=%s;', $params_functions));
                 eval(sprintf('$params=%s;', $params_functions));
                 $fields_verifies = sprintf('%s::$fields_verifies', $class_name_with_namespace);
                 eval(sprintf('$fields_verifies=%s;', $fields_verifies));
@@ -507,6 +510,14 @@ class ApiDoc extends Command
                 }
             }
             if(!$is_include){
+                //设置获取参数类型问题
+                if(strpos($each_param['name'], '/') !== false){
+                    $each_param['name'] = ClString::getBetween($each_param['name'], '', '/', false);
+                }
+                //忽略create_time、update_time
+                if(in_array($each_param['name'], ['create_time', 'update_time'])){
+                    continue;
+                }
                 $true_return[] = $each_param;
             }
         }

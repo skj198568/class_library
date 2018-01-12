@@ -630,9 +630,11 @@ class ClString
         if ($html) {
             $result = explode('<br/>', $result);
             foreach ($result as $k => $v) {
+                $has_comma = false;
                 //最后一个,号处理
                 if (substr($v, -1, 1) == ',') {
-                    $v = rtrim($v, ',') . '<i style="color: red;">,</i>';
+                    $v = rtrim($v, ',');
+                    $has_comma = true;
                 }
                 if (strpos($v, ':') !== false) {
                     $pre = ClString::getBetween($v, '', ':', false);
@@ -655,6 +657,9 @@ class ClString
                     $v = str_replace(']', '<span style="color: red;">]</span>', $v);
                 } else if (str_replace('&nbsp;', '', $v) == '[') {
                     $v = str_replace('[', '<span style="color: red;">[</span>', $v);
+                }
+                if($has_comma){
+                    $v .= '<i style="color: red;">,</i>';
                 }
                 $result[$k] = $v;
             }

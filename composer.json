@@ -15,7 +15,7 @@
     "phpoffice/phpexcel": "*",
     "phpmailer/phpmailer": "*",
     "michelf/php-markdown": "*",
-    "endroid/qrcode": "*"
+    "endroid/qr-code": "*"
   },
   "autoload": {
     "files": ["ClassLibrary/common.php"],

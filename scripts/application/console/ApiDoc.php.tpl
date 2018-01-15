@@ -621,7 +621,7 @@ class ApiDoc extends Command
      */
     private function getFunctionName($function_content){
         $function_name = ClString::getBetween($function_content, 'function', '(', false);
-        return trim($function_name);
+        return strtolower(trim($function_name));
     }
 
     /**

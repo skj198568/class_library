@@ -22,7 +22,7 @@ function log_info()
         $function = \ClassLibrary\ClCache::getFunctionHistory(2);
         //日志
         $str = '[' . $function . ']' .call_user_func_array(['\ClassLibrary\ClString', 'toString'], $args);
-        Log::record('[' . \ClassLibrary\ClCache::getFunctionHistory(2) . ']' . $str, Log::LOG);
+        Log::record($str, Log::LOG);
     }
 }
 

@@ -70,6 +70,7 @@ class BaseApiController extends Controller
      * @param $model_instance
      * @param $where
      * @param string $call_back 回调函数
+     * @param array $exclude_fields 不包含的字段
      * @param int $limit 每页显示数
      * @param null|int $duration 缓存时间
      * @return array
@@ -77,7 +78,7 @@ class BaseApiController extends Controller
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    protected function paging(BaseModel $model_instance, $where, $call_back = '', $limit = PAGES_NUM, $duration = null)
+    protected function paging(BaseModel $model_instance, $where, $call_back = '', $exclude_fields = [], $limit = PAGES_NUM, $duration = null)
     {
         $limit = get_param('limit', ClFieldVerify::instance()->verifyIsRequire()->verifyNumber()->fetchVerifies(), '每页显示数量', $limit);
         $total = get_param('total', ClFieldVerify::instance()->verifyNumber()->fetchVerifies(), '总数，默认为0', 0);
@@ -90,8 +91,9 @@ class BaseApiController extends Controller
             'total' => $total
         ];
         $return['items'] = $model_instance
-            ->cache([$model_instance->getTable(), $where, $order, $page, $limit, 'items'], $duration)
+            ->cache([$model_instance->getTable(), $where, $exclude_fields, $order, $page, $limit, 'items'], $duration)
             ->where($where)
+            ->field($model_instance::getAllFields($exclude_fields))
             ->order([
                 $sort => $order
             ])

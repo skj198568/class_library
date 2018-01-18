@@ -3,7 +3,6 @@
   "description": "tp5框架常用类库",
   "type": "library",
   "license": "MIT",
-  "version": "0.8",
   "authors": [
     {
       "name": "宋可敬",

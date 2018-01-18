@@ -463,13 +463,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isPassword($each_value, $v_verify[1], $v_verify[2])) {
-                                            $error_msg = sprintf('%s:%s 密码长度%s~%s', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1], $v_verify[2]);
+                                            $error_msg = sprintf('%s:%s 密码长度%s~%s，且只能包含字符、数字和下划线', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1], $v_verify[2]);
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isPassword($fields[$k_field], $v_verify[1], $v_verify[2])) {
-                                        $error_msg = sprintf('%s:%s 密码长度%s~%s', $k_field, $fields[$k_field], $v_verify[1], $v_verify[2]);
+                                        $error_msg = sprintf('%s:%s 密码长度%s~%s，且只能包含字符、数字和下划线', $k_field, $fields[$k_field], $v_verify[1], $v_verify[2]);
                                     }
                                 }
                             }

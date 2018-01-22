@@ -320,6 +320,15 @@ class ClFieldVerify
     }
 
     /**
+     * 时间格式
+     * @return $this
+     */
+    public function verifyIsDate(){
+        $this->field_config['verifies'][] = 'is_date';
+        return $this;
+    }
+
+    /**
      * 唯一值
      * @return $this
      */
@@ -419,6 +428,9 @@ class ClFieldVerify
                         break;
                     case 'unique':
                         $filters_desc[] = '唯一值';
+                        break;
+                    case 'is_date':
+                        $filters_desc[] = '时间格式';
                         break;
                 }
             }
@@ -866,6 +878,21 @@ class ClFieldVerify
                                             //两个结果记录不同，则不可更新
                                             $error_msg = sprintf('%s:%s 该值为unique，不可重复，已经存在记录id=%s', $k_field, $fields[$k_field], $field_id);
                                         }
+                                    }
+                                }
+                            }
+                            break;
+                        case 'is_date':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isDate($each_value)) {
+                                            $error_msg = sprintf('%s:%s 时间格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isDate($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 时间格式错误', $k_field, $fields[$k_field]);
                                     }
                                 }
                             }

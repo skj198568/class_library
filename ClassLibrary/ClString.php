@@ -222,6 +222,9 @@ class ClString
      */
     public static function replaceOnce($search, $replace, $string)
     {
+        if(empty($search)){
+            return $string;
+        }
         $pos = strpos($string, $search);
         if ($pos === false) {
             return $string;

@@ -127,7 +127,7 @@ class ClFieldVerify
     }
 
     /**
-     * 字符串最长
+     * 字符串长度
      * @param $length
      * @return $this
      */

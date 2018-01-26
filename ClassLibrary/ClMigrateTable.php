@@ -16,7 +16,7 @@ namespace ClassLibrary;
  */
 class ClMigrateTable
 {
-    
+
     /**
      * 实例对象
      * @var null
@@ -130,7 +130,15 @@ class ClMigrateTable
             ], $this->table_config),
             JSON_UNESCAPED_UNICODE)
         );
-        $this->table_config = [];
+        $this->table_config = [
+            'create_api' => [
+                self::V_CREATE_API_GET_LIST,
+                self::V_CREATE_API_GET,
+                self::V_CREATE_API_CREATE,
+                self::V_CREATE_API_DELETE,
+                self::V_CREATE_API_UPDATE
+            ]
+        ];
         return $sql;
     }
 

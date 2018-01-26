@@ -98,7 +98,7 @@ class ClMigrateField extends ClFieldVerify
 
     /**
      * 展现格式化
-     * @param mixed $format 例如：date('Y-m-d H:i:s', %s)
+     * @param string|array $format 两种方式，date('Y-m-d H:i:s', %s)这种会自动sprintf进行格式话，这种[["1","是"],["0","否"]]会自动按1和0进行格式话显示
      * @param string $alias_append 别名，如果不为空，则自动拼接生成新字段，如果为空，则覆盖当前字段
      * @return $this
      */
@@ -134,15 +134,6 @@ class ClMigrateField extends ClFieldVerify
     public function fetch($name)
     {
         $this->field_config['name'] = $name;
-        //静态变量
-        if(isset($this->field_config['const_values']) && !empty($this->field_config['const_values'])){
-            $format = [];
-            foreach($this->field_config['const_values'] as $each){
-                $format[] = [$each[1], $each[2]];
-            }
-            //添加格式化
-            $this->showFormat($format, '_show');
-        }
         $result = json_encode($this->field_config, JSON_UNESCAPED_UNICODE);
         $this->field_config = [];
         return $result;

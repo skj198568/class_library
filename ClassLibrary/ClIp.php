@@ -18,12 +18,6 @@ class ClIp
 {
 
     /**
-     * 百度key
-     * @var string
-     */
-    private static $baidu_key = 'B57ddde27d7b2603d4387ba49f708b4d';
-
-    /**
      * 错误码
      * @var array
      */
@@ -55,15 +49,16 @@ class ClIp
 
     /**
      * 获取错误地址，正确返回array，错误直接返回错误信息
-     * @param $ip
-     * @return string|array
+     * @param string $ip
+     * @param string $bai_du_developer_key 百度开发者key
+     * @return mixed|string
      */
-    public static function getAddress($ip)
+    public static function getAddress($ip, $bai_du_developer_key)
     {
         if(!ClVerify::isIp($ip)){
             return 'ip地址错误：'.$ip;
         }
-        $r = ClHttp::http(sprintf('http://api.map.baidu.com/location/ip?ip=%s&ak=%s&coor=bd09ll', $ip, self::$baidu_key));
+        $r = ClHttp::http(sprintf('http://api.map.baidu.com/location/ip?ip=%s&ak=%s&coor=bd09ll', $ip, $bai_du_developer_key));
         if ($r['status'] == 0) {
             return $r['content'];
         } else {

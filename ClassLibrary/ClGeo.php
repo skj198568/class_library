@@ -23,18 +23,6 @@ class ClGeo
     private static $r = 6378137;
 
     /**
-     * 腾讯地图请求key值，1万次/每日，5次/秒
-     * @var string
-     */
-    private static $qq_key = '436BZ-ECMKU-6INVS-BH7GZ-OXYJ6-OFF77';
-
-    /**
-     * 百度key
-     * @var string
-     */
-    private static $baidu_key = 'B57ddde27d7b2603d4387ba49f708b4d';
-
-    /**
      * 计算两点间的距离
      * @param integer $a_wei a点纬度
      * @param integer $a_jing a点经度
@@ -59,23 +47,24 @@ class ClGeo
     /**
      * 依据地址获取经纬度，建议缓存查询结果
      * @param string $address 地址
-     * @param string $key qq开发者key
+     * @param string $qq_developer_key qq开发者key
      * @return bool|mixed
      */
-    public static function getByAddressWithQQMap($address, $key = '')
+    public static function getByAddressWithQQMap($address, $qq_developer_key = '')
     {
-        $r = ClHttp::http(sprintf('http://apis.map.qq.com/ws/geocoder/v1/?address=%s&key=%s', urlencode($address), empty($key) ? self::$qq_key : $key));
+        $r = ClHttp::http(sprintf('http://apis.map.qq.com/ws/geocoder/v1/?address=%s&key=%s', urlencode($address), $qq_developer_key));
         return $r['status'] == 0 ? $r['result'] : false;
     }
 
     /**
      * 依据地址获取经纬度，建议缓存查询结果
      * @param $address
-     * @param string $key
+     * @param string $bai_du_developer_key 百度开发者key
      * @return bool|mixed
      */
-    public static function getByAddressWithBaiDu($address, $key = ''){
-        $r = ClHttp::http(sprintf('http://api.map.baidu.com/geocoder/v2/?address=%s&output=json&ak=%s', urlencode($address), empty($key) ? self::$baidu_key : $key));
+    public static function getByAddressWithBaiDu($address, $bai_du_developer_key = ''){
+        $r = ClHttp::http(sprintf('http://api.map.baidu.com/geocoder/v2/?address=%s&output=json&ak=%s', urlencode($address), $bai_du_developer_key));
         return $r['status'] == 0 ? $r['result'] : false;
     }
+
 }

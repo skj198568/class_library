@@ -35,16 +35,30 @@ class ClFile
             //去除为空的数据
             array_shift($dir_array);
         }
-        //第一个目录不判断
-        $dir_str .= $dir_array[0];
-        array_shift($dir_array);
         //判断最后一个是文件还是文件夹
         if ($is_file) {
             $min_limit = 1;
         } else {
             $min_limit = empty(self::getSuffix($file_name)) ? 0 : 1;
         }
-        while (is_array($dir_array) && count($dir_array) > $min_limit) {
+        if($min_limit > 0){
+            array_pop($dir_array);
+        }
+        //赋值
+        $temp_dir_array = $dir_array;
+        while (is_array($temp_dir_array) && count($temp_dir_array) > $min_limit) {
+            $dir_str = '/' . implode('/', $temp_dir_array);
+            if (is_dir($dir_str)) {
+                break;
+            }
+            array_pop($temp_dir_array);
+        }
+        //去除相同目录
+        $dir_array = '/' . implode('/', $dir_array);
+        $dir_array = str_replace($dir_str, '', $dir_array);
+        $dir_array = explode('/', trim($dir_array, '/'));
+        //第一个目录不判断
+        while (is_array($dir_array) && !empty($dir_array)) {
             $dir_str .= '/' . $dir_array[0];
             if (!is_dir($dir_str)) {
                 mkdir($dir_str, 0777);

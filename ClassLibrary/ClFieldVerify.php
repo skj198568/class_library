@@ -475,13 +475,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isPassword($each_value, $v_verify[1], $v_verify[2])) {
-                                            $error_msg = sprintf('%s:%s 密码长度%s~%s，且只能包含字符、数字和下划线', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1], $v_verify[2]);
+                                            $error_msg = sprintf('%s:%s 密码长度%s~%s，且只能包含字符、数字和下划线', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1], $v_verify[2]);
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isPassword($fields[$k_field], $v_verify[1], $v_verify[2])) {
-                                        $error_msg = sprintf('%s:%s 密码长度%s~%s，且只能包含字符、数字和下划线', $k_field, $fields[$k_field], $v_verify[1], $v_verify[2]);
+                                        $error_msg = sprintf('%s:%s 密码长度%s~%s，且只能包含字符、数字和下划线', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field], $v_verify[1], $v_verify[2]);
                                     }
                                 }
                             }
@@ -491,13 +491,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!in_array($each_value, $v_verify[1])) {
-                                            $error_msg = sprintf('%s:%s 不在%s范围内', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 不在%s范围内', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!in_array($fields[$k_field], $v_verify[1])) {
-                                        $error_msg = sprintf('%s:%s 不在%s范围内', $k_field, $fields[$k_field], json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
+                                        $error_msg = sprintf('%s:%s 不在%s范围内', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field], json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
                                     }
                                 }
                             }
@@ -507,13 +507,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if ($each_value < $v_verify[1] || $each_value > $v_verify[2]) {
-                                            $error_msg = sprintf('%s:%s 不在[%s, %s]区间内', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1], $v_verify[2]);
+                                            $error_msg = sprintf('%s:%s 不在[%s, %s]区间内', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1], $v_verify[2]);
                                             break;
                                         }
                                     }
                                 } else {
                                     if ($fields[$k_field] < $v_verify[1] || $fields[$k_field] > $v_verify[2]) {
-                                        $error_msg = sprintf('%s:%s 不在[%s, %s]区间内', $k_field, $fields[$k_field], $v_verify[1], $v_verify[2]);
+                                        $error_msg = sprintf('%s:%s 不在[%s, %s]区间内', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field], $v_verify[1], $v_verify[2]);
                                     }
                                 }
                             }
@@ -523,13 +523,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if ($each_value > $v_verify[1]) {
-                                            $error_msg = sprintf('%s:%s 最大值%s', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
+                                            $error_msg = sprintf('%s:%s 最大值%s', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
                                             break;
                                         }
                                     }
                                 } else {
                                     if ($fields[$k_field] > $v_verify[1]) {
-                                        $error_msg = sprintf('%s:%s 最大值%s', $k_field, $fields[$k_field], $v_verify[1]);
+                                        $error_msg = sprintf('%s:%s 最大值%s', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field], $v_verify[1]);
                                     }
                                 }
                             }
@@ -539,13 +539,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if ($each_value < $v_verify[1]) {
-                                            $error_msg = sprintf('%s:%s 最小值%s', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
+                                            $error_msg = sprintf('%s:%s 最小值%s', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
                                             break;
                                         }
                                     }
                                 } else {
                                     if ($fields[$k_field] < $v_verify[1]) {
-                                        $error_msg = sprintf('%s:%s 最小值%s', $k_field, $fields[$k_field], $v_verify[1]);
+                                        $error_msg = sprintf('%s:%s 最小值%s', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field], $v_verify[1]);
                                     }
                                 }
                             }
@@ -555,13 +555,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (ClString::getLength($each_value) != $v_verify[1]) {
-                                            $error_msg = sprintf('%s:%s 长度为%s', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
+                                            $error_msg = sprintf('%s:%s 长度为%s', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
                                             break;
                                         }
                                     }
                                 } else {
                                     if (ClString::getLength($fields[$k_field]) != $v_verify[1]) {
-                                        $error_msg = sprintf('%s:%s 长度为%s', $k_field, $fields[$k_field], $v_verify[1]);
+                                        $error_msg = sprintf('%s:%s 长度为%s', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field], $v_verify[1]);
                                     }
                                 }
                             }
@@ -571,13 +571,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (ClString::getLength($each_value) > $v_verify[1]) {
-                                            $error_msg = sprintf('%s:%s 最大长度%s', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
+                                            $error_msg = sprintf('%s:%s 最大长度%s', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
                                             break;
                                         }
                                     }
                                 } else {
                                     if (ClString::getLength($fields[$k_field]) > $v_verify[1]) {
-                                        $error_msg = sprintf('%s:%s 最大长度%s', $k_field, $fields[$k_field], $v_verify[1]);
+                                        $error_msg = sprintf('%s:%s 最大长度%s', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field], $v_verify[1]);
                                     }
                                 }
                             }
@@ -587,13 +587,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (ClString::getLength($each_value) < $v_verify[1]) {
-                                            $error_msg = sprintf('%s:%s 最小长度%s', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
+                                            $error_msg = sprintf('%s:%s 最小长度%s', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
                                             break;
                                         }
                                     }
                                 } else {
                                     if (ClString::getLength($fields[$k_field]) < $v_verify[1]) {
-                                        $error_msg = sprintf('%s:%s 最小长度%s', $k_field, $fields[$k_field], $v_verify[1]);
+                                        $error_msg = sprintf('%s:%s 最小长度%s', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field], $v_verify[1]);
                                     }
                                 }
                             }
@@ -618,13 +618,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isEmail($each_value)) {
-                                            $error_msg = sprintf('%s:%s 邮箱格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 邮箱格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isEmail($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s 邮箱格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 邮箱格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -634,13 +634,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isMobile($each_value)) {
-                                            $error_msg = sprintf('%s:%s 手机号码格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 手机号码格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isMobile($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s 手机号码格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 手机号码格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -650,13 +650,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isIp($each_value)) {
-                                            $error_msg = sprintf('%s:%s ip格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s ip格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isIp($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s ip格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s ip格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -666,13 +666,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isPostcode($each_value)) {
-                                            $error_msg = sprintf('%s:%s 邮编格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 邮编格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isPostcode($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s 邮编格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 邮编格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -682,12 +682,12 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isIdCard($each_value)) {
-                                            $error_msg = sprintf('%s:%s 身份证格式错误', $k_field, $fields[$k_field]);
+                                            $error_msg = sprintf('%s:%s 身份证格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isIdCard($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s 身份证格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 身份证格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -697,13 +697,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isChinese($each_value)) {
-                                            $error_msg = sprintf('%s:%s 中文格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 中文格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isChinese($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s 中文格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 中文格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -713,13 +713,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isChineseAlpha($each_value)) {
-                                            $error_msg = sprintf('%s:%s 中文、英文格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 中文、英文格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isChineseAlpha($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s 中文、英文格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 中文、英文格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -729,13 +729,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isChineseAlphaNum($each_value)) {
-                                            $error_msg = sprintf('%s:%s 中文、英文、数字格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 中文、英文、数字格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isChineseAlphaNum($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s 中文、英文、数字格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 中文、英文、数字格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -745,13 +745,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isChineseAlphaNumDash($each_value)) {
-                                            $error_msg = sprintf('%s:%s 中文、英文、数字、-、_格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 中文、英文、数字、-、_格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isChineseAlphaNumDash($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s 中文、英文、数字、-、_格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 中文、英文、数字、-、_格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -761,13 +761,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isAlpha($each_value)) {
-                                            $error_msg = sprintf('%s:%s 英文格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 英文格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isAlpha($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s 英文格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 英文格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -777,13 +777,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isAlphaNum($each_value)) {
-                                            $error_msg = sprintf('%s:%s 英文、数字格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 英文、数字格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isAlphaNum($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s 英文、数字格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 英文、数字格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -793,13 +793,13 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isAlphaNumDash($each_value)) {
-                                            $error_msg = sprintf('%s:%s 英文、数字、-、_格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 英文、数字、-、_格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isAlphaNumDash($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s 英文、数字、-、_格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 英文、数字、-、_格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -809,12 +809,12 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isUrl($each_value)) {
-                                            $error_msg = sprintf('%s:%s url格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s url格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isUrl($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s url格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s url格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -824,12 +824,12 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!is_numeric($each_value)) {
-                                            $error_msg = sprintf('%s:%s 数字格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 数字格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                         }
                                     }
                                 } else {
                                     if (!is_numeric($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s 数字格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 数字格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -839,12 +839,12 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isTel($each_value)) {
-                                            $error_msg = sprintf('%s:%s 固话格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 固话格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isTel($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s 固话格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 固话格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }
@@ -852,7 +852,7 @@ class ClFieldVerify
                         case 'array':
                             if (isset($fields[$k_field])) {
                                 if (!is_array($fields[$k_field])) {
-                                    $error_msg = sprintf('%s:%s 数组格式错误', $k_field, $fields[$k_field]);
+                                    $error_msg = sprintf('%s:%s 数组格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                 }
                             }
                             break;
@@ -865,7 +865,7 @@ class ClFieldVerify
                                         $k_field => $fields[$k_field]
                                     ])->count();
                                     if ($count > 0) {
-                                        $error_msg = sprintf('%s:%s 该值为unique，不可重复', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 该值为unique，不可重复', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }else{
                                     //更新，则要判断where条件
@@ -876,7 +876,7 @@ class ClFieldVerify
                                         $where_id = $new_instance->where($where['AND'])->value($new_instance->getPk());
                                         if($field_id != $where_id){
                                             //两个结果记录不同，则不可更新
-                                            $error_msg = sprintf('%s:%s 该值为unique，不可重复，已经存在记录id=%s', $k_field, $fields[$k_field], $field_id);
+                                            $error_msg = sprintf('%s:%s 该值为unique，不可重复，已经存在记录id=%s', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field], $field_id);
                                         }
                                     }
                                 }
@@ -887,12 +887,12 @@ class ClFieldVerify
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isDate($each_value)) {
-                                            $error_msg = sprintf('%s:%s 时间格式错误', $k_field, json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 时间格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
                                         }
                                     }
                                 } else {
                                     if (!ClVerify::isDate($fields[$k_field])) {
-                                        $error_msg = sprintf('%s:%s 时间格式错误', $k_field, $fields[$k_field]);
+                                        $error_msg = sprintf('%s:%s 时间格式错误', empty($instance::$fields_names[$k_field]) ? $k_field : $instance::$fields_names[$k_field], $fields[$k_field]);
                                     }
                                 }
                             }

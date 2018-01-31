@@ -27,9 +27,9 @@ class ClFile
         $file_name = trim(str_replace('\\', '/', $absolute_file_name), '/');
         $dir_array = explode('/', $file_name);
         if (ClSystem::isWin()) {
-            $dir_str = '';
+            $dir_str_pre = '';
         } else {
-            $dir_str = '/';
+            $dir_str_pre = '/';
         }
         if (empty($dir_array[0])) {
             //去除为空的数据
@@ -47,14 +47,14 @@ class ClFile
         //赋值
         $temp_dir_array = $dir_array;
         while (is_array($temp_dir_array) && count($temp_dir_array) > $min_limit) {
-            $dir_str = '/' . implode('/', $temp_dir_array);
+            $dir_str = $dir_str_pre . implode('/', $temp_dir_array);
             if (is_dir($dir_str)) {
                 break;
             }
             array_pop($temp_dir_array);
         }
         //去除相同目录
-        $dir_array = '/' . implode('/', $dir_array);
+        $dir_array = $dir_str_pre . implode('/', $dir_array);
         $dir_array = str_replace($dir_str, '', $dir_array);
         $dir_array = explode('/', trim($dir_array, '/'));
         //第一个目录不判断

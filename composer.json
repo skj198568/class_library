@@ -11,7 +11,7 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "phpoffice/phpspreadsheet": "*",
+    "phpoffice/phpexcel": "*",
     "phpmailer/phpmailer": "*",
     "michelf/php-markdown": "*",
     "endroid/qr-code": "*"

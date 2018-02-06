@@ -929,8 +929,8 @@ class ClFieldVerify
         if(is_null($instance)){
             return $key_field;
         }
-        if(!empty($instance::$fields_names[$k_field])){
-            return $instance::$fields_names[$k_field].'('.$k_field.')';
+        if(isset($instance::$fields_names[$key_field]) && !empty($instance::$fields_names[$key_field])){
+            return $instance::$fields_names[$key_field].'('.$key_field.')';
         }else{
             return $key_field;
         }

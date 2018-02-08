@@ -326,7 +326,6 @@ class ClFile
      * 处理客户端上传
      * @param string $file_absolute_path 文件保存绝对路径
      * @return array
-     * @throws \Think\Exception
      */
     public static function uploadDealClient($file_absolute_path = '')
     {

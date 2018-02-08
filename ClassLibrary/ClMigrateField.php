@@ -88,7 +88,7 @@ class ClMigrateField extends ClFieldVerify
 
     /**
      * 展现时映射其他表字段，该字段必须为其他表的主键
-     * @param array $map_fields 映射表字段数组：[['其他表字段', '显示名称', '字段说明'], ['user.name', 'name_show', '用户名'], ['user.age', 'value_show', '年龄']]
+     * @param array $map_fields 映射表字段数组：[['不带前缀的表名.表字段', '显示名称', '字段说明'], ['user.name', 'name_show', '用户名'], ['user.age', 'value_show', '年龄']]
      * @return $this
      */
     public function showMapFields($map_fields = []){

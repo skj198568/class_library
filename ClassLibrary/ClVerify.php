@@ -26,36 +26,6 @@ class ClVerify
     private static $model_instance = null;
 
     /**
-     * 生成验证码
-     * @param string $id
-     */
-    public static function entryCode($id = '')
-    {
-        if (self::$model_instance == null) {
-            self::$model_instance = new Verify(array(
-                'reset' => false
-            ));
-        }
-        self::$model_instance->entry($id);
-    }
-
-    /**
-     * 校验验证码
-     * @param $code
-     * @param string $id
-     * @return bool
-     */
-    public static function checkCode($code, $id = '')
-    {
-        if (self::$model_instance == null) {
-            self::$model_instance = new Verify(array(
-                'reset' => false
-            ));
-        }
-        return self::$model_instance->check($code, $id);
-    }
-
-    /**
      * 是否是邮件
      * @param $str
      * @return bool
@@ -265,16 +235,6 @@ class ClVerify
     }
 
     /**
-     * 创建密码
-     * @param $ps
-     * @return mixed
-     */
-    public static function createPs($ps)
-    {
-        return md5($ps . 'SongKeJing');
-    }
-
-    /**
      * 大写字母
      * @param $str
      * @return bool
@@ -372,6 +332,15 @@ class ClVerify
      */
     public static function isDate($str){
         return false !== strtotime($str);
+    }
+
+    /**
+     * 是否是域名
+     * @param $str
+     * @return bool
+     */
+    public static function isDomain($str){
+        return preg_match('/(http(s?):\/\/)?([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,6}/u', $str) === 1;
     }
 
 }

@@ -339,6 +339,16 @@ class ClFieldVerify
     }
 
     /**
+     * 是否是域名
+     * @return $this
+     */
+    public function verifyIsDomain()
+    {
+        $this->field_config['verifies'][] = 'is_domain';
+        return $this;
+    }
+
+    /**
      * 获取描述名称
      * @param $filters
      * @return string
@@ -431,6 +441,9 @@ class ClFieldVerify
                         break;
                     case 'is_date':
                         $filters_desc[] = '时间格式';
+                        break;
+                    case 'is_domain':
+                        $filters_desc[] = '域名';
                         break;
                 }
             }
@@ -893,6 +906,21 @@ class ClFieldVerify
                                 } else {
                                     if (!ClVerify::isDate($fields[$k_field])) {
                                         $error_msg = sprintf('%s:%s 时间格式错误', self::getFieldDesc($k_field, $instance), $fields[$k_field]);
+                                    }
+                                }
+                            }
+                            break;
+                        case 'is_domain':
+                            if (isset($fields[$k_field])) {
+                                if (is_array($fields[$k_field])) {
+                                    foreach ($fields[$k_field] as $each_value) {
+                                        if (!ClVerify::isDomain($each_value)) {
+                                            $error_msg = sprintf('%s:%s 域名格式错误', self::getFieldDesc($k_field, $instance), json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE));
+                                        }
+                                    }
+                                } else {
+                                    if (!ClVerify::isDomain($fields[$k_field])) {
+                                        $error_msg = sprintf('%s:%s 域名格式错误', self::getFieldDesc($k_field, $instance), $fields[$k_field]);
                                     }
                                 }
                             }

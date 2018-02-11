@@ -332,7 +332,7 @@ class ClFile
         $file_size = input('post.file_size', '', 'trim');
         $file_name = input('post.name', '', 'trim,strval');
         $chunk = input('post.chunk', 'no', 'trim');
-        $root_path = sprintf(DOCUMENT_ROOT_PATH . '/files/%s/', date('Ymd'));
+        $root_path = sprintf(DOCUMENT_ROOT_PATH . '/upload/%s/', date('Ymd'));
         if (!is_dir($root_path)) {
             ClFile::dirCreate($root_path);
         }

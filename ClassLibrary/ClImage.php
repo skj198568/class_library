@@ -9,6 +9,7 @@
 namespace ClassLibrary;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\QrCode;
+use think\Image;
 
 /**
  * 图片处理类
@@ -49,7 +50,7 @@ class ClImage
             }
             return;
         }
-        $image = \think\Image::open($img_url);
+        $image = Image::open($img_url);
         $image_width = $image->width();
         $image_height = $image->height();
         //居中裁剪图片

@@ -62,12 +62,25 @@ class ClFile
             $dir_str .= '/' . $dir_array[0];
             if (!is_dir($dir_str)) {
                 mkdir($dir_str, 0777);
-                //修改权限，root用户创建可能是0755
-                chmod($dir_str, 0777);
+                if(self::checkChmod($dir_str, 0777)){
+                    //修改权限，root用户创建可能是0755
+                    chmod($dir_str, 0777);
+                }
             }
             array_shift($dir_array);
         }
         return $dir_str;
+    }
+
+    /**
+     * 判断文件、文件夹权限
+     * @param $file_path
+     * @param int $target_chmod
+     * @return bool
+     */
+    public static function checkChmod($file_path, $target_chmod = 0777){
+        $mod = substr(base_convert(@fileperms($file_path),10,8),-4);
+        return ($mod == $target_chmod) || ($mod == strval($target_chmod));
     }
 
     /**

@@ -41,7 +41,7 @@ class ClFile
         } else {
             $min_limit = empty(self::getSuffix($file_name)) ? 0 : 1;
         }
-        if($min_limit > 0){
+        if ($min_limit > 0) {
             array_pop($dir_array);
         }
         //赋值
@@ -62,7 +62,7 @@ class ClFile
             $dir_str .= '/' . $dir_array[0];
             if (!is_dir($dir_str)) {
                 mkdir($dir_str, 0777);
-                if(self::checkChmod($dir_str, 0777)){
+                if (self::checkChmod($dir_str, 0777)) {
                     //修改权限，root用户创建可能是0755
                     chmod($dir_str, 0777);
                 }
@@ -78,8 +78,9 @@ class ClFile
      * @param int $target_chmod
      * @return bool
      */
-    public static function checkChmod($file_path, $target_chmod = 0777){
-        $mod = substr(base_convert(@fileperms($file_path),10,8),-4);
+    public static function checkChmod($file_path, $target_chmod = 0777)
+    {
+        $mod = substr(base_convert(@fileperms($file_path), 10, 8), -4);
         return ($mod == $target_chmod) || ($mod == strval($target_chmod));
     }
 
@@ -345,12 +346,12 @@ class ClFile
         $file_size = input('post.file_size', '', 'trim');
         $file_name = input('post.name', '', 'trim,strval');
         $chunk = input('post.chunk', 'no', 'trim');
-        $root_path = sprintf(DOCUMENT_ROOT_PATH . '/upload/%s/', date('Ymd'));
+        $root_path = sprintf(DOCUMENT_ROOT_PATH . '/upload/%s/', date('Y/m/d'));
         if (!is_dir($root_path)) {
             ClFile::dirCreate($root_path);
         }
         if ($chunk == 'no') {
-            $save_file = ($file_absolute_path == '' ? $root_path : $file_absolute_path) . date('His') .'.'. self::getSuffix($file_name);
+            $save_file = ($file_absolute_path == '' ? $root_path : $file_absolute_path) . date('His') . '_' . (ClString::toCrc32($file_size . $file_name)) . '.' . self::getSuffix($file_name);
             if (!is_dir($save_file)) {
                 ClFile::dirCreate($save_file);
             }
@@ -372,7 +373,7 @@ class ClFile
         //分片上传
         $chunks = input('post.chunks/d', null, 'trim');
         //目标文件
-        $destination_file = ($file_absolute_path == '' ? $root_path : $file_absolute_path) . date('Ymd') . '/' . (ClString::toCrc32($file_size . $file_name . $chunks) . '_temp' . self::getSuffix($file_name));
+        $destination_file = ($file_absolute_path == '' ? $root_path : $file_absolute_path) . (ClString::toCrc32($file_size . $file_name . $chunks) . '_temp' . self::getSuffix($file_name));
         $chunks = input('post.chunks', null, 'trim,intval');
         if ($_FILES['file']['error'] == 0) {
             $f = null;
@@ -411,19 +412,19 @@ class ClFile
                     rename($destination_file, $temp_name);
                 }
                 $destination_file = $temp_name;
-                return array(
+                return [
                     'result' => true,
                     'msg' => '上传成功',
                     'file' => str_replace(DOCUMENT_ROOT_PATH, '', $destination_file)
-                );
+                ];
             }
         } else {
             //记录日志
             log_info($_FILES);
-            return array(
+            return [
                 'result' => false,
                 'msg' => $_FILES['file']['error']
-            );
+            ];
         }
     }
 

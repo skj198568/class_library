@@ -703,5 +703,48 @@ class ClImage
         return str_replace(DOCUMENT_ROOT_PATH, '', $save_absolute_url);
     }
 
+    /**
+     * png转jpg
+     * @param $file_absolute_url 图片文件绝对地址
+     * @param bool $is_delete 是否删除
+     * @param int $quality 图片质量
+     * @return mixed
+     */
+    public static function png2jpg($file_absolute_url, $is_delete = true, $quality = 90)
+    {
+        $src_file = $file_absolute_url;
+        $add_server_document_root_dir = false;
+        if (!is_file($src_file)) {
+            if (is_file(ClHttp::getServerDocumentRoot() . $src_file)) {
+                $add_server_document_root_dir = true;
+                $src_file = ClHttp::getServerDocumentRoot() . $src_file;
+            }
+        }
+        $src_file_ext = ClFile::getSuffix($src_file);
+        if ($src_file_ext == 'png') {
+            $dst_file = str_replace('.png', '.jpg', $src_file);
+            $photo_size = GetImageSize($src_file);
+            $pw = $photo_size[0];
+            $ph = $photo_size[1];
+            $dst_image = ImageCreateTrueColor($pw, $ph);
+            imagecolorallocate($dst_image, 255, 255, 255);
+            //读取图片  
+            $src_image = ImageCreateFromPNG($src_file);
+            //合拼图片  
+            imagecopyresampled($dst_image, $src_image, 0, 0, 0, 0, $pw, $ph, $pw, $ph);
+            imagejpeg($dst_image, $dst_file, 90);
+            if ($is_delete) {
+                unlink($src_file);
+            }
+            imagedestroy($src_image);
+            if ($add_server_document_root_dir) {
+                $dst_file = str_replace(ClHttp::getServerDocumentRoot(), '', $dst_file);
+            }
+            return $dst_file;
+        } else {
+            return $file_absolute_url;
+        }
+    }
+
 }
 

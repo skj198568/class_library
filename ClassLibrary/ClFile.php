@@ -118,7 +118,7 @@ class ClFile
     /**
      * 获取文件夹下面的所有文件
      * @param string $dir 文件夹目录绝对地址
-     * @param array $file_types :文件类型array('pdf', 'doc')
+     * @param array $file_types :文件类型array('.pdf', '.doc')
      * @param array $ignore_dir_or_file : 忽略的文件或文件夹
      * @return array
      */
@@ -188,11 +188,16 @@ class ClFile
     /**
      * 获取文件后缀名
      * @param $file
-     * @return mixed
+     * @param bool $with_point 是否包含.
+     * @return string
      */
-    public static function getSuffix($file)
+    public static function getSuffix($file, $with_point = true)
     {
-        return isset(pathinfo($file)['extension']) ? strtolower(pathinfo($file)['extension']) : '';
+        $suffix = isset(pathinfo($file)['extension']) ? strtolower(pathinfo($file)['extension']) : '';
+        if($with_point && !empty($suffix)){
+            $suffix = '.'.$suffix;
+        }
+        return $suffix;
     }
 
     /**
@@ -274,14 +279,19 @@ class ClFile
         $path = preg_replace('/\/+/', '/', $path);
         if (strpos($path, '/') === false) {
             $suffix = self::getSuffix($path);
-            return ClString::hasChinese($path) ? (!empty($suffix) ? (ClString::toCrc32(trim($path, '.' . $suffix))) . '.' . $suffix : ClString::toCrc32($path)) : $path;
+            if(ClString::hasChinese($path)){
+                if(!empty($suffix)){
+                    return ClString::toCrc32($path).$suffix;
+                }else{
+                    return ClString::toCrc32($path);
+                }
+            }else{
+                return $path;
+            }
         } else {
             $path = explode('/', $path);
             foreach ($path as $k => $v) {
-                if (ClString::hasChinese($v)) {
-                    $suffix = self::getSuffix($v);
-                    $path[$k] = empty($suffix) ? ClString::toCrc32($v) : ClString::toCrc32(trim($v, '.' . $suffix)) . '.' . $suffix;
-                }
+                $path[$k] = self::pathChineseToEnglish($v);
             }
             return implode('/', $path);
         }
@@ -351,7 +361,7 @@ class ClFile
             ClFile::dirCreate($root_path);
         }
         if ($chunk == 'no') {
-            $save_file = ($file_absolute_path == '' ? $root_path : $file_absolute_path) . date('His') . '_' . (ClString::toCrc32($file_size . $file_name)) . '.' . self::getSuffix($file_name);
+            $save_file = ($file_absolute_path == '' ? $root_path : $file_absolute_path) . date('His') . '_' . (ClString::toCrc32($file_size . $file_name)) . self::getSuffix($file_name);
             if (!is_dir($save_file)) {
                 ClFile::dirCreate($save_file);
             }

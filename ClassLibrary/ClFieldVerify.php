@@ -484,7 +484,7 @@ class ClFieldVerify
                 if (is_array($v_verify)) {
                     switch ($v_verify[0]) {
                         case 'password':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isPassword($each_value, $v_verify[1], $v_verify[2])) {
@@ -500,7 +500,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'in_array':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!in_array($each_value, $v_verify[1])) {
@@ -516,7 +516,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'in_scope':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if ($each_value < $v_verify[1] || $each_value > $v_verify[2]) {
@@ -532,7 +532,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'max':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if ($each_value > $v_verify[1]) {
@@ -548,7 +548,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'min':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if ($each_value < $v_verify[1]) {
@@ -564,7 +564,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'length':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (ClString::getLength($each_value) != $v_verify[1]) {
@@ -580,7 +580,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'length_max':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (ClString::getLength($each_value) > $v_verify[1]) {
@@ -596,7 +596,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'length_min':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (ClString::getLength($each_value) < $v_verify[1]) {
@@ -616,18 +616,18 @@ class ClFieldVerify
                     switch ($v_verify) {
                         case 'is_required':
                             //更新不必判断是否必须，必须字段是在新增的时候判断
-                            if ($type != 'update') {
-                                if (!isset($fields[$k_field]) || (isset($fields[$k_field]) && !is_numeric($fields[$k_field]) && empty($fields[$k_field]))) {
-                                    $error_msg = sprintf('%s为必填项', self::getFieldDesc($k_field, $instance));
+                            if ($type == 'update') {
+                                if (isset($fields[$k_field]) && !self::fieldNeedCheck($fields, $k_field)) {
+                                    $error_msg = sprintf('%s不可为空', self::getFieldDesc($k_field, $instance));
                                 }
                             } else {
-                                if (isset($fields[$k_field]) && !is_numeric($fields[$k_field]) && empty($fields[$k_field])) {
-                                    $error_msg = sprintf('%s不可为空', self::getFieldDesc($k_field, $instance));
+                                if (!isset($fields[$k_field]) || !self::fieldNeedCheck($fields, $k_field)) {
+                                    $error_msg = sprintf('%s为必填项', self::getFieldDesc($k_field, $instance));
                                 }
                             }
                             break;
                         case 'email':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isEmail($each_value)) {
@@ -643,7 +643,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'mobile':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isMobile($each_value)) {
@@ -659,7 +659,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'ip':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isIp($each_value)) {
@@ -675,7 +675,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'postcode':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isPostcode($each_value)) {
@@ -691,7 +691,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'id_card':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isIdCard($each_value)) {
@@ -706,7 +706,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'chinese':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isChinese($each_value)) {
@@ -722,7 +722,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'chinese_alpha':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isChineseAlpha($each_value)) {
@@ -738,7 +738,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'chinese_alpha_num':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isChineseAlphaNum($each_value)) {
@@ -754,7 +754,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'chinese_alpha_num_dash':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isChineseAlphaNumDash($each_value)) {
@@ -770,7 +770,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'alpha':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isAlpha($each_value)) {
@@ -786,7 +786,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'alpha_num':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isAlphaNum($each_value)) {
@@ -802,7 +802,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'alpha_num_dash':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isAlphaNumDash($each_value)) {
@@ -818,7 +818,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'url':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isUrl($each_value)) {
@@ -833,7 +833,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'number':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!is_numeric($each_value)) {
@@ -848,7 +848,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'tel':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isTel($each_value)) {
@@ -863,14 +863,14 @@ class ClFieldVerify
                             }
                             break;
                         case 'array':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (!is_array($fields[$k_field])) {
                                     $error_msg = sprintf('%s:%s 数组格式错误', self::getFieldDesc($k_field, $instance), $fields[$k_field]);
                                 }
                             }
                             break;
                         case 'unique':
-                            if (isset($fields[$k_field]) && !is_null($instance)) {
+                            if (self::fieldNeedCheck($fields, $k_field) && !is_null($instance)) {
                                 $new_instance = $instance::instance(-2);
                                 if($type == 'insert'){
                                     //插入，则只需要判断是否存在
@@ -896,7 +896,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'is_date':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isDate($each_value)) {
@@ -911,7 +911,7 @@ class ClFieldVerify
                             }
                             break;
                         case 'is_domain':
-                            if (isset($fields[$k_field])) {
+                            if (self::fieldNeedCheck($fields, $k_field)) {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!ClVerify::isDomain($each_value)) {
@@ -962,6 +962,16 @@ class ClFieldVerify
         }else{
             return $key_field;
         }
+    }
+
+    /**
+     * 字段是否校验
+     * @param $fields
+     * @param $k_field
+     * @return bool
+     */
+    private static function fieldNeedCheck($fields, $k_field){
+        return isset($fields[$k_field]) && (is_numeric($fields[$k_field]) || !empty($fields[$k_field]));
     }
 
 }

@@ -7,6 +7,7 @@
  */
 
 namespace ClassLibrary;
+
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\QrCode;
 use think\Image;
@@ -29,13 +30,17 @@ class ClImage
      */
     public static function centerCut($img_url, $cut_width, $cut_height = 0, $save_img_url = '', $is_delete = false)
     {
-        if(!is_file($img_url)){
-            if(is_file(ClHttp::getServerDocumentRoot().$img_url)){
-                $img_url = ClHttp::getServerDocumentRoot().$img_url;
+        if (!is_file($img_url)) {
+            if (is_file(ClHttp::getServerDocumentRoot() . $img_url)) {
+                $img_url = ClHttp::getServerDocumentRoot() . $img_url;
             }
         }
+        if(!is_file($img_url)){
+            log_info('文件不存在：'.$img_url);
+            return;
+        }
         $cut_width = intval($cut_width);
-        if($cut_height == 0){
+        if ($cut_height == 0) {
             $cut_height = self::getHeightByProportion($img_url, $cut_width);
         }
         $cut_height = intval($cut_height);
@@ -153,7 +158,7 @@ class ClImage
         $file_dir = '/QrCode';
         $file_name = md5($str . $logo_absolute_file . $qr_width) . '.png';
         //三级目录存储
-        $file = $file_dir . '/' . implode('/', ClString::toArray(substr($file_name, 0 ,32))). '/'.$file_name;
+        $file = $file_dir . '/' . implode('/', ClString::toArray(substr($file_name, 0, 32))) . '/' . $file_name;
         if ($force == false && is_file(DOCUMENT_ROOT_PATH . $file)) {
             return $file;
         }
@@ -169,10 +174,10 @@ class ClImage
             ->setForegroundColor($foreground_color)
             ->setBackgroundColor($background_color)
             ->setValidateResult(false);
-        if(!empty($logo_absolute_file)){
+        if (!empty($logo_absolute_file)) {
             $qrCode
                 ->setLogoPath($logo_absolute_file)
-                ->setLogoWidth(ceil($qr_width/5));
+                ->setLogoWidth(ceil($qr_width / 5));
         }
         //保存
         $qrCode->writeFile(DOCUMENT_ROOT_PATH . $file);
@@ -194,7 +199,7 @@ class ClImage
         $temp_logo = DOCUMENT_ROOT_PATH . '/temp.png';
         self::centerCut($logo_absolute_file, ceil($QR_width / 5), ceil($QR_width / 5), $temp_logo);
         //拼接图片
-        $x = $y = ceil(($QR_width-$QR_width/5)/2);
+        $x = $y = ceil(($QR_width - $QR_width / 5) / 2);
         return self::mergeImages($qr_absolute_file, $temp_logo, $x, $y);
     }
 
@@ -597,7 +602,7 @@ class ClImage
         $white = imagecolorallocate($image, 255, 255, 255);
         imagefill($image, 0, 0, $white);
         $font = 5;
-        imagestring($image, $font, ceil(($img_width-imagefontwidth($font)*strlen($text))/2), $img_height + 5, $text, $black);
+        imagestring($image, $font, ceil(($img_width - imagefontwidth($font) * strlen($text)) / 2), $img_height + 5, $text, $black);
 
         $location = 10;
         for ($position = 1; $position <= strlen($code_string); $position++) {
@@ -671,21 +676,21 @@ class ClImage
     public static function createWithString($string, $save_absolute_url = '', $width = 0, $height = 0, $x = -1, $y = -1)
     {
         $font = 10;
-        if($width == 0){
-            $width = imagefontwidth($font)*strlen($string);
+        if ($width == 0) {
+            $width = imagefontwidth($font) * strlen($string);
         }
-        if($height == 0){
+        if ($height == 0) {
             $height = imagefontheight($font);
         }
-        if($x == -1){
-            $x = ceil(($width-imagefontwidth($font)*strlen($string))/2);
+        if ($x == -1) {
+            $x = ceil(($width - imagefontwidth($font) * strlen($string)) / 2);
         }
-        if($y == -1){
-            $y = ceil(($height-imagefontheight($font))/2);
+        if ($y == -1) {
+            $y = ceil(($height - imagefontheight($font)) / 2);
         }
-        if(empty($save_absolute_url)){
-            $save_absolute_url = DOCUMENT_ROOT_PATH.'/static/images/string/'.ClString::toCrc32($string).$width.'_'.$height.'_'.$x.'_'.$y.'.png';
-            if(is_file($save_absolute_url)){
+        if (empty($save_absolute_url)) {
+            $save_absolute_url = DOCUMENT_ROOT_PATH . '/static/images/string/' . ClString::toCrc32($string) . $width . '_' . $height . '_' . $x . '_' . $y . '.png';
+            if (is_file($save_absolute_url)) {
                 return str_replace(DOCUMENT_ROOT_PATH, '', $save_absolute_url);
             }
         }

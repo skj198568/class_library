@@ -142,7 +142,8 @@ class ClArray
      * @param $array
      * @return string
      */
-    public static function jsonUnicode($array){
+    public static function jsonUnicode($array)
+    {
         return json_encode($array, JSON_UNESCAPED_UNICODE);
     }
 
@@ -151,7 +152,8 @@ class ClArray
      * @param $array
      * @return string
      */
-    public static function jsonPretty($array){
+    public static function jsonPretty($array)
+    {
         return json_encode($array, JSON_PRETTY_PRINT);
     }
 
@@ -160,7 +162,8 @@ class ClArray
      * @param $array
      * @return string
      */
-    public static function jsonSlashes($array){
+    public static function jsonSlashes($array)
+    {
         return json_encode($array, JSON_UNESCAPED_SLASHES);
     }
 
@@ -171,14 +174,15 @@ class ClArray
      * @param array $filters 过滤器
      * @return array
      */
-    public static function getByKeys($array, $keys, $filters = ['trim']){
+    public static function getByKeys($array, $keys, $filters = ['trim'])
+    {
         $return = [];
-        foreach($array as $k => $v){
-            if(in_array($k, $keys)){
+        foreach ($array as $k => $v) {
+            if (in_array($k, $keys)) {
                 $return[$k] = $v;
             }
         }
-        if(!empty($filters)){
+        if (!empty($filters)) {
             $return = self::itemFilters($return, $filters);
         }
         return $return;
@@ -190,16 +194,42 @@ class ClArray
      * @param array $filters
      * @return array
      */
-    public static function itemFilters($array, $filters = ['trim']){
-        if(!is_array($array)){
+    public static function itemFilters($array, $filters = ['trim'])
+    {
+        if (!is_array($array)) {
             return $array;
         }
-        foreach($filters as $filter){
-            array_walk_recursive($array, function(&$each) use ($filter){
+        foreach ($filters as $filter) {
+            array_walk_recursive($array, function (&$each) use ($filter) {
                 $each = call_user_func($filter, $each);
             });
         }
         return $array;
+    }
+
+    /**
+     * 判断数组是否是一维数组
+     * @param array $arr
+     * @param int $is_rule 是否是规则数组，规则数组为类似数据库存储结构
+     * @return bool
+     */
+    public static function isLinearArray($arr, $is_rule = true)
+    {
+        if (count($arr) === count($arr, 1)) {
+            //数组内，单个属性不存在数组情况，属于简单数组
+            return true;
+        } else if ($is_rule) {
+            //如果是规则数组，则进一步判断每一个值是否是数组，如果有一个值不为数组，则是一维数组
+            foreach ($arr as $k => $v) {
+                if (!is_array($v)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            //非规则数组
+            return false;
+        }
     }
 
 }

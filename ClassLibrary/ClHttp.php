@@ -35,11 +35,15 @@ class ClHttp
 
     /**
      * 获取服务器地址
+     * @param bool $with_protocol
      * @return string
      */
-    public static function getServerDomain()
+    public static function getServerDomain($with_protocol = true)
     {
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+        $protocol = '';
+        if($with_protocol){
+            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+        }
         return $protocol . $_SERVER['HTTP_HOST'];
     }
 

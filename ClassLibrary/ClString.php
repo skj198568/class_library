@@ -289,7 +289,9 @@ class ClString
      */
     public static function parseToArray($string, $begin_tag, $end_tag, $is_include_tag = true)
     {
-        preg_match_all("($begin_tag(.*)$end_tag)siU", $string, $matching_data);
+        $preg_quote_begin_tag = preg_quote($begin_tag);
+        $preg_quote_end_tag = preg_quote($end_tag);
+        preg_match_all("($preg_quote_begin_tag(.*)$preg_quote_end_tag)siU", $string, $matching_data);
         if ($is_include_tag == false) {
             foreach ($matching_data[0] as $k => $v) {
                 $v = str_replace($begin_tag, '', $v);

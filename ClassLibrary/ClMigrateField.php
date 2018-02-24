@@ -14,7 +14,7 @@ namespace ClassLibrary;
  * Class ClMigrateField
  * @package ClassLibrary
  */
-class ClMigrateField extends ClFieldVerify
+class ClMigrateField extends ClFieldBase
 {
 
     /**

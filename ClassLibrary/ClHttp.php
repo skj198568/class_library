@@ -562,6 +562,9 @@ class ClHttp
      */
     public static function downloadCurl($remote, $local_absolute_file)
     {
+        //创建文件夹
+        ClFile::dirCreate($local_absolute_file);
+        //下载
         $cp = curl_init($remote);
         $fp = fopen($local_absolute_file, "w");
         curl_setopt($cp, CURLOPT_FILE, $fp);

@@ -175,6 +175,14 @@ class ClFile
         $file = trim($file);
         $file = basename($file);
         if ($has_suffix) {
+            //兼容url处理
+            if(strpos($file, '?')){
+                $file = ClString::getBetween($file, '', '?', false);
+            }
+            //兼容url处理
+            if(strpos($file, '#')){
+                $file = ClString::getBetween($file, '', '#', false);
+            }
             return $file;
         } else {
             if (strpos($file, '.') === false) {

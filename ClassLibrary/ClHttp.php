@@ -565,7 +565,7 @@ class ClHttp
         //创建文件夹
         ClFile::dirCreate($local_absolute_file);
         //下载
-        $cp = curl_init($remote);
+        $cp = curl_init(urlencode($remote));
         $fp = fopen($local_absolute_file, "w");
         curl_setopt($cp, CURLOPT_FILE, $fp);
         curl_setopt($cp, CURLOPT_HEADER, 0);

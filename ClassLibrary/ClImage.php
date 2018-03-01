@@ -710,7 +710,7 @@ class ClImage
 
     /**
      * png转jpg
-     * @param $file_absolute_url 图片文件绝对地址
+     * @param string $file_absolute_url 图片文件绝对地址
      * @param bool $is_delete 是否删除
      * @param int $quality 图片质量
      * @return mixed

@@ -31,8 +31,8 @@ class ClImage
     public static function centerCut($img_url, $cut_width, $cut_height = 0, $save_img_url = '', $is_delete = false)
     {
         if (!is_file($img_url)) {
-            if (is_file(ClHttp::getServerDocumentRoot() . $img_url)) {
-                $img_url = ClHttp::getServerDocumentRoot() . $img_url;
+            if (is_file(DOCUMENT_ROOT_PATH . $img_url)) {
+                $img_url = DOCUMENT_ROOT_PATH . $img_url;
             }
         }
         if(!is_file($img_url)){
@@ -720,13 +720,15 @@ class ClImage
         $src_file = $file_absolute_url;
         $add_server_document_root_dir = false;
         if (!is_file($src_file)) {
-            if (is_file(ClHttp::getServerDocumentRoot() . $src_file)) {
+            if (is_file(DOCUMENT_ROOT_PATH . $src_file)) {
                 $add_server_document_root_dir = true;
-                $src_file = ClHttp::getServerDocumentRoot() . $src_file;
+                $src_file = DOCUMENT_ROOT_PATH . $src_file;
+            }else{
+                return $file_absolute_url;
             }
         }
         $src_file_ext = ClFile::getSuffix($src_file);
-        if ($src_file_ext == 'png') {
+        if ($src_file_ext == '.png') {
             $dst_file = str_replace('.png', '.jpg', $src_file);
             $photo_size = GetImageSize($src_file);
             $pw = $photo_size[0];
@@ -743,7 +745,7 @@ class ClImage
             }
             imagedestroy($src_image);
             if ($add_server_document_root_dir) {
-                $dst_file = str_replace(ClHttp::getServerDocumentRoot(), '', $dst_file);
+                $dst_file = str_replace(DOCUMENT_ROOT_PATH, '', $dst_file);
             }
             return $dst_file;
         } else {

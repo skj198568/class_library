@@ -454,7 +454,7 @@ class ClFile
     public static function getRemoteFileSize($remote_file_url)
     {
         $header = get_headers($remote_file_url, true);
-        if (empty($header)) {
+        if (empty($header) || !isset($header['Content-Length'])) {
             return 0;
         } else {
             return $header['Content-Length'];
@@ -473,8 +473,11 @@ class ClFile
             //本地存储地址
             $local_absolute_file = ClFile::getLocalAbsoluteUrlByRemoteUrl($remote_file_url);
         }
+        //创建文件夹
+        self::dirCreate($local_absolute_file);
+        $remote_file_size = self::getRemoteFileSize($remote_file_url);
         if (is_file($local_absolute_file)) {
-            if ($is_file && filesize($local_absolute_file) == self::getRemoteFileSize($remote_file_url)) {
+            if ($is_file && ($remote_file_size > 0 && filesize($local_absolute_file) == $remote_file_size)) {
                 return $local_absolute_file;
             } else {
                 unlink($local_absolute_file);
@@ -512,7 +515,7 @@ class ClFile
         fclose($f_local);
         fclose($f_remote);
         $file_size = filesize($local_temp);
-        if ($is_file && $file_size != self::getRemoteFileSize($remote_file_url)) {
+        if ($is_file && ($remote_file_size > 0 && $file_size != $remote_file_size)) {
             //文件大小不一致
             unlink($local_temp);
             //设置id

@@ -222,7 +222,7 @@ class ClString
      */
     public static function replaceOnce($search, $replace, $string)
     {
-        if(empty($search)){
+        if (empty($search)) {
             return $string;
         }
         $pos = strpos($string, $search);
@@ -601,8 +601,8 @@ class ClString
             $tab = "\t";
             $newline = "\n";
         }
-        for ($i = 0; $i < strlen($json); $i++) {
-            $char = $json[$i];
+        $json = self::toArray($json);
+        foreach ($json as $k_char => $char) {
             if ($ignore_next) {
                 $result .= $char;
                 $ignore_next = false;
@@ -617,14 +617,19 @@ class ClString
                         $result = trim($result) . $newline . str_repeat($tab, $tab_count) . $char;
                         break;
                     case ',':
-                        $result .= $char . $newline . str_repeat($tab, $tab_count);
+                        //判断+1字符串为"时，才换行
+                        if(isset($json[$k_char+1]) && $json[$k_char+1] == '"'){
+                            $result .= $char . $newline . str_repeat($tab, $tab_count);
+                        }
                         break;
                     case '"':
                         $in_quote = !$in_quote;
                         $result .= $char;
                         break;
                     case '\\':
-                        if ($in_quote) $ignore_next = true;
+                        if ($in_quote) {
+                            $ignore_next = true;
+                        }
                         $result .= $char;
                         break;
                     default:
@@ -663,7 +668,7 @@ class ClString
                 } else if (str_replace('&nbsp;', '', $v) == '[') {
                     $v = str_replace('[', '<span style="color: red;">[</span>', $v);
                 }
-                if($has_comma){
+                if ($has_comma) {
                     $v .= '<i style="color: red;">,</i>';
                 }
                 $result[$k] = $v;

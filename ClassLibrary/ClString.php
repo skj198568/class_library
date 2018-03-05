@@ -620,6 +620,8 @@ class ClString
                         //判断+1字符串为"时，才换行
                         if(isset($json[$k_char+1]) && $json[$k_char+1] == '"'){
                             $result .= $char . $newline . str_repeat($tab, $tab_count);
+                        }else{
+                            $result .= $char;
                         }
                         break;
                     case '"':

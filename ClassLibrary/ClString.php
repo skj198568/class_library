@@ -677,6 +677,8 @@ class ClString
             }
             $result = implode('<br/>', $result);
         }
+        //替换转义字符
+        $result = str_replace(['\/', '\"'], ['/', '"'], $result);
         return $result;
     }
 

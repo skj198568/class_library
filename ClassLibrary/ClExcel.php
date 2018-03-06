@@ -142,8 +142,12 @@ class ClExcel
     public function excelToArray($excel_file, $is_delete_excel = false, $is_delete_csv = false, $auto_fixed = false)
     {
         if(!is_file($excel_file)){
-            le_info(sprintf('文件“%s”，不存在。', $excel_file));
-            return false;
+            if(is_file(DOCUMENT_ROOT_PATH.$excel_file)){
+                $excel_file = DOCUMENT_ROOT_PATH.$excel_file;
+            }else{
+                le_info(sprintf('文件“%s”，不存在。', $excel_file));
+                return false;
+            }
         }
         $suffix = ClFile::getSuffix($excel_file);
         $obj_reader = null;

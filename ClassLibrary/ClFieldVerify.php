@@ -145,7 +145,10 @@ class ClFieldVerify extends ClFieldBase
      * @return mixed
      */
     public function fetchVerifies(){
-        $verifies = $this->field_config['verifies'];
+        $verifies = [];
+        if(isset($this->field_config['verifies'])){
+            $verifies = $this->field_config['verifies'];
+        }
         $this->field_config = [];
         return $verifies;
     }

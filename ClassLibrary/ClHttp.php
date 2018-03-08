@@ -144,7 +144,7 @@ class ClHttp
      * @param string $result_type 结果格式
      * @return mixed
      */
-    public static function http($url, $params = array(), $duration = 0, $is_debug = false, $result_type = 'json')
+    public static function http($url, $params = [], $duration = 0, $is_debug = false, $result_type = 'json')
     {
         $config = ['post' => $params];
         if($result_type == 'json'){

@@ -51,14 +51,15 @@ class ClIp
      * 获取错误地址，正确返回array，错误直接返回错误信息
      * @param string $ip
      * @param string $bai_du_developer_key 百度开发者key
+     * @param int $duration 缓存时间
      * @return mixed|string
      */
-    public static function getAddress($ip, $bai_du_developer_key)
+    public static function getAddress($ip, $bai_du_developer_key, $duration = 0)
     {
         if(!ClVerify::isIp($ip)){
             return 'ip地址错误：'.$ip;
         }
-        $r = ClHttp::http(sprintf('http://api.map.baidu.com/location/ip?ip=%s&ak=%s&coor=bd09ll', $ip, $bai_du_developer_key));
+        $r = ClHttp::http(sprintf('http://api.map.baidu.com/location/ip?ip=%s&ak=%s&coor=bd09ll', $ip, $bai_du_developer_key), [], $duration);
         if ($r['status'] == 0) {
             return $r['content'];
         } else {

@@ -82,6 +82,10 @@ class ClMigrateField extends ClFieldBase
      */
     public function constValues($values = [])
     {
+        if (ClArray::isLinearArray($values)) {
+            echo_info($values, '参数错误，应该是二维数组，请参考方法说明。');
+            exit();
+        }
         $this->field_config['const_values'] = ClArray::itemFilters($values);
         return $this;
     }
@@ -92,6 +96,10 @@ class ClMigrateField extends ClFieldBase
      * @return $this
      */
     public function showMapFields($map_fields = []){
+        if(ClArray::isLinearArray($map_fields)){
+            echo_info($map_fields, '参数错误，应该是二维数组，请参考方法说明。');
+            exit();
+        }
         $this->field_config['show_map_fields'] = $map_fields;
         return $this;
     }

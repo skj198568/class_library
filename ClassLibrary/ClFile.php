@@ -87,9 +87,10 @@ class ClFile
     /**
      * 获取当前文件夹下面所有的文件夹
      * @param $dir
+     * @param bool $with_path
      * @return array
      */
-    public static function dirGet($dir)
+    public static function dirGet($dir, $with_path = true)
     {
         $data = array();
         if (is_dir($dir)) {
@@ -97,7 +98,11 @@ class ClFile
             while ($file = $dp->read()) {
                 if ($file != '.' && $file != '..') {
                     if (is_dir($dir . '/' . $file)) {
-                        $data[] = $dir . '/' . $file;
+                        if($with_path){
+                            $data[] = $dir . '/' . $file;
+                        }else{
+                            $data[] = $file;
+                        }
                     }
                 }
             }

@@ -167,7 +167,7 @@ class ClMergeResource
         foreach ($js_files as $v) {
             $js_path = self::getJsAbsolutePath($v);
             if (is_file($js_path)) {
-                fputs($js_temp_file_handle, file_get_contents($js_path));
+                fputs($js_temp_file_handle, file_get_contents($js_path)."\n");
             }
         }
         fclose($js_temp_file_handle);
@@ -248,7 +248,7 @@ class ClMergeResource
                 }
             }
             if (is_file($file_path)) {
-                fputs($temp_file_handle, $file_content);
+                fputs($temp_file_handle, $file_content."\n");
             }
         }
         fclose($temp_file_handle);

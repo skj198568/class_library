@@ -87,10 +87,9 @@ class ClFile
     /**
      * 获取当前文件夹下面所有的文件夹
      * @param $dir
-     * @param bool $with_path
      * @return array
      */
-    public static function dirGet($dir, $with_path = true)
+    public static function dirGet($dir)
     {
         $data = array();
         if (is_dir($dir)) {
@@ -98,11 +97,7 @@ class ClFile
             while ($file = $dp->read()) {
                 if ($file != '.' && $file != '..') {
                     if (is_dir($dir . '/' . $file)) {
-                        if($with_path){
-                            $data[] = $dir . '/' . $file;
-                        }else{
-                            $data[] = $file;
-                        }
+                        $data[] = $dir . '/' . $file;
                     }
                 }
             }
@@ -361,11 +356,14 @@ class ClFile
 
     /**
      * 处理客户端上传
-     * @param string $file_absolute_path 文件保存绝对路径
+     * @param string $file_save_dir 文件保存绝对路径或相对路径，如果是相对路径，则会自动拼接成绝对路径
      * @return array
      */
-    public static function uploadDealClient($file_absolute_path = '')
+    public static function uploadDealClient($file_save_dir = '')
     {
+        if(strpos($file_save_dir, DOCUMENT_ROOT_PATH) === false){
+            $file_save_dir = DOCUMENT_ROOT_PATH.'/'.ltrim($file_save_dir, '/');
+        }
         $file_size = input('post.file_size', '', 'trim');
         $file_name = input('post.name', '', 'trim,strval');
         $chunk = input('post.chunk', 'no', 'trim');
@@ -374,7 +372,7 @@ class ClFile
             ClFile::dirCreate($root_path);
         }
         if ($chunk == 'no') {
-            $save_file = ($file_absolute_path == '' ? $root_path : $file_absolute_path) . date('His') . '_' . (ClString::toCrc32($file_size . $file_name)) . self::getSuffix($file_name);
+            $save_file = ($file_save_dir == '' ? $root_path : $file_save_dir) . date('His') . '_' . (ClString::toCrc32($file_size . $file_name)) . self::getSuffix($file_name);
             if (!is_dir($save_file)) {
                 ClFile::dirCreate($save_file);
             }
@@ -396,7 +394,7 @@ class ClFile
         //分片上传
         $chunks = input('post.chunks/d', null, 'trim');
         //目标文件
-        $destination_file = ($file_absolute_path == '' ? $root_path : $file_absolute_path) . (ClString::toCrc32($file_size . $file_name . $chunks) . '_temp' . self::getSuffix($file_name));
+        $destination_file = ($file_save_dir == '' ? $root_path : $file_save_dir) . (ClString::toCrc32($file_size . $file_name . $chunks) . '_temp' . self::getSuffix($file_name));
         $chunks = input('post.chunks', null, 'trim,intval');
         if ($_FILES['file']['error'] == 0) {
             $f = null;

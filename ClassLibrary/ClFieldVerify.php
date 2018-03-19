@@ -54,7 +54,7 @@ class ClFieldVerify extends ClFieldBase
                         $filters_desc[] = sprintf('在%s范围内', json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
                         break;
                     case 'in_scope':
-                        $filters_desc[] = sprintf('不在[%s, %s]区间内', $v_verify[1], $v_verify[2]);
+                        $filters_desc[] = sprintf('在[%s, %s]区间内', $v_verify[1], $v_verify[2]);
                         break;
                     case 'max':
                         $filters_desc[] = sprintf('最大值%s', $v_verify[1]);

@@ -9,6 +9,8 @@
 
 namespace ClassLibrary;
 
+use think\exception\ErrorException;
+
 /**
  * Class ClFile(文件类库)
  * @package Common\Common
@@ -176,11 +178,11 @@ class ClFile
         $file = basename($file);
         if ($has_suffix) {
             //兼容url处理
-            if(strpos($file, '?')){
+            if (strpos($file, '?')) {
                 $file = ClString::getBetween($file, '', '?', false);
             }
             //兼容url处理
-            if(strpos($file, '#')){
+            if (strpos($file, '#')) {
                 $file = ClString::getBetween($file, '', '#', false);
             }
             return $file;
@@ -202,8 +204,8 @@ class ClFile
     public static function getSuffix($file, $with_point = true)
     {
         $suffix = isset(pathinfo($file)['extension']) ? strtolower(pathinfo($file)['extension']) : '';
-        if($with_point && !empty($suffix)){
-            $suffix = '.'.$suffix;
+        if ($with_point && !empty($suffix)) {
+            $suffix = '.' . $suffix;
         }
         return $suffix;
     }
@@ -287,13 +289,13 @@ class ClFile
         $path = preg_replace('/\/+/', '/', $path);
         if (strpos($path, '/') === false) {
             $suffix = self::getSuffix($path);
-            if(ClString::hasChinese($path)){
-                if(!empty($suffix)){
-                    return ClString::toCrc32($path).$suffix;
-                }else{
+            if (ClString::hasChinese($path)) {
+                if (!empty($suffix)) {
+                    return ClString::toCrc32($path) . $suffix;
+                } else {
                     return ClString::toCrc32($path);
                 }
-            }else{
+            } else {
                 return $path;
             }
         } else {
@@ -361,8 +363,8 @@ class ClFile
      */
     public static function uploadDealClient($file_save_dir = '')
     {
-        if(strpos($file_save_dir, DOCUMENT_ROOT_PATH) === false){
-            $file_save_dir = DOCUMENT_ROOT_PATH.'/'.ltrim($file_save_dir, '/');
+        if (strpos($file_save_dir, DOCUMENT_ROOT_PATH) === false) {
+            $file_save_dir = DOCUMENT_ROOT_PATH . '/' . ltrim($file_save_dir, '/');
         }
         $file_size = input('post.file_size', '', 'trim');
         $file_name = input('post.name', '', 'trim,strval');
@@ -456,7 +458,11 @@ class ClFile
      */
     public static function getRemoteFileSize($remote_file_url)
     {
-        $header = get_headers($remote_file_url, true);
+        try {
+            $header = get_headers($remote_file_url, true);
+        } catch (ErrorException $e) {
+            $header = '';
+        }
         if (empty($header) || !isset($header['Content-Length'])) {
             return 0;
         } else {
@@ -492,13 +498,19 @@ class ClFile
         //设置超时时间
         @ini_set('default_socket_timeout', 2);
         //下载文件
-        $f_remote = fopen($remote_file_url, 'rb');
-        if (empty($f_remote)) {
+        try {
+            $f_remote = fopen($remote_file_url, 'rb');
+        } catch (ErrorException $e) {
             log_info('fopen error:', $remote_file_url);
-            fclose($f_remote);
             //设置id
             return false;
         }
+//        if (empty($f_remote)) {
+//            log_info('fopen error:', $remote_file_url);
+//            fclose($f_remote);
+//            //设置id
+//            return false;
+//        }
         $file_size = 0;
         $local_temp = dirname($local_absolute_file) . '/temp';
         $f_local = fopen($local_temp, 'w+');

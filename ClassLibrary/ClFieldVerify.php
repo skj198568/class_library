@@ -137,7 +137,7 @@ class ClFieldVerify extends ClFieldBase
                 }
             }
         }
-        return implode('; ', $filters_desc);
+        return empty($filters_desc) ? '无' : implode('; ', $filters_desc);
     }
 
     /**

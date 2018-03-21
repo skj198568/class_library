@@ -14,17 +14,16 @@ namespace ClassLibrary;
  * Class ClIp
  * @package ClassLibrary
  */
-class ClIp
-{
+class ClIp {
 
     /**
      * 错误码
      * @var array
      */
     private static $error_code = [
-        0 => '正常',
-        1 => '该服务响应超时或系统内部错误，如遇此问题，请到官方论坛进行反馈',
-        10 => 'Post上传数据不能超过8M',
+        0   => '正常',
+        1   => '该服务响应超时或系统内部错误，如遇此问题，请到官方论坛进行反馈',
+        10  => 'Post上传数据不能超过8M',
         101 => '请求消息没有携带AK参数',
         102 => '对于Mobile类型的应用请求需要携带mcode参数，该错误码代表服务器没有解析到mcode',
         200 => 'AK有误请检查再重试	根据请求的ak，找不到对应的APP',
@@ -54,10 +53,9 @@ class ClIp
      * @param int $duration 缓存时间
      * @return mixed|string
      */
-    public static function getAddress($ip, $bai_du_developer_key, $duration = 0)
-    {
-        if(!ClVerify::isIp($ip)){
-            return 'ip地址错误：'.$ip;
+    public static function getAddress($ip, $bai_du_developer_key, $duration = 0) {
+        if (!ClVerify::isIp($ip)) {
+            return 'ip地址错误：' . $ip;
         }
         $r = ClHttp::http(sprintf('http://api.map.baidu.com/location/ip?ip=%s&ak=%s&coor=bd09ll', $ip, $bai_du_developer_key), [], $duration);
         if ($r['status'] == 0) {

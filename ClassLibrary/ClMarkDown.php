@@ -7,6 +7,7 @@
  */
 
 namespace ClassLibrary;
+
 use Michelf\Markdown;
 
 /**
@@ -14,18 +15,17 @@ use Michelf\Markdown;
  * Class ClMarkDown
  * @package Common\ClassLibrary
  */
-class ClMarkDown
-{
+class ClMarkDown {
 
     /**
      * 解析markdown->html
      * @param $content
      * @return string
      */
-    public static function parse($content){
-        spl_autoload_register(function($class){
-            if(is_file(__DIR__.DIRECTORY_SEPARATOR.preg_replace('{\\\\|_(?!.*\\\\)}', DIRECTORY_SEPARATOR, ltrim($class, '\\')).'.php')){
-                require_once __DIR__.DIRECTORY_SEPARATOR.preg_replace('{\\\\|_(?!.*\\\\)}', DIRECTORY_SEPARATOR, ltrim($class, '\\')).'.php';
+    public static function parse($content) {
+        spl_autoload_register(function ($class) {
+            if (is_file(__DIR__ . DIRECTORY_SEPARATOR . preg_replace('{\\\\|_(?!.*\\\\)}', DIRECTORY_SEPARATOR, ltrim($class, '\\')) . '.php')) {
+                require_once __DIR__ . DIRECTORY_SEPARATOR . preg_replace('{\\\\|_(?!.*\\\\)}', DIRECTORY_SEPARATOR, ltrim($class, '\\')) . '.php';
             }
         });
         return Markdown::defaultTransform($content);

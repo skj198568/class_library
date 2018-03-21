@@ -18,8 +18,7 @@ namespace ClassLibrary\WX;
  *    <li>-40011: 生成xml失败</li>
  * </ul>
  */
-class ErrorCode
-{
+class ErrorCode {
     public static $OK = 0;
     public static $ValidateSignatureError = -40001;
     public static $ParseXmlError = -40002;

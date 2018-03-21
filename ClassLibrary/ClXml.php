@@ -15,19 +15,17 @@ namespace ClassLibrary;
  * Class ClXml
  * @package ClassLibrary
  */
-class ClXml
-{
+class ClXml {
 
     /**
      * xml to array
      * @param $xml
      * @return mixed
      */
-    public static function toArray($xml)
-    {
-        $obj = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+    public static function toArray($xml) {
+        $obj  = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
         $json = json_encode($obj);
-        $arr = json_decode($json, true);
+        $arr  = json_decode($json, true);
         return $arr;
     }
 

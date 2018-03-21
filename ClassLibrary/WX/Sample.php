@@ -4,8 +4,8 @@ include_once "WXMsgCrypt.php";
 
 // 假设企业号在公众平台上设置的参数如下
 $encodingAesKey = "jWmYm7qr5nMoAUwZRjGtBxmz3KA1tkAj3ykkR6q2B2C";
-$token = "QDG6eK";
-$corpId = "wx5823bf96d3bd56c7";
+$token          = "QDG6eK";
+$corpId         = "wx5823bf96d3bd56c7";
 
 /*
 ------------使用示例一：验证回调URL---------------
@@ -35,7 +35,7 @@ $sVerifyEchoStr = "P9nAzCzyDtyTWESHep1vC5X9xho/qYX3Zpb4yKa9SKld1DsH3Iyt3tP3zNdtp
 // 需要返回的明文
 $EchoStr = "";
 
-$wxcpt = new WXBizMsgCrypt($token, $encodingAesKey, $corpId);
+$wxcpt   = new WXBizMsgCrypt($token, $encodingAesKey, $corpId);
 $errCode = $wxcpt->VerifyURL($sVerifyMsgSig, $sVerifyTimeStamp, $sVerifyNonce, $sVerifyEchoStr, $sEchoStr);
 if ($errCode == 0) {
     //
@@ -73,8 +73,8 @@ $sReqNonce = "1372623149";
 // post请求的密文数据
 // $sReqData = HttpUtils.PostData();
 $sReqData = "<xml><ToUserName><![CDATA[wx5823bf96d3bd56c7]]></ToUserName><Encrypt><![CDATA[RypEvHKD8QQKFhvQ6QleEB4J58tiPdvo+rtK1I9qca6aM/wvqnLSV5zEPeusUiX5L5X/0lWfrf0QADHHhGd3QczcdCUpj911L3vg3W/sYYvuJTs3TUUkSUXxaccAS0qhxchrRYt66wiSpGLYL42aM6A8dTT+6k4aSknmPj48kzJs8qLjvd4Xgpue06DOdnLxAUHzM6+kDZ+HMZfJYuR+LtwGc2hgf5gsijff0ekUNXZiqATP7PF5mZxZ3Izoun1s4zG4LUMnvw2r+KqCKIw+3IQH03v+BCA9nMELNqbSf6tiWSrXJB3LAVGUcallcrw8V2t9EL4EhzJWrQUax5wLVMNS0+rUPA3k22Ncx4XXZS9o0MBH27Bo6BpNelZpS+/uh9KsNlY6bHCmJU9p8g7m3fVKn28H3KDYA5Pl/T8Z1ptDAVe0lXdQ2YoyyH2uyPIGHBZZIs2pDBS8R07+qN+E7Q==]]></Encrypt><AgentID><![CDATA[218]]></AgentID></xml>";
-$sMsg = "";  // 解析之后的明文
-$errCode = $wxcpt->DecryptMsg($sReqMsgSig, $sReqTimeStamp, $sReqNonce, $sReqData, $sMsg);
+$sMsg     = "";  // 解析之后的明文
+$errCode  = $wxcpt->DecryptMsg($sReqMsgSig, $sReqTimeStamp, $sReqNonce, $sReqData, $sMsg);
 if ($errCode == 0) {
     // 解密成功，sMsg即为xml格式的明文
     // TODO: 对明文的处理
@@ -113,9 +113,9 @@ if ($errCode == 0) {
 */
 
 // 需要发送的明文
-$sRespData = "<xml><ToUserName><![CDATA[mycreate]]></ToUserName><FromUserName><![CDATA[wx5823bf96d3bd56c7]]></FromUserName><CreateTime>1348831860</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[this is a test]]></Content><MsgId>1234567890123456</MsgId><AgentID>128</AgentID></xml>";
+$sRespData   = "<xml><ToUserName><![CDATA[mycreate]]></ToUserName><FromUserName><![CDATA[wx5823bf96d3bd56c7]]></FromUserName><CreateTime>1348831860</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[this is a test]]></Content><MsgId>1234567890123456</MsgId><AgentID>128</AgentID></xml>";
 $sEncryptMsg = ""; //xml格式的密文
-$errCode = $wxcpt->EncryptMsg($sRespData, $sReqTimeStamp, $sReqNonce, $sEncryptMsg);
+$errCode     = $wxcpt->EncryptMsg($sRespData, $sReqTimeStamp, $sReqNonce, $sEncryptMsg);
 if ($errCode == 0) {
     // TODO:
     // 加密成功，企业需要将加密之后的sEncryptMsg返回

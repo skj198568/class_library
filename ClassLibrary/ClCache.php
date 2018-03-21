@@ -14,8 +14,7 @@ namespace ClassLibrary;
  * Class ClCache
  * @package ClassLibrary
  */
-class ClCache
-{
+class ClCache {
 
     /**
      * key分隔符
@@ -34,25 +33,24 @@ class ClCache
      * @param int $index 函数调用逆序 -1/获取所有调用
      * @return string
      */
-    public static function getFunctionHistory($index = 1)
-    {
+    public static function getFunctionHistory($index = 1) {
         $functions = debug_backtrace();
         if (count($functions) > 0) {
-            if(array_key_exists($index, $functions)){
+            if (array_key_exists($index, $functions)) {
                 if (array_key_exists('class', $functions[$index])) {
                     $class_array = explode('\\', $functions[$index]['class']);
                     return array_pop($class_array) . ucfirst($functions[$index]['function']);
                 } else {
                     return $functions[$index]['function'];
                 }
-            }else{
+            } else {
                 $call_array = [];
-                foreach($functions as $k => $v){
-                    if($k == 0){
+                foreach ($functions as $k => $v) {
+                    if ($k == 0) {
                         continue;
                     }
                     if (array_key_exists('class', $v)) {
-                        $class_array = explode('\\', $v['class']);
+                        $class_array  = explode('\\', $v['class']);
                         $call_array[] = array_pop($class_array) . ucfirst($v['function']);
                     } else {
                         $call_array[] = $v['function'];
@@ -71,11 +69,10 @@ class ClCache
      * @param $params
      * @return string
      */
-    private static function createKeyByParams($params)
-    {
+    private static function createKeyByParams($params) {
         $key = '';
         foreach ($params as $each) {
-            if(is_string($each)){
+            if (is_string($each)) {
                 $each = trim($each);
             }
             if (is_numeric($each)) {
@@ -83,12 +80,12 @@ class ClCache
             } else if (is_array($each)) {
                 $key .= self::$seg_str . ClString::toCrc32(json_encode($each, JSON_UNESCAPED_UNICODE));
             } else if (is_bool($each)) {
-                if($each){
+                if ($each) {
                     $key .= self::$seg_str . 'true';
-                }else{
+                } else {
                     $key .= self::$seg_str . 'false';
                 }
-            }else if (is_null($each)) {
+            } else if (is_null($each)) {
                 $key .= self::$seg_str . 'null';
             } else {
                 $key .= self::$seg_str . ClString::toCrc32($each);
@@ -101,10 +98,9 @@ class ClCache
      * 获取缓存key
      * @return bool|string
      */
-    public static function getKey()
-    {
+    public static function getKey() {
         $function = self::getFunctionHistory(2);
-        if($function == 'call_user_func_array'){
+        if ($function == 'call_user_func_array') {
             $function = self::getFunctionHistory(4);
         }
         $args = func_get_args();
@@ -122,9 +118,8 @@ class ClCache
      * 删除缓存
      * @return bool
      */
-    public static function remove()
-    {
-        $args = func_get_args();
+    public static function remove() {
+        $args     = func_get_args();
         $function = self::getFunctionHistory(2);
         //删除Rc后缀
         $function = str_replace('Rc', '', $function);
@@ -132,9 +127,9 @@ class ClCache
             $function .= self::createKeyByParams($args);
         }
         //已经删除过的，不再删除
-        if(in_array($function, self::$get_remove_keys)){
+        if (in_array($function, self::$get_remove_keys)) {
             return true;
-        }else{
+        } else {
             self::$get_remove_keys[] = $function;
         }
         foreach ([$function, $function . self::$seg_str . 'k'] as $key_each) {
@@ -146,7 +141,7 @@ class ClCache
     /**
      * 删除之后处理
      */
-    public static function removeAfter(){
+    public static function removeAfter() {
         //清空
         self::$get_remove_keys = [];
     }
@@ -156,13 +151,12 @@ class ClCache
      * @param $key
      * @return bool|mixed
      */
-    public static function addToKeysList($key)
-    {
+    public static function addToKeysList($key) {
         if (strpos($key, self::$seg_str) === false) {
             return false;
         }
-        $father_key = explode(self::$seg_str, $key);
-        $key_father_temp = '';
+        $father_key       = explode(self::$seg_str, $key);
+        $key_father_temp  = '';
         $father_key_count = count($father_key) - 1;
         for ($i = 0; $i < $father_key_count; $i++) {
             if ($key_father_temp == '') {
@@ -171,7 +165,7 @@ class ClCache
                 $key_father_temp = $key_father_temp . self::$seg_str . $father_key[$i];
             }
             $key_temp = $key_father_temp . self::$seg_str . $father_key[$i + 1];
-            $map = cache($key_father_temp . self::$seg_str . 'k');
+            $map      = cache($key_father_temp . self::$seg_str . 'k');
             if (empty($map)) {
                 cache($key_father_temp . self::$seg_str . 'k', [$key_temp]);
             } else {
@@ -189,14 +183,13 @@ class ClCache
      * @param $key
      * @return bool
      */
-    public static function dealInvalidDataByKey($key)
-    {
+    public static function dealInvalidDataByKey($key) {
         //没有子存储或者缓存不存在
         if (strpos($key, self::$seg_str) === false || empty(cache($key))) {
             return false;
         }
-        $father_key = explode(self::$seg_str, $key);
-        $key_father_temp = '';
+        $father_key       = explode(self::$seg_str, $key);
+        $key_father_temp  = '';
         $father_key_count = count($father_key) - 1;
         for ($i = 0; $i < $father_key_count; $i++) {
             if ($key_father_temp == '') {
@@ -205,7 +198,7 @@ class ClCache
                 $key_father_temp = $key_father_temp . self::$seg_str . $father_key[$i];
             }
             $key_temp = $key_father_temp . self::$seg_str . $father_key[$i + 1];
-            $map = cache($key_father_temp . self::$seg_str . 'k');
+            $map      = cache($key_father_temp . self::$seg_str . 'k');
             //map不存在，或者是不在map里，均认为该key对应的value，不是最新的值
             if (!(is_array($map) && in_array($key_temp, $map))) {
                 //该key对应的value为无效数据，进行删除操作

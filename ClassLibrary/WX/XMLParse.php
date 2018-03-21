@@ -1,6 +1,7 @@
 <?php
 
 namespace ClassLibrary\WX;
+
 use Think\Exception;
 
 /**
@@ -8,22 +9,20 @@ use Think\Exception;
  *
  * 提供提取消息格式中的密文及生成回复消息格式的接口.
  */
-class XMLParse
-{
+class XMLParse {
 
     /**
      * 提取出xml数据包中的加密消息
      * @param string $xml_text 待提取的xml字符串
      * @return string 提取出的加密消息字符串
      */
-    public static function extract($xml_text)
-    {
+    public static function extract($xml_text) {
         try {
             $xml = new \DOMDocument();
             $xml->loadXML($xml_text);
-            $array_e = $xml->getElementsByTagName('Encrypt');
-            $array_a = $xml->getElementsByTagName('ToUserName');
-            $encrypt = $array_e->item(0)->nodeValue;
+            $array_e      = $xml->getElementsByTagName('Encrypt');
+            $array_a      = $xml->getElementsByTagName('ToUserName');
+            $encrypt      = $array_e->item(0)->nodeValue;
             $to_user_name = $array_a->item(0)->nodeValue;
             return array(0, $encrypt, $to_user_name);
         } catch (Exception $e) {
@@ -40,8 +39,7 @@ class XMLParse
      * @param string $nonce 随机字符串
      * @return string
      */
-    public static function generate($encrypt, $signature, $timestamp, $nonce)
-    {
+    public static function generate($encrypt, $signature, $timestamp, $nonce) {
         $format = "<xml>
 <Encrypt><![CDATA[%s]]></Encrypt>
 <MsgSignature><![CDATA[%s]]></MsgSignature>

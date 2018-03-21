@@ -13,8 +13,7 @@ namespace ClassLibrary;
  * Class ClZip 压缩包类库
  * @package Common\Common
  */
-class ClZip
-{
+class ClZip {
 
     /**
      * 解压缩文件
@@ -23,8 +22,7 @@ class ClZip
      * @param bool $is_cover 是否覆盖，如果false，则不覆盖文件，否则覆盖掉已经解压出的文件
      * @return array|resource|string
      */
-    public static function unzip($zip_file, $target_dir = '', $is_cover = false)
-    {
+    public static function unzip($zip_file, $target_dir = '', $is_cover = false) {
         if (!is_file($zip_file)) {
             return false;
         }
@@ -57,8 +55,7 @@ class ClZip
      * @param int $zip_flags 1/创建，8覆盖原zip文件
      * @return mixed
      */
-    public static function zip($zip_file, $files, $is_delete = true, $zip_flags = 1)
-    {
+    public static function zip($zip_file, $files, $is_delete = true, $zip_flags = 1) {
         $zip_handle = new \ZipArchive();
         //创建文件夹
         ClFile::dirCreate($zip_file);

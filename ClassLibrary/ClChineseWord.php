@@ -22,8 +22,7 @@ use Home\Model\ChineseWordModel;
  * Class ClChineseWord
  * @package ClassLibrary
  */
-class ClChineseWord
-{
+class ClChineseWord {
 
     const UCS2 = 'ucs-2be';
 
@@ -131,12 +130,11 @@ class ClChineseWord
      * @param bool $differ_max 多元切分
      * @param bool $word_property 词性标注
      */
-    public function __construct($differ_freq = true, $unit_word = true, $differ_max = true, $word_property = false)
-    {
-        self::$SP = chr(0xFF) . chr(0xFE);
-        $this->differ_freq = $differ_freq;
-        $this->unit_word = $unit_word;
-        $this->differ_max = $differ_max;
+    public function __construct($differ_freq = true, $unit_word = true, $differ_max = true, $word_property = false) {
+        self::$SP            = chr(0xFF) . chr(0xFE);
+        $this->differ_freq   = $differ_freq;
+        $this->unit_word     = $unit_word;
+        $this->differ_max    = $differ_max;
         $this->word_property = $word_property;
         //转换$add_on_dic词典
         foreach ($this->add_on_dic as $k => $v) {
@@ -150,8 +148,7 @@ class ClChineseWord
      * 生成的分词结果数据类型 1 为全部， 2为 词典词汇及单个中日韩简繁字符及英文， 3 为词典词汇及英文
      * @param int $result_type
      */
-    public function setResultType($result_type = 1)
-    {
+    public function setResultType($result_type = 1) {
         $this->result_type = $result_type;
     }
 
@@ -159,8 +156,7 @@ class ClChineseWord
      * 设置句子分词长度，小于此长度则不会进行分词
      * @param int $not_split_length
      */
-    public function setNotSplitLength($not_split_length = 5)
-    {
+    public function setNotSplitLength($not_split_length = 5) {
         $this->not_split_length = $not_split_length;
     }
 
@@ -168,8 +164,7 @@ class ClChineseWord
      * 设置岐义处理
      * @param bool $differ_freq
      */
-    public function setDifferFreq($differ_freq = true)
-    {
+    public function setDifferFreq($differ_freq = true) {
         $this->differ_freq = $differ_freq;
     }
 
@@ -177,8 +172,7 @@ class ClChineseWord
      * 设置新词识别
      * @param bool $unit_word
      */
-    public function setUnitWord($unit_word = true)
-    {
+    public function setUnitWord($unit_word = true) {
         $this->unit_word = $unit_word;
     }
 
@@ -186,8 +180,7 @@ class ClChineseWord
      * 设置多元切分
      * @param bool $differ_max
      */
-    public function setDifferMax($differ_max = true)
-    {
+    public function setDifferMax($differ_max = true) {
         $this->differ_max = $differ_max;
     }
 
@@ -195,8 +188,7 @@ class ClChineseWord
      * 设置词性标注
      * @param bool $word_property
      */
-    public function setWordProperty($word_property = true)
-    {
+    public function setWordProperty($word_property = true) {
         $this->word_property = $word_property;
     }
 
@@ -204,8 +196,7 @@ class ClChineseWord
      * 设置待分词的字符串utf-8
      * @param $source_string
      */
-    public function setSourceString($source_string)
-    {
+    public function setSourceString($source_string) {
         //先去除所有空格
         $source_string = trim(preg_replace('/^[(\xc2\xa0)|\s]+/', '', $source_string));
         //转码
@@ -216,8 +207,7 @@ class ClChineseWord
      * 设置是否对结果进行优化
      * @param bool $is_optimize
      */
-    public function setIsOptimize($is_optimize = true)
-    {
+    public function setIsOptimize($is_optimize = true) {
         $this->is_optimize = $is_optimize;
     }
 
@@ -227,8 +217,7 @@ class ClChineseWord
      * @param int $is_new
      * @return array|mixed
      */
-    private function getWordInfo($word, $is_new = 0)
-    {
+    private function getWordInfo($word, $is_new = 0) {
         if (empty($word)) {
             return array();
         }
@@ -240,8 +229,7 @@ class ClChineseWord
      * 删除词信息缓存
      * @param $word
      */
-    private function getWordInfoRc($word)
-    {
+    private function getWordInfoRc($word) {
         ChineseWordModel::getByWordRc($word);
     }
 
@@ -250,8 +238,7 @@ class ClChineseWord
      * @parem $word unicode编码的词
      * @return void
      */
-    public function getWordProperty($word)
-    {
+    public function getWordProperty($word) {
         if (strlen($word) < 4) {
             return '/s';
         }
@@ -265,14 +252,13 @@ class ClChineseWord
      * @param $word_info
      * @return bool
      */
-    private function setWordInfo($word, $word_info)
-    {
+    private function setWordInfo($word, $word_info) {
         if (empty($word)) {
             return false;
         }
         //判断该词汇是否存在
         $is_exist_word_info = $this->getWordInfo($word, -1);
-        $word = $this->outStringEncoding($word);
+        $word               = $this->outStringEncoding($word);
         if (!empty($is_exist_word_info)) {
             //词频+1
             return ChineseWordModel::setIncFrequency($is_exist_word_info['id']);
@@ -281,10 +267,10 @@ class ClChineseWord
             $this->getWordInfoRc($word);
             //新增词汇
             return ChineseWordModel::addNew(array(
-                'word' => $word,
+                'word'      => $word,
                 'frequency' => intval($word_info['c']),
-                'category' => strval($word_info['m']),
-                'is_new' => 1
+                'category'  => strval($word_info['m']),
+                'is_new'    => 1
             ));
         }
     }
@@ -294,8 +280,7 @@ class ClChineseWord
      * @param $word
      * @return bool
      */
-    private function isExistWord($word)
-    {
+    private function isExistWord($word) {
         $word_info = $this->getWordInfo($word);
         return empty($word_info) ? false : true;
     }
@@ -303,29 +288,28 @@ class ClChineseWord
     /**
      * 开始分词
      */
-    public function start()
-    {
+    public function start() {
         //重置数据
         $this->resetValueForNewStart();
         $this->source_string .= chr(0) . chr(32);
-        $s_len = strlen($this->source_string);
+        $s_len               = strlen($this->source_string);
         //全角与半角字符对照表
         $sbcArr = array();
-        $j = 0;
-        $scb = '';
+        $j      = 0;
+        $scb    = '';
         for ($i = 0xFF00; $i < 0xFF5F; $i++) {
             $scb = 0x20 + $j;
             $j++;
             $sbcArr[$i] = $scb;
         }
         //对字符串进行粗分
-        $onstr = '';
-        $lastc = 1; //1 中/韩/日文, 2 英文/数字/符号('.', '@', '#', '+'), 3 ANSI符号 4 纯数字 5 非ANSI符号或不支持字符
-        $s = 0;
-        $ansiWordMatch = "[0-9a-z@#%\+\.-]";
+        $onstr          = '';
+        $lastc          = 1; //1 中/韩/日文, 2 英文/数字/符号('.', '@', '#', '+'), 3 ANSI符号 4 纯数字 5 非ANSI符号或不支持字符
+        $s              = 0;
+        $ansiWordMatch  = "[0-9a-z@#%\+\.-]";
         $notNumberMatch = "[a-z@#%\+]";
         for ($i = 0; $i < $s_len; $i++) {
-            $c = $this->source_string[$i] . $this->source_string[++$i];
+            $c  = $this->source_string[$i] . $this->source_string[++$i];
             $cn = hexdec(bin2hex($c));
             $cn = isset($sbcArr[$cn]) ? $sbcArr[$cn] : $cn;
             //ANSI字符
@@ -399,9 +383,9 @@ class ClChineseWord
                     //检测书名
                     if ($cn == 0x300A) {
                         $tmpw = '';
-                        $n = 1;
+                        $n    = 1;
                         $isok = false;
-                        $ew = chr(0x30) . chr(0x0B);
+                        $ew   = chr(0x30) . chr(0x0B);
                         while (true) {
                             $w = $this->source_string[$i + $n] . $this->source_string[$i + $n + 1];
                             if ($w == $ew) {
@@ -410,7 +394,7 @@ class ClChineseWord
                                 $s++;
 
                                 $this->simple_result[$s]['w'] = $tmpw;
-                                $this->new_words[$tmpw] = 1;
+                                $this->new_words[$tmpw]       = 1;
                                 if (!isset($this->new_words[$tmpw])) {
                                     $this->found_word_str .= $this->outStringEncoding($tmpw) . '/nb, ';
                                     $this->setWordInfo($tmpw, array('c' => 1, 'm' => 'nb'));
@@ -431,13 +415,13 @@ class ClChineseWord
                                 $this->simple_result[$s]['t'] = 5;
                                 $s++;
 
-                                $i = $i + $n + 1;
-                                $isok = true;
+                                $i     = $i + $n + 1;
+                                $isok  = true;
                                 $onstr = '';
                                 $lastc = 5;
                                 break;
                             } else {
-                                $n = $n + 2;
+                                $n    = $n + 2;
                                 $tmpw .= $w;
                                 if (strlen($tmpw) > 60) {
                                     break;
@@ -476,10 +460,9 @@ class ClChineseWord
     /**
      * 为了再次分词设置程序默认值
      */
-    private function resetValueForNewStart()
-    {
+    private function resetValueForNewStart() {
         $this->finally_result = array();
-        $this->simple_result = array();
+        $this->simple_result  = array();
     }
 
     /**
@@ -489,15 +472,14 @@ class ClChineseWord
      * @parem $spos   当前粗分结果游标
      * @return bool
      */
-    private function deepAnalysis(&$str, $ctype, $spos)
-    {
+    private function deepAnalysis(&$str, $ctype, $spos) {
 
         //中文句子
         if ($ctype == 1) {
             $s_len = strlen($str);
             //小于系统配置分词要求长度的句子
             if ($s_len < $this->not_split_length) {
-                $tmpstr = '';
+                $tmpstr   = '';
                 $lastType = 0;
                 if ($spos > 0)
                     $lastType = $this->simple_result[$spos - 1]['t'];
@@ -507,9 +489,9 @@ class ClChineseWord
                         $str2 = '';
                         if (!in_array($str, $this->add_on_dic['u'], true) && in_array(substr($str, 0, 2), $this->add_on_dic['u'], true)) {
                             $str2 = substr($str, 2, 2);
-                            $str = substr($str, 0, 2);
+                            $str  = substr($str, 0, 2);
                         }
-                        $ww = $this->simple_result[$spos - 1]['w'] . $str;
+                        $ww                                  = $this->simple_result[$spos - 1]['w'] . $str;
                         $this->simple_result[$spos - 1]['w'] = $ww;
                         $this->simple_result[$spos - 1]['t'] = 4;
                         if (!isset($this->new_words[$this->simple_result[$spos - 1]['w']])) {
@@ -546,11 +528,10 @@ class ClChineseWord
      * @parem $str
      * @return void
      */
-    private function deepAnalysisCn(&$str, $lastec, $spos, $s_len)
-    {
+    private function deepAnalysisCn(&$str, $lastec, $spos, $s_len) {
         $quote1 = chr(0x20) . chr(0x1C);
         $tmparr = array();
-        $hasw = 0;
+        $hasw   = 0;
         //如果前一个词为 “ ， 并且字符串小于3个字符当成一个词处理。
         if ($spos > 0 && $s_len < 11 && $this->simple_result[$spos - 1]['w'] == $quote1) {
             $tmparr[] = $str;
@@ -570,11 +551,11 @@ class ClChineseWord
             //是否已经到最后两个字
             if ($i <= 2) {
                 $tmparr[] = $nc;
-                $i = 0;
+                $i        = 0;
                 break;
             }
             $isok = false;
-            $i = $i + 1;
+            $i    = $i + 1;
             for ($k = $this->dic_word_max; $k > 1; $k = $k - 2) {
                 if ($i < $k)
                     continue;
@@ -585,8 +566,8 @@ class ClChineseWord
                 }
                 if ($this->isExistWord($w)) {
                     $tmparr[] = $w;
-                    $i = $i - $k + 1;
-                    $isok = true;
+                    $i        = $i - $k + 1;
+                    $isok     = true;
                     break;
                 }
             }
@@ -613,12 +594,11 @@ class ClChineseWord
      * @return bool
      */
     //t = 1 中/韩/日文, 2 英文/数字/符号('.', '@', '#', '+'), 3 ANSI符号 4 纯数字 5 非ANSI符号或不支持字符
-    private function optimizeResult(&$smarr, $spos)
-    {
+    private function optimizeResult(&$smarr, $spos) {
         $newarr = array();
         $prePos = $spos - 1;
-        $arlen = count($smarr);
-        $i = $j = 0;
+        $arlen  = count($smarr);
+        $i      = $j = 0;
         //检测数量词
         if ($prePos > -1 && !isset($this->finally_result[$prePos])) {
             $lastw = $this->simple_result[$prePos]['w'];
@@ -639,8 +619,8 @@ class ClChineseWord
                 $newarr[$j] = $smarr[$i];
                 break;
             }
-            $cw = $smarr[$i];
-            $nw = $smarr[$i + 1];
+            $cw      = $smarr[$i];
+            $nw      = $smarr[$i + 1];
             $ischeck = false;
             //检测数量词
             if (in_array($cw, $this->add_on_dic['c'], true) && in_array($nw, $this->add_on_dic['u'], true)) {
@@ -746,7 +726,7 @@ class ClChineseWord
                 $newarr[$j] = $cw;
                 //二元消岐处理——最大切分模式
                 if ($this->differ_max && !in_array($cw, $this->add_on_dic['s'], true) && strlen($cw) < 5 && strlen($nw) < 7) {
-                    $s_len = strlen($nw);
+                    $s_len   = strlen($nw);
                     $hasDiff = false;
                     for ($y = 2; $y <= $s_len - 2; $y = $y + 2) {
                         $nhead = substr($nw, $y - 2, 2);
@@ -754,7 +734,7 @@ class ClChineseWord
                         if ($this->isExistWord($nfont . $nhead)) {
                             if (strlen($cw) > 2)
                                 $j++;
-                            $hasDiff = true;
+                            $hasDiff    = true;
                             $newarr[$j] = $nfont . $nhead;
                         }
                     }
@@ -770,10 +750,9 @@ class ClChineseWord
      * 转换最终分词结果到 finally_result 数组
      * @return void
      */
-    private function sortFinallyResult()
-    {
+    private function sortFinallyResult() {
         $newarr = array();
-        $i = 0;
+        $i      = 0;
         foreach ($this->simple_result as $k => $v) {
             if (empty($v['w']))
                 continue;
@@ -792,7 +771,7 @@ class ClChineseWord
             }
         }
         $this->finally_result = $newarr;
-        $newarr = '';
+        $newarr               = '';
     }
 
     /**
@@ -800,8 +779,7 @@ class ClChineseWord
      * @param $str
      * @return string
      */
-    private function inStringEncode(&$str)
-    {
+    private function inStringEncode(&$str) {
         return mb_convert_encoding($str, self::UCS2, 'utf-8');
     }
 
@@ -810,8 +788,7 @@ class ClChineseWord
      * @parem str
      * return string
      */
-    private function outStringEncoding(&$str)
-    {
+    private function outStringEncoding(&$str) {
         return mb_convert_encoding($str, 'utf-8', self::UCS2);
     }
 
@@ -821,8 +798,7 @@ class ClChineseWord
      * @param bool $word_meanings
      * @return string
      */
-    public function getFinallyResult($spword = ' ', $word_meanings = false)
-    {
+    public function getFinallyResult($spword = ' ', $word_meanings = false) {
         $rsstr = '';
         foreach ($this->finally_result as $v) {
             if ($this->result_type == 2 && ($v['t'] == 3 || $v['t'] == 5)) {
@@ -848,8 +824,7 @@ class ClChineseWord
      * 获取粗分结果，不包含粗分属性
      * @return array()
      */
-    public function getSimpleResult()
-    {
+    public function getSimpleResult() {
         $rearr = array();
         foreach ($this->simple_result as $k => $v) {
             if (empty($v['w']))
@@ -865,8 +840,7 @@ class ClChineseWord
      * 获取粗分结果，包含粗分属性（1中文词句、2 ANSI词汇（包括全角），3 ANSI标点符号（包括全角），4数字（包括全角），5 中文标点或无法识别字符）
      * @return array()
      */
-    public function getSimpleResultAll()
-    {
+    public function getSimpleResultAll() {
         $rearr = array();
         foreach ($this->simple_result as $k => $v) {
             $w = $this->outStringEncoding($v['w']);
@@ -882,8 +856,7 @@ class ClChineseWord
      * 获取索引hash数组
      * @return array('word'=>count,...)
      */
-    public function getFinallyIndex()
-    {
+    public function getFinallyIndex() {
         $rearr = array();
         foreach ($this->finally_result as $v) {
             if ($this->result_type == 2 && ($v['t'] == 3 || $v['t'] == 5)) {
@@ -905,8 +878,7 @@ class ClChineseWord
     /**
      * 析构函数
      */
-    public function __destruct()
-    {
+    public function __destruct() {
 
     }
 

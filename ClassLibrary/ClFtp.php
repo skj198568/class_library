@@ -13,8 +13,7 @@ namespace ClassLibrary;
  * Class ClFtp
  * @package ClassLibrary
  */
-class ClFtp
-{
+class ClFtp {
 
     /**
      * @var string
@@ -28,8 +27,7 @@ class ClFtp
      * @param string $password 密码
      * @param int $timeout 超时时间
      */
-    public static function connect($host, $port, $username = '', $password = '', $timeout = 3600)
-    {
+    public static function connect($host, $port, $username = '', $password = '', $timeout = 3600) {
         self::$con = ftp_connect($host, $port, $timeout) or die("Could not connect");
         if (!empty($username)) {
             ftp_login(self::$con, $username, $password);
@@ -44,8 +42,7 @@ class ClFtp
      * @param int $resume 规定在远程文件中的何处开始拷贝。默认是 0。
      * @return bool
      */
-    public static function down($file_local_absolute_url, $file_remote_absolute_url, $mode = FTP_BINARY, $resume = 0)
-    {
+    public static function down($file_local_absolute_url, $file_remote_absolute_url, $mode = FTP_BINARY, $resume = 0) {
         return ftp_get(self::$con, $file_local_absolute_url, $file_remote_absolute_url, $mode, $resume);
     }
 
@@ -54,8 +51,7 @@ class ClFtp
      * @param $dir_remote_absolute_url 远程绝对目录
      * @return array
      */
-    public static function getDirs($dir_remote_absolute_url)
-    {
+    public static function getDirs($dir_remote_absolute_url) {
         $data = ftp_nlist(self::$con, $dir_remote_absolute_url);
         return $data;
     }
@@ -66,9 +62,8 @@ class ClFtp
      * @param array $file_types :文件类型array('pdf', 'doc')
      * @return array
      */
-    public static function getFiles($dir_remote_absolute_url, $file_types = array())
-    {
-        $data = ftp_nlist(self::$con, $dir_remote_absolute_url);
+    public static function getFiles($dir_remote_absolute_url, $file_types = array()) {
+        $data         = ftp_nlist(self::$con, $dir_remote_absolute_url);
         $return_array = array();
         if (!empty($data)) {
             if (!empty($file_types)) {
@@ -88,8 +83,7 @@ class ClFtp
     /**
      * 关闭链接
      */
-    public static function close()
-    {
+    public static function close() {
         if (!empty(self::$con)) {
             ftp_close(self::$con);
         }

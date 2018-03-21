@@ -15,16 +15,14 @@ namespace ClassLibrary;
  * Class ClHtml
  * @package ClassLibrary
  */
-class ClHtml
-{
+class ClHtml {
 
     /**
      * 删除静态文件
      * @param $file_absolute_url
      * @return bool
      */
-    public static function delete($file_absolute_url)
-    {
+    public static function delete($file_absolute_url) {
         if (is_file($file_absolute_url)) {
             //删除
             return unlink($file_absolute_url);
@@ -35,8 +33,7 @@ class ClHtml
     /**
      * 删除所有html缓存
      */
-    public static function deleteAll()
-    {
+    public static function deleteAll() {
         $files = ClFile::dirGetFiles(DOCUMENT_ROOT_PATH . '/Html');
         foreach ($files as $each) {
             if (is_file($each)) {

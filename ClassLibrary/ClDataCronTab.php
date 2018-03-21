@@ -8,6 +8,7 @@
  */
 
 namespace ClassLibrary;
+
 use think\Exception;
 
 /**
@@ -15,8 +16,7 @@ use think\Exception;
  * Class ClDateCronTab
  * @package ClassLibrary
  */
-class ClDataCronTab
-{
+class ClDataCronTab {
 
     /**
      * 检查某时间($time)是否符合某个CronTab时间计划($str_cron)
@@ -26,8 +26,7 @@ class ClDataCronTab
      *
      * @return bool/string 出错返回string（错误信息）
      */
-    public static function check($time, $str_cron)
-    {
+    public static function check($time, $str_cron) {
         $format_time = self::formatTimestamp($time);
         $format_cron = self::formatCronTab($str_cron);
         if (!is_array($format_cron)) {
@@ -44,8 +43,7 @@ class ClDataCronTab
      *
      * @return bool
      */
-    public static function formatCheck(array $format_time, array $format_cron)
-    {
+    public static function formatCheck(array $format_time, array $format_cron) {
         return (!$format_cron[0] || in_array($format_time[0], $format_cron[0]))
             && (!$format_cron[1] || in_array($format_time[1], $format_cron[1]))
             && (!$format_cron[2] || in_array($format_time[2], $format_cron[2]))
@@ -61,8 +59,7 @@ class ClDataCronTab
      *
      * @return array
      */
-    public static function formatTimestamp($time)
-    {
+    public static function formatTimestamp($time) {
         return explode('-', date('s-i-G-j-n-w', $time));
     }
 
@@ -71,18 +68,17 @@ class ClDataCronTab
      * @param $str_cron crontab的时间计划字符串，如"15 3 * * *"
      * @return array|string 正确返回数组，出错返回字符串（错误信息）
      */
-    public static function formatCronTab($str_cron)
-    {
+    public static function formatCronTab($str_cron) {
         //格式检查
         $str_cron = trim($str_cron);
-        $reg = '#^((\*(/\d+)?|((\d+(-\d+)?)(?3)?)(,(?4))*))( (?2)){5}$#';
+        $reg      = '#^((\*(/\d+)?|((\d+(-\d+)?)(?3)?)(,(?4))*))( (?2)){5}$#';
         if (!preg_match($reg, $str_cron)) {
             return '格式错误:' . $str_cron;
         }
         try {
             //分别解析分、时、日、月、周
-            $arr_cron = array();
-            $parts = explode(' ', $str_cron);
+            $arr_cron    = array();
+            $parts       = explode(' ', $str_cron);
             $arr_cron[0] = self::parseCronPart($parts[0], 0, 59);//秒
             $arr_cron[1] = self::parseCronPart($parts[1], 0, 59);//分
             $arr_cron[2] = self::parseCronPart($parts[2], 0, 59);//时
@@ -104,22 +100,21 @@ class ClDataCronTab
      * @return array 若为空数组则表示可任意取值
      * @throws Exception
      */
-    protected static function parseCronPart($part, $f_min, $f_max)
-    {
+    protected static function parseCronPart($part, $f_min, $f_max) {
         $list = array();
 
         //处理"," -- 列表
         if (false !== strpos($part, ',')) {
             $arr = explode(',', $part);
             foreach ($arr as $v) {
-                $tmp = self::parseCronPart($v, $f_min, $f_max);
+                $tmp  = self::parseCronPart($v, $f_min, $f_max);
                 $list = array_merge($list, $tmp);
             }
             return $list;
         }
 
         //处理"/" -- 间隔
-        $tmp = explode('/', $part);
+        $tmp  = explode('/', $part);
         $part = $tmp[0];
         $step = isset($tmp[1]) ? $tmp[1] : 1;
 

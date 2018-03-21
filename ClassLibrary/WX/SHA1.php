@@ -1,6 +1,7 @@
 <?php
 
 namespace ClassLibrary\WX;
+
 use Think\Exception;
 
 /**
@@ -8,8 +9,7 @@ use Think\Exception;
  *
  * 计算公众平台的消息签名接口.
  */
-class SHA1
-{
+class SHA1 {
 
     /**
      * 用SHA1算法生成安全签名
@@ -19,8 +19,7 @@ class SHA1
      * @param string $encrypt 密文消息
      * @return array
      */
-    public static function getSHA1($token, $timestamp, $nonce, $encrypt_msg)
-    {
+    public static function getSHA1($token, $timestamp, $nonce, $encrypt_msg) {
         //排序
         try {
             $array = array($encrypt_msg, $token, $timestamp, $nonce);

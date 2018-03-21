@@ -13,8 +13,7 @@ namespace ClassLibrary;
  * Class ClGeoHash
  * @package ClassLibrary
  */
-class ClGeoHash
-{
+class ClGeoHash {
 
     private static $table = "0123456789bcdefghjkmnpqrstuvwxyz";
 
@@ -29,22 +28,21 @@ class ClGeoHash
      * @param float $prec
      * @return string
      */
-    public static function encode($lng, $lat, $prec = 0.00001)
-    {
+    public static function encode($lng, $lat, $prec = 0.00001) {
         $minlng = -180;
         $maxlng = 180;
         $minlat = -90;
         $maxlat = 90;
-        $hash = array();
-        $error = 180;
+        $hash   = array();
+        $error  = 180;
         $isEven = true;
-        $chr = 0b00000;
-        $b = 0;
+        $chr    = 0b00000;
+        $b      = 0;
         while ($error >= $prec) {
             if ($isEven) {
                 $next = ($minlng + $maxlng) / 2;
                 if ($lng > $next) {
-                    $chr |= self::$bits[$b];
+                    $chr    |= self::$bits[$b];
                     $minlng = $next;
                 } else {
                     $maxlng = $next;
@@ -52,7 +50,7 @@ class ClGeoHash
             } else {
                 $next = ($minlat + $maxlat) / 2;
                 if ($lat > $next) {
-                    $chr |= self::$bits[$b];
+                    $chr    |= self::$bits[$b];
                     $minlat = $next;
                 } else {
                     $maxlat = $next;
@@ -63,16 +61,15 @@ class ClGeoHash
                 $b++;
             } else {
                 $hash[] = self::$table[$chr];
-                $error = max($maxlng - $minlng, $maxlat - $minlat);
-                $b = 0;
-                $chr = 0b00000;
+                $error  = max($maxlng - $minlng, $maxlat - $minlat);
+                $b      = 0;
+                $chr    = 0b00000;
             }
         }
         return join('', $hash);
     }
 
-    public static function expand($hash)
-    {
+    public static function expand($hash) {
         list($minlng, $maxlng, $minlat, $maxlat) = self::decode($hash);
         $dlng = ($maxlng - $minlng) / 2;
         $dlat = ($maxlat - $minlat) / 2;
@@ -88,8 +85,7 @@ class ClGeoHash
         );
     }
 
-    public static function getRect($hash)
-    {
+    public static function getRect($hash) {
         list($minlng, $maxlng, $minlat, $maxlat) = self::decode($hash);
         return array(
             array($minlng, $minlat),
@@ -105,8 +101,7 @@ class ClGeoHash
      * @var $hash string geohash
      * @return array array($minlng, $maxlng, $minlat, $maxlat);
      */
-    public static function decode($hash)
-    {
+    public static function decode($hash) {
         $minlng = -180;
         $maxlng = 180;
         $minlat = -90;

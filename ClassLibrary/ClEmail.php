@@ -16,8 +16,7 @@ use think\Exception;
  * Class ClEmail(class library邮件)
  * @package Common\Common
  */
-class ClEmail
-{
+class ClEmail {
 
     /**
      * model实例
@@ -80,24 +79,22 @@ class ClEmail
      * @param string $reply_email 回复邮箱
      * @param string $reply_name 回复姓名
      */
-    public static function init($smtp_user, $smtp_password, $smtp_host, $smtp_port = 25, $from_email = '', $from_name = '', $reply_email = '', $reply_name = '')
-    {
-        self::$smtp_host = $smtp_host;
-        self::$smtp_port = $smtp_port;
-        self::$smtp_user = $smtp_user;
+    public static function init($smtp_user, $smtp_password, $smtp_host, $smtp_port = 25, $from_email = '', $from_name = '', $reply_email = '', $reply_name = '') {
+        self::$smtp_host     = $smtp_host;
+        self::$smtp_port     = $smtp_port;
+        self::$smtp_user     = $smtp_user;
         self::$smtp_password = $smtp_password;
-        self::$from_email = !empty($from_email) ? $from_email : $smtp_user;
-        self::$from_name = !empty($from_name) ? $from_name : $smtp_user;
-        self::$reply_email = !empty($reply_email) ? $reply_email : self::$from_email;
-        self::$reply_name = !empty($reply_name) ? $reply_name : self::$from_name;
+        self::$from_email    = !empty($from_email) ? $from_email : $smtp_user;
+        self::$from_name     = !empty($from_name) ? $from_name : $smtp_user;
+        self::$reply_email   = !empty($reply_email) ? $reply_email : self::$from_email;
+        self::$reply_name    = !empty($reply_name) ? $reply_name : self::$from_name;
     }
 
     /**
      * 获取实例
      * @return null|PHPMailer
      */
-    private static function getInstance()
-    {
+    private static function getInstance() {
         if (self::$model_instance == null) {
             self::$model_instance = new PHPMailer();
         }
@@ -114,8 +111,7 @@ class ClEmail
      * @throws Exception
      * @throws \PHPMailer\PHPMailer\Exception
      */
-    public static function send($to_email_info, $title = '', $body = '', $attachment = [])
-    {
+    public static function send($to_email_info, $title = '', $body = '', $attachment = []) {
         if (empty(self::$smtp_host)) {
             throw new Exception('please call ClEmail::init() first.');
         }
@@ -124,17 +120,17 @@ class ClEmail
         self::getInstance()->SMTPDebug = 0;                     // 关闭SMTP调试功能
         // 1 = errors and messages
         // 2 = messages only
-        self::getInstance()->SMTPAuth = true;                  // 启用 SMTP 验证功能
+        self::getInstance()->SMTPAuth   = true;                  // 启用 SMTP 验证功能
         self::getInstance()->SMTPSecure = self::$smtp_port == 25 ? '' : 'ssl';                 // 使用安全协议
-        self::getInstance()->Host = self::$smtp_host;  // SMTP 服务器
-        self::getInstance()->Port = self::$smtp_port;  // SMTP服务器的端口号
-        self::getInstance()->Username = self::$smtp_user;  // SMTP服务器用户名
-        self::getInstance()->Password = self::$smtp_password;  // SMTP服务器密码
+        self::getInstance()->Host       = self::$smtp_host;  // SMTP 服务器
+        self::getInstance()->Port       = self::$smtp_port;  // SMTP服务器的端口号
+        self::getInstance()->Username   = self::$smtp_user;  // SMTP服务器用户名
+        self::getInstance()->Password   = self::$smtp_password;  // SMTP服务器密码
         self::getInstance()->SetFrom(self::$from_email, self::$from_name);
         self::getInstance()->AddReplyTo(self::$reply_email, self::$reply_name);
         self::getInstance()->Subject = $title;
         self::getInstance()->MsgHTML($body);
-        foreach($to_email_info as $each){
+        foreach ($to_email_info as $each) {
             self::getInstance()->AddAddress($each['email'], $each['name']);
         }
         self::getInstance()->isHTML(true);

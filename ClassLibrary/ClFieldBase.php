@@ -14,8 +14,7 @@ namespace ClassLibrary;
  * Class ClFieldBase
  * @package ClassLibrary
  */
-class ClFieldBase
-{
+class ClFieldBase {
 
     /**
      * 字段配置
@@ -28,8 +27,7 @@ class ClFieldBase
      * @param array $filters 例如，['trim', 'intval']
      * @return $this
      */
-    public function filters($filters = ['trim'])
-    {
+    public function filters($filters = ['trim']) {
         $this->field_config['filters'] = ClArray::itemFilters($filters);
         return $this;
     }
@@ -38,8 +36,7 @@ class ClFieldBase
      * 必须填写
      * @return $this
      */
-    public function verifyIsRequire()
-    {
+    public function verifyIsRequire() {
         if (!isset($this->field_config['verifies'])) {
             $this->field_config['verifies'][] = 'is_required';
         } else {
@@ -56,8 +53,7 @@ class ClFieldBase
      * @param int $max
      * @return $this
      */
-    public function verifyIsPassword($min = 6, $max = 18)
-    {
+    public function verifyIsPassword($min = 6, $max = 18) {
         $this->field_config['verifies'][] = ['password', intval($min), intval($max)];
         return $this;
     }
@@ -67,8 +63,7 @@ class ClFieldBase
      * @param array $valid_values
      * @return $this
      */
-    public function verifyInArray($valid_values = [])
-    {
+    public function verifyInArray($valid_values = []) {
         $this->field_config['verifies'][] = ['in_array', ClArray::itemFilters($valid_values)];
         return $this;
     }
@@ -79,8 +74,7 @@ class ClFieldBase
      * @param $max
      * @return $this
      */
-    public function verifyIntInScope($min, $max)
-    {
+    public function verifyIntInScope($min, $max) {
         $this->field_config['verifies'][] = ['in_scope', intval($min), intval($max)];
         return $this;
     }
@@ -90,8 +84,7 @@ class ClFieldBase
      * @param $max
      * @return $this
      */
-    public function verifyIntMax($max)
-    {
+    public function verifyIntMax($max) {
         $this->field_config['verifies'][] = ['max', intval($max)];
         return $this;
     }
@@ -101,8 +94,7 @@ class ClFieldBase
      * @param $min
      * @return $this
      */
-    public function verifyIntMin($min)
-    {
+    public function verifyIntMin($min) {
         $this->field_config['verifies'][] = ['min', intval($min)];
         return $this;
     }
@@ -112,8 +104,7 @@ class ClFieldBase
      * @param $length
      * @return $this
      */
-    public function verifyStringLength($length)
-    {
+    public function verifyStringLength($length) {
         $this->field_config['verifies'][] = ['length', intval($length)];
         return $this;
     }
@@ -123,8 +114,7 @@ class ClFieldBase
      * @param $length
      * @return $this
      */
-    public function verifyStringLengthMax($length)
-    {
+    public function verifyStringLengthMax($length) {
         $this->field_config['verifies'][] = ['length_max', intval($length)];
         return $this;
     }
@@ -134,8 +124,7 @@ class ClFieldBase
      * @param $length
      * @return $this
      */
-    public function verifyStringLengthMin($length)
-    {
+    public function verifyStringLengthMin($length) {
         $this->field_config['verifies'][] = ['length_min', intval($length)];
         return $this;
     }
@@ -144,8 +133,7 @@ class ClFieldBase
      * 邮件
      * @return $this
      */
-    public function verifyEmail()
-    {
+    public function verifyEmail() {
         $this->field_config['verifies'][] = 'email';
         return $this;
     }
@@ -154,8 +142,7 @@ class ClFieldBase
      * 手机
      * @return $this
      */
-    public function verifyMobile()
-    {
+    public function verifyMobile() {
         $this->field_config['verifies'][] = 'mobile';
         return $this;
     }
@@ -164,8 +151,7 @@ class ClFieldBase
      * ip地址
      * @return $this
      */
-    public function verifyIp()
-    {
+    public function verifyIp() {
         $this->field_config['verifies'][] = 'ip';
         return $this;
     }
@@ -174,8 +160,7 @@ class ClFieldBase
      * 邮政编码校验
      * @return $this
      */
-    public function verifyPostcode()
-    {
+    public function verifyPostcode() {
         $this->field_config['verifies'][] = 'postcode';
         return $this;
     }
@@ -184,8 +169,7 @@ class ClFieldBase
      * 身份证
      * @return $this
      */
-    public function verifyIdCard()
-    {
+    public function verifyIdCard() {
         $this->field_config['verifies'][] = 'id_card';
         return $this;
     }
@@ -194,8 +178,7 @@ class ClFieldBase
      * 汉字
      * @return $this
      */
-    public function verifyChinese()
-    {
+    public function verifyChinese() {
         $this->field_config['verifies'][] = 'chinese';
         return $this;
     }
@@ -204,8 +187,7 @@ class ClFieldBase
      * 汉字、字母
      * @return $this
      */
-    public function verifyChineseAlpha()
-    {
+    public function verifyChineseAlpha() {
         $this->field_config['verifies'][] = 'chinese_alpha';
         return $this;
     }
@@ -214,8 +196,7 @@ class ClFieldBase
      * 汉字、字母、数字
      * @return $this
      */
-    public function verifyChineseAlphaNum()
-    {
+    public function verifyChineseAlphaNum() {
         $this->field_config['verifies'][] = 'chinese_alpha_num';
         return $this;
     }
@@ -224,8 +205,7 @@ class ClFieldBase
      * 汉字、字母、数字、下划线_、破折号-
      * @return $this
      */
-    public function verifyChineseAlphaNumDash()
-    {
+    public function verifyChineseAlphaNumDash() {
         $this->field_config['verifies'][] = 'chinese_alpha_num_dash';
         return $this;
     }
@@ -234,8 +214,7 @@ class ClFieldBase
      * 字母
      * @return $this
      */
-    public function verifyAlpha()
-    {
+    public function verifyAlpha() {
         $this->field_config['verifies'][] = 'alpha';
         return $this;
     }
@@ -244,8 +223,7 @@ class ClFieldBase
      * 字母和数字
      * @return $this
      */
-    public function verifyAlphaNum()
-    {
+    public function verifyAlphaNum() {
         $this->field_config['verifies'][] = 'alpha_num';
         return $this;
     }
@@ -254,8 +232,7 @@ class ClFieldBase
      * 字母、数字，下划线_、破折号-
      * @return $this
      */
-    public function verifyAlphaNumDash()
-    {
+    public function verifyAlphaNumDash() {
         $this->field_config['verifies'][] = 'alpha_num_dash';
         return $this;
     }
@@ -264,8 +241,7 @@ class ClFieldBase
      * 网址
      * @return $this
      */
-    public function verifyUrl()
-    {
+    public function verifyUrl() {
         $this->field_config['verifies'][] = 'url';
         return $this;
     }
@@ -274,8 +250,7 @@ class ClFieldBase
      * 数字
      * @return $this
      */
-    public function verifyNumber()
-    {
+    public function verifyNumber() {
         $this->field_config['verifies'][] = 'number';
         return $this;
     }
@@ -284,8 +259,7 @@ class ClFieldBase
      * 数组
      * @return $this
      */
-    public function verifyArray()
-    {
+    public function verifyArray() {
         $this->field_config['verifies'][] = 'array';
         return $this;
     }
@@ -294,8 +268,7 @@ class ClFieldBase
      * 固话
      * @return $this
      */
-    public function verifyTel()
-    {
+    public function verifyTel() {
         $this->field_config['verifies'][] = 'tel';
         return $this;
     }
@@ -304,7 +277,7 @@ class ClFieldBase
      * 时间格式
      * @return $this
      */
-    public function verifyIsDate(){
+    public function verifyIsDate() {
         $this->field_config['verifies'][] = 'is_date';
         return $this;
     }
@@ -313,8 +286,7 @@ class ClFieldBase
      * 唯一值
      * @return $this
      */
-    public function verifyUnique()
-    {
+    public function verifyUnique() {
         $this->field_config['verifies'][] = 'unique';
         return $this;
     }
@@ -323,8 +295,7 @@ class ClFieldBase
      * 是否是域名
      * @return $this
      */
-    public function verifyIsDomain()
-    {
+    public function verifyIsDomain() {
         $this->field_config['verifies'][] = 'is_domain';
         return $this;
     }

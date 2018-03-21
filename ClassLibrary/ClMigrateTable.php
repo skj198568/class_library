@@ -14,8 +14,7 @@ namespace ClassLibrary;
  * Class ClMigrateTable
  * @package ClassLibrary
  */
-class ClMigrateTable
-{
+class ClMigrateTable {
 
     /**
      * 实例对象
@@ -47,8 +46,7 @@ class ClMigrateTable
      * 实例对象
      * @return ClMigrateTable|null
      */
-    public static function instance()
-    {
+    public static function instance() {
         if (self::$instance == null) {
             self::$instance = new self();
         }
@@ -60,9 +58,8 @@ class ClMigrateTable
      * @param $comment_name
      * @return array
      */
-    public function fetch($comment_name)
-    {
-        $result = json_encode(
+    public function fetch($comment_name) {
+        $result             = json_encode(
             array_merge([
                 'name' => $comment_name
             ], $this->table_config),
@@ -84,8 +81,7 @@ class ClMigrateTable
      * @param int $duration
      * @return $this
      */
-    public function usingCache($duration = 3600)
-    {
+    public function usingCache($duration = 3600) {
         $this->table_config['is_cache'] = $duration;
         return $this;
     }
@@ -95,8 +91,7 @@ class ClMigrateTable
      * @param int $show_type 1/modal弹出框, 2/page单个页面
      * @return $this
      */
-    public function createView($show_type = 1)
-    {
+    public function createView($show_type = 1) {
         $this->table_config['show_type'] = $show_type;
         return $this;
     }
@@ -112,7 +107,7 @@ class ClMigrateTable
         ClMigrateTable::V_CREATE_API_CREATE,
         ClMigrateTable::V_CREATE_API_DELETE,
         ClMigrateTable::V_CREATE_API_UPDATE
-    ]){
+    ]) {
         $this->table_config['create_api'] = $functions;
         return $this;
     }
@@ -123,12 +118,12 @@ class ClMigrateTable
      * @param $comment_name
      * @return string
      */
-    public function getUpdateCommentSql($table, $comment_name){
-        $sql = sprintf("ALTER TABLE `%s` COMMENT='%s'", config('database.prefix').$table, json_encode(
-            array_merge([
-                'name' => $comment_name
-            ], $this->table_config),
-            JSON_UNESCAPED_UNICODE)
+    public function getUpdateCommentSql($table, $comment_name) {
+        $sql                = sprintf("ALTER TABLE `%s` COMMENT='%s'", config('database.prefix') . $table, json_encode(
+                array_merge([
+                    'name' => $comment_name
+                ], $this->table_config),
+                JSON_UNESCAPED_UNICODE)
         );
         $this->table_config = [
             'create_api' => [

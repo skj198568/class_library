@@ -13,8 +13,7 @@ namespace ClassLibrary;
  * Class ClSystem 系统级函数
  * @package ClassLibrary
  */
-class ClSystem
-{
+class ClSystem {
 
     /**
      * 是否是64位系统
@@ -44,8 +43,7 @@ class ClSystem
      * 判断是否是64位环境
      * @return bool|string
      */
-    public static function is64bit()
-    {
+    public static function is64bit() {
         if (self::$is_64bit !== null) {
             return self::$is_64bit;
         }
@@ -68,8 +66,7 @@ class ClSystem
      * 获取本机地址
      * @return string
      */
-    public static function getLocalIp()
-    {
+    public static function getLocalIp() {
         if (self::$local_ip !== null) {
             return self::$local_ip;
         }
@@ -93,7 +90,7 @@ class ClSystem
             if (!empty($out)) {
                 if (isset($out[1]) && strstr($out[1], 'addr:')) {
                     $tmpArray = explode(":", $out[1]);
-                    $tmpIp = explode(" ", $tmpArray[1]);
+                    $tmpIp    = explode(" ", $tmpArray[1]);
                     if (preg_match($preg, trim($tmpIp[0]))) {
                         self::$local_ip = trim($tmpIp[0]);
                     }
@@ -110,8 +107,7 @@ class ClSystem
      * 判断系统是否是windows
      * @return bool
      */
-    public static function isWin()
-    {
+    public static function isWin() {
         if (self::$is_win !== null) {
             return self::$is_win;
         }
@@ -127,8 +123,7 @@ class ClSystem
      * 获取mac地址
      * @return null
      */
-    public static function getMac()
-    {
+    public static function getMac() {
         if (self::$mac != null) {
             return self::$mac;
         }

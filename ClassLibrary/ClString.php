@@ -13,16 +13,14 @@ namespace ClassLibrary;
  * Class ClString 字符串类库
  * @package ClassLibrary
  */
-class ClString
-{
+class ClString {
 
     /**
      * 计算中文字符串长度，支持中文
      * @param $string
      * @return int
      */
-    public static function getLength($string)
-    {
+    public static function getLength($string) {
         if (is_string($string)) {
             // 将字符串分解为单元
             preg_match_all('/./us', $string, $match);
@@ -49,11 +47,10 @@ class ClString
      * @param $to
      * @return string
      */
-    public static function encoding($string, $to)
-    {
+    public static function encoding($string, $to) {
         $encode_arr = array('GB2312', 'UTF-8', 'ASCII', 'GBK', 'BIG5', 'JIS', 'eucjp-win', 'sjis-win', 'EUC-JP');
-        $encoded = mb_detect_encoding($string, $encode_arr);
-        $string = mb_convert_encoding($string, $to, $encoded);
+        $encoded    = mb_detect_encoding($string, $encode_arr);
+        $string     = mb_convert_encoding($string, $to, $encoded);
         return $string;
     }
 
@@ -62,8 +59,7 @@ class ClString
      * @param $str
      * @return bool
      */
-    public static function hasChinese($str)
-    {
+    public static function hasChinese($str) {
         return preg_match('/[\x7f-\xff]/', $str) === 1;
     }
 
@@ -72,8 +68,7 @@ class ClString
      * @param $str
      * @return string 正整数
      */
-    public static function toCrc32($str)
-    {
+    public static function toCrc32($str) {
         return self::toFloat(sprintf('%u', crc32($str)));
     }
 
@@ -82,8 +77,7 @@ class ClString
      * @param $str
      * @return float
      */
-    public static function toFloat($str)
-    {
+    public static function toFloat($str) {
         return floatval($str);
     }
 
@@ -92,10 +86,9 @@ class ClString
      * @param $money
      * @return string
      */
-    public static function moneyFormat($money)
-    {
-        $money = strval($money);
-        $money = strrev($money);
+    public static function moneyFormat($money) {
+        $money      = strval($money);
+        $money      = strrev($money);
         $return_str = '';
         //是否存在小数
         if (strpos($money, '.')) {
@@ -123,8 +116,7 @@ class ClString
      * @param $str
      * @return mixed
      */
-    public static function toArray($str)
-    {
+    public static function toArray($str) {
         preg_match_all('/./u', $str, $arr);
         unset($str);
         return $arr[0];
@@ -135,8 +127,7 @@ class ClString
      * @param $string
      * @return string
      */
-    public static function spaceTrim($string)
-    {
+    public static function spaceTrim($string) {
         if (strlen($string) > 0) {
             $str_array = ClString::toArray($string);
             foreach ($str_array as $k => $each) {
@@ -155,8 +146,7 @@ class ClString
      * @param string $separator
      * @return string
      */
-    public static function spaceManyToOne($string, $separator = ' ')
-    {
+    public static function spaceManyToOne($string, $separator = ' ') {
         if (strlen($string) > 0) {
             $str_array = ClString::toArray($string);
             foreach ($str_array as $k => $each) {
@@ -174,8 +164,7 @@ class ClString
      * @param $s
      * @return string
      */
-    public static function getInt($s)
-    {
+    public static function getInt($s) {
         preg_match_all('/\d+/', $s, $arr);
         $s = '';
         if (!empty($arr[0])) {
@@ -189,10 +178,9 @@ class ClString
      * @param $s
      * @return string
      */
-    public static function getChinese($s)
-    {
+    public static function getChinese($s) {
         $array = self::toArray($s);
-        $str = '';
+        $str   = '';
         foreach ($array as $each) {
             if (ClVerify::isChinese($each)) {
                 $str .= $each;
@@ -207,8 +195,7 @@ class ClString
      * @param array $value_array
      * @return mixed
      */
-    public static function sprintf($str, array $value_array)
-    {
+    public static function sprintf($str, array $value_array) {
         array_unshift($value_array, $str);
         return call_user_func_array('sprintf', $value_array);
     }
@@ -220,8 +207,7 @@ class ClString
      * @param $string
      * @return mixed
      */
-    public static function replaceOnce($search, $replace, $string)
-    {
+    public static function replaceOnce($search, $replace, $string) {
         if (empty($search)) {
             return $string;
         }
@@ -240,13 +226,12 @@ class ClString
      * @param bool $is_include_tag :是否包含分割标签
      * @return string 返回分割后的结果
      */
-    public static function split($string, $separator_tag, $get_before = true, $is_include_tag = true)
-    {
+    public static function split($string, $separator_tag, $get_before = true, $is_include_tag = true) {
         if ($separator_tag === '') {
             return $string;
         }
-        $lc_str = strtolower($string);
-        $marker = strtolower($separator_tag);
+        $lc_str     = strtolower($string);
+        $marker     = strtolower($separator_tag);
         $split_here = strpos($lc_str, $marker);
         if ($split_here === false) {
             return $string;
@@ -273,8 +258,7 @@ class ClString
      * @param bool|true $is_include_tag :是否包含标签
      * @return string 结果
      */
-    public static function getBetween($string, $begin_tag, $end_tag = '', $is_include_tag = true)
-    {
+    public static function getBetween($string, $begin_tag, $end_tag = '', $is_include_tag = true) {
         $temp = self::split($string, $begin_tag, false, $is_include_tag);
         return $end_tag === '' ? $temp : self::split($temp, $end_tag, true, $is_include_tag);
     }
@@ -287,15 +271,14 @@ class ClString
      * @param bool|true $is_include_tag 是否包含标签
      * @return mixed
      */
-    public static function parseToArray($string, $begin_tag, $end_tag, $is_include_tag = true)
-    {
+    public static function parseToArray($string, $begin_tag, $end_tag, $is_include_tag = true) {
         $preg_quote_begin_tag = preg_quote($begin_tag);
-        $preg_quote_end_tag = preg_quote($end_tag);
+        $preg_quote_end_tag   = preg_quote($end_tag);
         preg_match_all("($preg_quote_begin_tag(.*)$preg_quote_end_tag)siU", $string, $matching_data);
         if ($is_include_tag == false) {
             foreach ($matching_data[0] as $k => $v) {
-                $v = str_replace($begin_tag, '', $v);
-                $v = str_replace($end_tag, '', $v);
+                $v                    = str_replace($begin_tag, '', $v);
+                $v                    = str_replace($end_tag, '', $v);
                 $matching_data[0][$k] = $v;
             }
         }
@@ -308,8 +291,7 @@ class ClString
      * @param $attribute :属性
      * @return string
      */
-    public static function getAttribute($string, $attribute)
-    {
+    public static function getAttribute($string, $attribute) {
         # Use Tidy library to 'clean' input
         $cleaned_html = self::tidyHtml($string);
         # Remove all line feeds from the string
@@ -327,8 +309,7 @@ class ClString
      * @param bool|false $is_remove_tag :是否删除标签
      * @return mixed
      */
-    public static function remove($string, $begin_tag, $end_tag, $is_remove_tag = false)
-    {
+    public static function remove($string, $begin_tag, $end_tag, $is_remove_tag = false) {
         $remove_array = self::parseToArray($string, $begin_tag, $end_tag, $is_remove_tag);
         //循环替换
         for ($xx = 0; $xx < count($remove_array); $xx++) {
@@ -342,14 +323,13 @@ class ClString
      * @param $input_string
      * @return string
      */
-    public static function tidyHtml($input_string)
-    {
+    public static function tidyHtml($input_string) {
         if (function_exists('tidy_get_release')) {
             $config = array(
                 'uppercase-attributes' => true,
-                'wrap' => 800
+                'wrap'                 => 800
             );
-            $tidy = new \tidy();
+            $tidy   = new \tidy();
             $tidy->parseString($input_string, $config, 'utf8');
             $tidy->cleanRepair();
             $input_string = tidy_get_output($tidy);
@@ -363,8 +343,7 @@ class ClString
      * @param string $str_pol
      * @return string 生成的字符串
      */
-    public static function getRandomStr($length = 16, $str_pol = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz')
-    {
+    public static function getRandomStr($length = 16, $str_pol = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz') {
         $str = '';
         $max = strlen($str_pol) - 1;
         for ($i = 0; $i < $length; $i++) {
@@ -378,8 +357,7 @@ class ClString
      * @param $str
      * @return mixed
      */
-    public static function stripTags($str)
-    {
+    public static function stripTags($str) {
         //去除html字符
         $str = strip_tags(self::htmlFormat($str));
         //js中html字符无法转换
@@ -401,8 +379,7 @@ class ClString
      * @param string $charset 编码格式
      * @return string
      */
-    public static function subStringForView($str, $start = 0, $length = 10, $suffix = false, $charset = "utf-8")
-    {
+    public static function subStringForView($str, $start = 0, $length = 10, $suffix = false, $charset = "utf-8") {
         $str = self::stripTags($str);
         //获取字符串长度
         $str_len = self::getLength($str);
@@ -417,10 +394,10 @@ class ClString
                 $slice = '';
             }
         } else {
-            $re['utf-8'] = '/[\x01-\x7f]|[\xc2-\xdf][\x80-\xbf]|[\xe0-\xef][\x80-\xbf]{2}|[\xf0-\xff][\x80-\xbf]{3}/';
+            $re['utf-8']  = '/[\x01-\x7f]|[\xc2-\xdf][\x80-\xbf]|[\xe0-\xef][\x80-\xbf]{2}|[\xf0-\xff][\x80-\xbf]{3}/';
             $re['gb2312'] = '/[\x01-\x7f]|[\xb0-\xf7][\xa0-\xfe]/';
-            $re['gbk'] = '/[\x01-\x7f]|[\x81-\xfe][\x40-\xfe]/';
-            $re['big5'] = '/[\x01-\x7f]|[\x81-\xfe]([\x40-\x7e]|\xa1-\xfe])/';
+            $re['gbk']    = '/[\x01-\x7f]|[\x81-\xfe][\x40-\xfe]/';
+            $re['big5']   = '/[\x01-\x7f]|[\x81-\xfe]([\x40-\x7e]|\xa1-\xfe])/';
             preg_match_all($re[$charset], $str, $match);
             $slice = join("", array_slice($match[0], $start, $length));
         }
@@ -431,20 +408,19 @@ class ClString
      * 获取唯一id
      * @return string
      */
-    public static function getUniqueId()
-    {
-        $uuid = array(
-            'time_low' => 0,
-            'time_mid' => 0,
-            'time_hi' => 0,
-            'clock_seq_hi' => 0,
+    public static function getUniqueId() {
+        $uuid                  = array(
+            'time_low'      => 0,
+            'time_mid'      => 0,
+            'time_hi'       => 0,
+            'clock_seq_hi'  => 0,
             'clock_seq_low' => 0,
-            'node' => array()
+            'node'          => array()
         );
-        $uuid['time_low'] = mt_rand(0, 0xffff) + (mt_rand(0, 0xffff) << 16);
-        $uuid['time_mid'] = mt_rand(0, 0xffff);
-        $uuid['time_hi'] = (4 << 12) | (mt_rand(0, 0x1000));
-        $uuid['clock_seq_hi'] = (1 << 7) | (mt_rand(0, 128));
+        $uuid['time_low']      = mt_rand(0, 0xffff) + (mt_rand(0, 0xffff) << 16);
+        $uuid['time_mid']      = mt_rand(0, 0xffff);
+        $uuid['time_hi']       = (4 << 12) | (mt_rand(0, 0x1000));
+        $uuid['clock_seq_hi']  = (1 << 7) | (mt_rand(0, 128));
         $uuid['clock_seq_low'] = mt_rand(0, 255);
         for ($i = 0; $i < 6; $i++) {
             $uuid['node'][$i] = mt_rand(0, 255);
@@ -469,8 +445,7 @@ class ClString
      * 订单编码，YmdHis.rand(10000000, 99999999).CC
      * @return string
      */
-    public static function getOrderNumber()
-    {
+    public static function getOrderNumber() {
         $order_id_main = date('YmdHis') . rand(10000000, 99999999);
         //订单号码主体长度
         $order_id_len = strlen($order_id_main);
@@ -487,8 +462,7 @@ class ClString
      * @param $str
      * @return mixed|string
      */
-    public static function urlEncode($str)
-    {
+    public static function urlEncode($str) {
         if ($str === true) {
             $str = 'true';
         } else if ($str === false) {
@@ -506,8 +480,7 @@ class ClString
      * @param $html
      * @return mixed
      */
-    public static function stripAmp($html)
-    {
+    public static function stripAmp($html) {
         //无限循环去除&amp;多次格式化问题
         while (strpos($html, '&amp;') !== false && strpos($html, '&lt;') === false) {
             $html = str_replace('&amp;', '&', $html);
@@ -526,8 +499,7 @@ class ClString
      * @param $html
      * @return mixed
      */
-    public static function htmlFormat($html)
-    {
+    public static function htmlFormat($html) {
         $html = self::stripAmp($html);
         $html = htmlspecialchars_decode($html);
         //去掉回车和换行
@@ -538,10 +510,9 @@ class ClString
      * 任何格式转为string
      * @return mixed|string
      */
-    public static function toString()
-    {
+    public static function toString() {
         $args = func_get_args();
-        $str = '';
+        $str  = '';
         foreach ($args as $each) {
             if (is_array($each) || is_object($each)) {
                 //转换
@@ -588,23 +559,22 @@ class ClString
      * @param bool $html
      * @return string
      */
-    public static function jsonFormat($json, $html = false)
-    {
-        $tab_count = 0;
-        $result = '';
-        $in_quote = false;
+    public static function jsonFormat($json, $html = false) {
+        $tab_count   = 0;
+        $result      = '';
+        $in_quote    = false;
         $ignore_next = false;
         if ($html) {
-            $tab = "&nbsp;&nbsp;&nbsp;&nbsp;";
+            $tab     = "&nbsp;&nbsp;&nbsp;&nbsp;";
             $newline = "<br/>";
         } else {
-            $tab = "\t";
+            $tab     = "\t";
             $newline = "\n";
         }
         $json = self::toArray($json);
         foreach ($json as $k_char => $char) {
             if ($ignore_next) {
-                $result .= $char;
+                $result      .= $char;
                 $ignore_next = false;
             } else {
                 switch ($char) {
@@ -618,15 +588,15 @@ class ClString
                         break;
                     case ',':
                         //判断+1字符串为"时，才换行
-                        if(isset($json[$k_char+1]) && $json[$k_char+1] == '"'){
+                        if (isset($json[$k_char + 1]) && $json[$k_char + 1] == '"') {
                             $result .= $char . $newline . str_repeat($tab, $tab_count);
-                        }else{
+                        } else {
                             $result .= $char;
                         }
                         break;
                     case '"':
                         $in_quote = !$in_quote;
-                        $result .= $char;
+                        $result   .= $char;
                         break;
                     case '\\':
                         if ($in_quote) {
@@ -645,11 +615,11 @@ class ClString
                 $has_comma = false;
                 //最后一个,号处理
                 if (substr($v, -1, 1) == ',') {
-                    $v = rtrim($v, ',');
+                    $v         = rtrim($v, ',');
                     $has_comma = true;
                 }
                 if (strpos($v, ':') !== false) {
-                    $pre = ClString::getBetween($v, '', ':', false);
+                    $pre  = ClString::getBetween($v, '', ':', false);
                     $left = trim(str_replace($pre, '', $v), ':');
                     if ($left == '[{') {
                         $left = '<span style="color:red;">[</span><span style="color: blue;">{</span>';

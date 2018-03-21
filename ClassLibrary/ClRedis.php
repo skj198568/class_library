@@ -8,6 +8,7 @@
  */
 
 namespace ClassLibrary;
+
 use think\Exception;
 
 /**
@@ -15,8 +16,7 @@ use think\Exception;
  * Class ClRedis
  * @package Common\Common
  */
-class ClRedis
-{
+class ClRedis {
 
     /**
      * 实例对象
@@ -53,27 +53,27 @@ class ClRedis
      * @return mixed
      * @throws Exception
      */
-    public function __construct($persistent = false, $host = '127.0.0.1', $port = 6379, $password = '', $select = 0, $timeout = 0, $expire = 0, $prefix = ''){
+    public function __construct($persistent = false, $host = '127.0.0.1', $port = 6379, $password = '', $select = 0, $timeout = 0, $expire = 0, $prefix = '') {
         if (!extension_loaded('redis')) {
             throw new Exception('not support: redis');
         }
         $this->persistent = $persistent;
-        $this->host = $host;
-        $this->port = $port;
-        $this->password = $password;
-        $this->select = $select;
-        $this->timeout = $timeout;
-        $this->expire = $expire;
-        $this->prefix = $prefix;
+        $this->host       = $host;
+        $this->port       = $port;
+        $this->password   = $password;
+        $this->select     = $select;
+        $this->timeout    = $timeout;
+        $this->expire     = $expire;
+        $this->prefix     = $prefix;
         $this->connect();
     }
 
     /**
      * 链接
      */
-    private function connect(){
+    private function connect() {
         $this->redis_instance = new \Redis;
-        $function = $this->persistent ? 'pconnect' : 'connect';
+        $function             = $this->persistent ? 'pconnect' : 'connect';
         $this->redis_instance->$function($this->host, $this->port, $this->timeout);
         if ('' != $this->password) {
             $this->redis_instance->auth($this->password);
@@ -88,8 +88,7 @@ class ClRedis
      * @param $key
      * @return boolean
      */
-    public function exist($key)
-    {
+    public function exist($key) {
         $this->checkConnect();
         return $this->redis_instance->exist($key) === 1;
     }
@@ -99,8 +98,7 @@ class ClRedis
      * @param $key
      * @return mixed
      */
-    public function strLen($key)
-    {
+    public function strLen($key) {
         $this->checkConnect();
         return $this->redis_instance->strlen($key);
     }
@@ -110,8 +108,7 @@ class ClRedis
      * @param $pattern
      * @return mixed
      */
-    public function keys($pattern)
-    {
+    public function keys($pattern) {
         $this->checkConnect();
         return $this->redis_instance->keys($pattern);
     }
@@ -122,8 +119,7 @@ class ClRedis
      * @param $duration
      * @return bool
      */
-    public function expire($key, $duration)
-    {
+    public function expire($key, $duration) {
         $this->checkConnect();
         return $this->redis_instance->expire($key, $duration) === 1;
     }
@@ -133,8 +129,7 @@ class ClRedis
      * @param $key
      * @return mixed 当 key 不存在时，返回 -2;当 key 存在但没有设置剩余生存时间时，返回 -1;否则，以秒为单位，返回 key 的剩余生存时间。
      */
-    public function ttl($key)
-    {
+    public function ttl($key) {
         $this->checkConnect();
         return $this->redis_instance->ttl($key);
     }
@@ -144,8 +139,7 @@ class ClRedis
      * @param $key
      * @return mixed none (key不存在)；string (字符串)；list (列表)；set (集合)；zset (有序集)；hash (哈希表)
      */
-    public function type($key)
-    {
+    public function type($key) {
         $this->checkConnect();
         return $this->redis_instance->type($key);
     }
@@ -155,8 +149,7 @@ class ClRedis
      * @param $index
      * @return mixed
      */
-    public function lIndex($index)
-    {
+    public function lIndex($index) {
         $this->checkConnect();
         return $this->redis_instance->lindex($index);
     }
@@ -167,8 +160,7 @@ class ClRedis
      * @param $value
      * @return mixed
      */
-    public function lPush($key, $value)
-    {
+    public function lPush($key, $value) {
         $this->checkConnect();
         return $this->redis_instance->lPush($key, $value);
     }
@@ -179,8 +171,7 @@ class ClRedis
      * @param $value
      * @return mixed
      */
-    public function lPushX($key, $value)
-    {
+    public function lPushX($key, $value) {
         $this->checkConnect();
         return $this->redis_instance->lPushx($key, $value);
     }
@@ -192,8 +183,7 @@ class ClRedis
      * @param $end
      * @return mixed
      */
-    public function lRange($key, $start, $end)
-    {
+    public function lRange($key, $start, $end) {
         $this->checkConnect();
         return $this->redis_instance->lRange($key, $start, $end);
     }
@@ -204,8 +194,7 @@ class ClRedis
      * @param $value
      * @return mixed
      */
-    public function rPush($key, $value)
-    {
+    public function rPush($key, $value) {
         $this->checkConnect();
         return $this->redis_instance->rPush($key, $value);
     }
@@ -216,8 +205,7 @@ class ClRedis
      * @param $value
      * @return mixed
      */
-    public function rPushX($key, $value)
-    {
+    public function rPushX($key, $value) {
         $this->checkConnect();
         return $this->redis_instance->rPushx($key, $value);
     }
@@ -227,8 +215,7 @@ class ClRedis
      * @param $key
      * @return mixed
      */
-    public function lPop($key)
-    {
+    public function lPop($key) {
         $this->checkConnect();
         return $this->redis_instance->lPop($key);
     }
@@ -238,8 +225,7 @@ class ClRedis
      * @param $key
      * @return mixed
      */
-    public function rPop($key)
-    {
+    public function rPop($key) {
         $this->checkConnect();
         return $this->redis_instance->rPop($key);
     }
@@ -248,12 +234,12 @@ class ClRedis
      * 当前链接是否有效
      * @return bool
      */
-    public function checkConnect(){
-        try{
-            if($this->redis_instance->ping() !== '+PONG'){
+    public function checkConnect() {
+        try {
+            if ($this->redis_instance->ping() !== '+PONG') {
                 $this->connect();
             }
-        }catch (\RedisException $e){
+        } catch (\RedisException $e) {
             $this->connect();
         }
     }

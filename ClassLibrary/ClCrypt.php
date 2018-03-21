@@ -13,8 +13,7 @@ namespace ClassLibrary;
  * Class ClCrypt
  * @package ClassLibrary
  */
-class ClCrypt
-{
+class ClCrypt {
 
     /**
      * 加密字符串
@@ -23,15 +22,14 @@ class ClCrypt
      * @param int $expire 有效期（秒）
      * @return mixed
      */
-    public static function encrypt($string, $key, $expire = 0)
-    {
+    public static function encrypt($string, $key, $expire = 0) {
         $expire = sprintf('%010d', $expire ? $expire + time() : 0);
-        $key = md5($key);
+        $key    = md5($key);
         $string = base64_encode($expire . $string);
-        $x = 0;
-        $len = strlen($string);
-        $l = strlen($key);
-        $char = $str = '';
+        $x      = 0;
+        $len    = strlen($string);
+        $l      = strlen($key);
+        $char   = $str = '';
         for ($i = 0; $i < $len; $i++) {
             if ($x == $l) $x = 0;
             $char .= substr($key, $x, 1);
@@ -49,19 +47,18 @@ class ClCrypt
      * @param string $key 加密key
      * @return string
      */
-    public static function decrypt($string, $key)
-    {
-        $key = md5($key);
+    public static function decrypt($string, $key) {
+        $key    = md5($key);
         $string = str_replace(array('-', '_'), array('+', '/'), $string);
-        $mod4 = strlen($string) % 4;
+        $mod4   = strlen($string) % 4;
         if ($mod4) {
             $string .= substr('====', $mod4);
         }
         $string = base64_decode($string);
-        $x = 0;
-        $len = strlen($string);
-        $l = strlen($key);
-        $char = $str = '';
+        $x      = 0;
+        $len    = strlen($string);
+        $l      = strlen($key);
+        $char   = $str = '';
         for ($i = 0; $i < $len; $i++) {
             if ($x == $l) $x = 0;
             $char .= substr($key, $x, 1);

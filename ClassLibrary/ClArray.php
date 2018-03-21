@@ -14,8 +14,7 @@ namespace ClassLibrary;
  * Class ClArray
  * @package Common\Common
  */
-class ClArray
-{
+class ClArray {
 
     /**
      * 将boolean型的元素转换为int型，1 or 0
@@ -23,8 +22,7 @@ class ClArray
      * @param $keys 需转换key值
      * @return mixed
      */
-    public static function boolToInt($a, $keys)
-    {
+    public static function boolToInt($a, $keys) {
         foreach ($a as $k => $v) {
             if (in_array($k, $keys)) {
                 if (is_bool($v)) {
@@ -45,8 +43,7 @@ class ClArray
      * @param $keys
      * @return mixed
      */
-    public static function intToBool($a, $keys)
-    {
+    public static function intToBool($a, $keys) {
         foreach ($a as $k => $v) {
             if (in_array($k, $keys)) {
                 if (empty($v)) {
@@ -64,8 +61,7 @@ class ClArray
      * @param $files
      * @return array
      */
-    public static function sortForDirFiles($files)
-    {
+    public static function sortForDirFiles($files) {
         $a = array();
         foreach ($files as $k => $v) {
             if (isset($a[strlen($v)])) {
@@ -91,8 +87,7 @@ class ClArray
      * @param string $split 合并分割符
      * @return string
      */
-    public static function toString($a, $split = '; ')
-    {
+    public static function toString($a, $split = '; ') {
         if (!is_array($a)) {
             return $a;
         }
@@ -122,8 +117,7 @@ class ClArray
      * @param $a
      * @return mixed
      */
-    public static function arrayUniqueFor2($a)
-    {
+    public static function arrayUniqueFor2($a) {
         //降维度
         foreach ($a as $k => $v) {
             $a[$k] = implode(',', $v);
@@ -142,8 +136,7 @@ class ClArray
      * @param $array
      * @return string
      */
-    public static function jsonUnicode($array)
-    {
+    public static function jsonUnicode($array) {
         return json_encode($array, JSON_UNESCAPED_UNICODE);
     }
 
@@ -152,8 +145,7 @@ class ClArray
      * @param $array
      * @return string
      */
-    public static function jsonPretty($array)
-    {
+    public static function jsonPretty($array) {
         return json_encode($array, JSON_PRETTY_PRINT);
     }
 
@@ -162,8 +154,7 @@ class ClArray
      * @param $array
      * @return string
      */
-    public static function jsonSlashes($array)
-    {
+    public static function jsonSlashes($array) {
         return json_encode($array, JSON_UNESCAPED_SLASHES);
     }
 
@@ -174,8 +165,7 @@ class ClArray
      * @param array $filters 过滤器
      * @return array
      */
-    public static function getByKeys($array, $keys, $filters = ['trim'])
-    {
+    public static function getByKeys($array, $keys, $filters = ['trim']) {
         $return = [];
         foreach ($array as $k => $v) {
             if (in_array($k, $keys)) {
@@ -194,8 +184,7 @@ class ClArray
      * @param array $filters
      * @return array
      */
-    public static function itemFilters($array, $filters = ['trim'])
-    {
+    public static function itemFilters($array, $filters = ['trim']) {
         if (!is_array($array)) {
             return $array;
         }
@@ -213,8 +202,7 @@ class ClArray
      * @param int $is_rule 是否是规则数组，规则数组为类似数据库存储结构
      * @return bool
      */
-    public static function isLinearArray($arr, $is_rule = true)
-    {
+    public static function isLinearArray($arr, $is_rule = true) {
         if (count($arr) === count($arr, 1)) {
             //数组内，单个属性不存在数组情况，属于简单数组
             return true;

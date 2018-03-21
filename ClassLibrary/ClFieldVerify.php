@@ -8,6 +8,7 @@
  */
 
 namespace ClassLibrary;
+
 use app\index\model\BaseModel;
 
 /**
@@ -15,8 +16,7 @@ use app\index\model\BaseModel;
  * Class ClFieldVerify
  * @package ClassLibrary
  */
-class ClFieldVerify extends ClFieldBase
-{
+class ClFieldVerify extends ClFieldBase {
 
 
     /**
@@ -29,8 +29,7 @@ class ClFieldVerify extends ClFieldBase
      * 实例对象
      * @return ClFieldVerify|null
      */
-    public static function instance()
-    {
+    public static function instance() {
         if (self::$instance == null) {
             self::$instance = new self();
         }
@@ -42,7 +41,7 @@ class ClFieldVerify extends ClFieldBase
      * @param $filters
      * @return string
      */
-    public static function getNamesStringByVerifies($filters){
+    public static function getNamesStringByVerifies($filters) {
         $filters_desc = [];
         foreach ($filters as $v_verify) {
             if (is_array($v_verify)) {
@@ -144,9 +143,9 @@ class ClFieldVerify extends ClFieldBase
      * 获取校验
      * @return mixed
      */
-    public function fetchVerifies(){
+    public function fetchVerifies() {
         $verifies = [];
-        if(isset($this->field_config['verifies'])){
+        if (isset($this->field_config['verifies'])) {
             $verifies = $this->field_config['verifies'];
         }
         $this->field_config = [];
@@ -160,12 +159,11 @@ class ClFieldVerify extends ClFieldBase
      * @param string $type
      * @param BaseModel $instance
      */
-    public static function verifyFields($fields, $fields_verifies = [], $type = 'insert', $instance = null)
-    {
+    public static function verifyFields($fields, $fields_verifies = [], $type = 'insert', $instance = null) {
         //去除无需校验的字段
-        foreach($fields as $k => $each_field){
-            if(is_array($each_field) && isset($each_field[0])){
-                if(in_array($each_field[0], ['exp', 'inc', 'dec'])){
+        foreach ($fields as $k => $each_field) {
+            if (is_array($each_field) && isset($each_field[0])) {
+                if (in_array($each_field[0], ['exp', 'inc', 'dec'])) {
                     unset($fields[$k]);
                 }
             }
@@ -564,7 +562,7 @@ class ClFieldVerify extends ClFieldBase
                         case 'unique':
                             if (self::fieldNeedCheck($fields, $k_field) && !is_null($instance)) {
                                 $new_instance = $instance::instance(-2);
-                                if($type == 'insert'){
+                                if ($type == 'insert') {
                                     //插入，则只需要判断是否存在
                                     $count = $new_instance->where([
                                         $k_field => $fields[$k_field]
@@ -572,14 +570,14 @@ class ClFieldVerify extends ClFieldBase
                                     if ($count > 0) {
                                         $error_msg = sprintf('%s:%s 该值为unique，不可重复', self::getFieldDesc($k_field, $instance), $fields[$k_field]);
                                     }
-                                }else{
+                                } else {
                                     //更新，则要判断where条件
                                     $field_id = $new_instance->where([$k_field => $fields[$k_field]])->value($new_instance->getPk());
-                                    if(!empty($field_id)){
+                                    if (!empty($field_id)) {
                                         //存在值的情况
-                                        $where = $instance->getOptions('where');
+                                        $where    = $instance->getOptions('where');
                                         $where_id = $new_instance->where($where['AND'])->value($new_instance->getPk());
-                                        if($field_id != $where_id){
+                                        if ($field_id != $where_id) {
                                             //两个结果记录不同，则不可更新
                                             $error_msg = sprintf('%s:%s 该值为unique，不可重复，已经存在记录id=%s', self::getFieldDesc($k_field, $instance), $fields[$k_field], $field_id);
                                         }
@@ -621,18 +619,18 @@ class ClFieldVerify extends ClFieldBase
                 }
             }
             if (!empty($error_msg)) {
-                $msg = json_encode([
-                    'status' => -1,
+                $msg   = json_encode([
+                    'status'  => -1,
                     'message' => $error_msg,
-                    'data' => $fields
+                    'data'    => $fields
                 ], JSON_UNESCAPED_UNICODE);
                 $value = isset($_SERVER['HTTP_X_REQUESTED_WITH']) ? strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) : '';
                 if (strpos($value, 'xmlhttprequest') !== false) {
                     //输出结果并退出
                     header('Content-Type:application/json; charset=utf-8');
                     echo($msg);
-                }else{
-                    echo($msg.PHP_EOL);
+                } else {
+                    echo($msg . PHP_EOL);
                 }
                 exit;
             }
@@ -645,13 +643,13 @@ class ClFieldVerify extends ClFieldBase
      * @param BaseModel|null $instance
      * @return string
      */
-    private static function getFieldDesc($key_field, BaseModel $instance = null){
-        if(is_null($instance)){
+    private static function getFieldDesc($key_field, BaseModel $instance = null) {
+        if (is_null($instance)) {
             return $key_field;
         }
-        if(isset($instance::$fields_names[$key_field]) && !empty($instance::$fields_names[$key_field])){
-            return $instance::$fields_names[$key_field].'('.$key_field.')';
-        }else{
+        if (isset($instance::$fields_names[$key_field]) && !empty($instance::$fields_names[$key_field])) {
+            return $instance::$fields_names[$key_field] . '(' . $key_field . ')';
+        } else {
             return $key_field;
         }
     }
@@ -662,7 +660,7 @@ class ClFieldVerify extends ClFieldBase
      * @param $k_field
      * @return bool
      */
-    private static function fieldNeedCheck($fields, $k_field){
+    private static function fieldNeedCheck($fields, $k_field) {
         return isset($fields[$k_field]) && (is_numeric($fields[$k_field]) || !empty($fields[$k_field]));
     }
 

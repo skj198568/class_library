@@ -14,15 +14,13 @@ namespace ClassLibrary;
  * Class ClMongo
  * @package ClassLibrary
  */
-class ClMongo
-{
+class ClMongo {
 
     /**
      * 针对mongo数据进行32位系统兼容处理
      * @param $data
      */
-    public static function convertResult(&$data)
-    {
+    public static function convertResult(&$data) {
         array_walk_recursive($data, function (&$val) {
             if (is_object($val)) {
                 if (is_a($val, 'MongoId')) {

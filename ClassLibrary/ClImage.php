@@ -17,8 +17,7 @@ use think\Image;
  * Class ClImg
  * @package ClassLibrary
  */
-class ClImage
-{
+class ClImage {
 
     /**
      * 居中剪裁图片
@@ -28,15 +27,14 @@ class ClImage
      * @param string $save_img_url 保存的图片绝对地址，如果为'',则覆盖掉原图片
      * @param bool $is_delete 当save_img_url不为空时，是否删掉原始img
      */
-    public static function centerCut($img_url, $cut_width, $cut_height = 0, $save_img_url = '', $is_delete = false)
-    {
+    public static function centerCut($img_url, $cut_width, $cut_height = 0, $save_img_url = '', $is_delete = false) {
         if (!is_file($img_url)) {
             if (is_file(DOCUMENT_ROOT_PATH . $img_url)) {
                 $img_url = DOCUMENT_ROOT_PATH . $img_url;
             }
         }
-        if(!is_file($img_url)){
-            log_info('文件不存在：'.$img_url);
+        if (!is_file($img_url)) {
+            log_info('文件不存在：' . $img_url);
             return;
         }
         $cut_width = intval($cut_width);
@@ -55,8 +53,8 @@ class ClImage
             }
             return;
         }
-        $image = Image::open($img_url);
-        $image_width = $image->width();
+        $image        = Image::open($img_url);
+        $image_width  = $image->width();
         $image_height = $image->height();
         //居中裁剪图片
         if ($image_width / $image_height > $cut_width / $cut_height) {
@@ -103,8 +101,7 @@ class ClImage
      * @param $img_absolute_url
      * @return mixed
      */
-    public static function getWidth($img_absolute_url)
-    {
+    public static function getWidth($img_absolute_url) {
         $info = getimagesize($img_absolute_url);
         return $info[0];
     }
@@ -115,8 +112,7 @@ class ClImage
      * @param $height
      * @return float
      */
-    public static function getWidthByProportion($img_absolute_url, $height)
-    {
+    public static function getWidthByProportion($img_absolute_url, $height) {
         return intval(self::getWidth($img_absolute_url) / self::getHeight($img_absolute_url) * $height);
     }
 
@@ -125,8 +121,7 @@ class ClImage
      * @param $img_absolute_url
      * @return mixed
      */
-    public static function getHeight($img_absolute_url)
-    {
+    public static function getHeight($img_absolute_url) {
         $info = getimagesize($img_absolute_url);
         return $info[1];
     }
@@ -137,8 +132,7 @@ class ClImage
      * @param $width
      * @return float
      */
-    public static function getHeightByProportion($img_absolute_url, $width)
-    {
+    public static function getHeightByProportion($img_absolute_url, $width) {
         return intval(self::getHeight($img_absolute_url) / self::getWidth($img_absolute_url) * $width);
     }
 
@@ -153,9 +147,8 @@ class ClImage
      * @return string
      * @throws \Endroid\QrCode\Exception\InvalidPathException
      */
-    public static function qrCode($str, $qr_width = 100, $logo_absolute_file = '', $force = false, $background_color = ['r' => 255, 'g' => 255, 'b' => 255], $foreground_color = ['r' => 0, 'g' => 0, 'b' => 0])
-    {
-        $file_dir = '/QrCode';
+    public static function qrCode($str, $qr_width = 100, $logo_absolute_file = '', $force = false, $background_color = ['r' => 255, 'g' => 255, 'b' => 255], $foreground_color = ['r' => 0, 'g' => 0, 'b' => 0]) {
+        $file_dir  = '/QrCode';
         $file_name = md5($str . $logo_absolute_file . $qr_width) . '.png';
         //三级目录存储
         $file = $file_dir . '/' . implode('/', ClString::toArray(substr($file_name, 0, 32))) . '/' . $file_name;
@@ -190,10 +183,9 @@ class ClImage
      * @param $logo_absolute_file
      * @return mixed
      */
-    public static function qrCodeAddLogo($qr_absolute_file, $logo_absolute_file)
-    {
-        $QR = imagecreatefromstring(file_get_contents($qr_absolute_file));
-        $QR_width = imagesx($QR);//二维码图片宽度
+    public static function qrCodeAddLogo($qr_absolute_file, $logo_absolute_file) {
+        $QR        = imagecreatefromstring(file_get_contents($qr_absolute_file));
+        $QR_width  = imagesx($QR);//二维码图片宽度
         $QR_height = imagesy($QR);//二维码图片高度
         //重新裁剪图片
         $temp_logo = DOCUMENT_ROOT_PATH . '/temp.png';
@@ -209,8 +201,7 @@ class ClImage
      * @param string $save_absolute_url
      * @return bool|string
      */
-    public static function base64Decode($base64_image_content, $save_absolute_url = '')
-    {
+    public static function base64Decode($base64_image_content, $save_absolute_url = '') {
         if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64_image_content, $result)) {
             $type = $result[2];
             if (empty($save_absolute_url)) {
@@ -232,8 +223,7 @@ class ClImage
      * @param $image_absolute_url
      * @return string 图片进行处理
      */
-    public static function base64Encode($image_absolute_url)
-    {
+    public static function base64Encode($image_absolute_url) {
         //不存在的图片，不进行处理
         if (!is_file($image_absolute_url)) {
             return $image_absolute_url;
@@ -251,8 +241,7 @@ class ClImage
      * @param bool $force 是否重新生成二维码
      * @return mixed|string 返回图片存储的地址
      */
-    public static function qrCodeWithBackgroundImage($content, $img_absolute_url, $img_width = 93, $save_img_absolute_url = '', $is_cut = false, $force = false)
-    {
+    public static function qrCodeWithBackgroundImage($content, $img_absolute_url, $img_width = 93, $save_img_absolute_url = '', $is_cut = false, $force = false) {
         if (!is_file($img_absolute_url)) {
             log_info(sprintf('背景图片"%s"不存在', $img_absolute_url));
             return false;
@@ -272,12 +261,12 @@ class ClImage
         //获取二维码可能生成的最小值
         $img_width = min(self::getHeight($img_absolute_url), self::getWidth($img_absolute_url), $img_width);
         //先生成二维码
-        $qr_url = self::qrCode($content, $img_width, '', $is_cut, $force);
+        $qr_url          = self::qrCode($content, $img_width, '', $is_cut, $force);
         $qr_absolute_url = DOCUMENT_ROOT_PATH . $qr_url;
-        $qr_height = self::getHeight($qr_absolute_url);
-        $qr_width = self::getWidth($qr_absolute_url);
-        $im = imagecreatefrompng($qr_absolute_url);
-        $new_im = imagecreatetruecolor($qr_width, $qr_height);
+        $qr_height       = self::getHeight($qr_absolute_url);
+        $qr_width        = self::getWidth($qr_absolute_url);
+        $im              = imagecreatefrompng($qr_absolute_url);
+        $new_im          = imagecreatetruecolor($qr_width, $qr_height);
         //设置背景颜色
         $bg_color = imagecolorallocate($new_im, 255, 255, 255);
         imagefill($new_im, 0, 0, $bg_color); //填充
@@ -299,18 +288,18 @@ class ClImage
         //颜色分割值
         $invite_color_black = 50;
         $invite_color_white = 100;
-        $rgb_list = [];
-        $r = 0;
-        $g = 0;
-        $b = 0;
+        $rgb_list           = [];
+        $r                  = 0;
+        $g                  = 0;
+        $b                  = 0;
         for ($x_index = 0; $x_index < $qr_width; $x_index++) {
             for ($y_index = 0; $y_index < $qr_height; $y_index++) {
                 $rgb = imagecolorat($im, $x_index, $y_index);
                 if ($rgb != 0) {
                     $rgb = imagecolorat($photo_im, $x_index, $y_index);
-                    $r = ($rgb >> 16) & 0xFF;
-                    $g = ($rgb >> 8) & 0xFF;
-                    $b = $rgb & 0xFF;
+                    $r   = ($rgb >> 16) & 0xFF;
+                    $g   = ($rgb >> 8) & 0xFF;
+                    $b   = $rgb & 0xFF;
                     if ($r > $invite_color_black) {
                         $r = $invite_color_black;
                     }
@@ -328,9 +317,9 @@ class ClImage
                     //外边框区域，获取对角线像素点
                     if ($x_index % 2 == 1 || $y_index % 2 == 0) {
                         $rgb = imagecolorat($photo_im, $x_index, $y_index);
-                        $r = ($rgb >> 16) & 0xFF;
-                        $g = ($rgb >> 8) & 0xFF;
-                        $b = $rgb & 0xFF;
+                        $r   = ($rgb >> 16) & 0xFF;
+                        $g   = ($rgb >> 8) & 0xFF;
+                        $b   = $rgb & 0xFF;
                         if ($r < $invite_color_white) {
                             $r = $invite_color_white;
                         }
@@ -350,7 +339,7 @@ class ClImage
         }
         //保存为图片
         if (empty($save_img_absolute_url)) {
-            $img_name = ClFile::getName($img_absolute_url);
+            $img_name      = ClFile::getName($img_absolute_url);
             $save_img_name = $img_name . '_qr_' . $img_width . '.png';
             //替换文件名
             $save_img_absolute_url = str_replace(ClFile::getName($img_absolute_url, true), $save_img_name, $img_absolute_url);
@@ -374,8 +363,7 @@ class ClImage
      * @param int $dpi
      * @return int
      */
-    public static function convertDpi($image_absolute_file, $saved_image_absolute_file = '', $dpi = 300)
-    {
+    public static function convertDpi($image_absolute_file, $saved_image_absolute_file = '', $dpi = 300) {
         // ob_start();
         // $im = imagecreatefrompng($filename);
         // imagepng($im);
@@ -390,8 +378,8 @@ class ClImage
         $data = pack("NNC", $dpi * 39.37, $dpi * 39.37, 0x01);
         //CRC检验码由数据块符号和数据域计算得到
         $checksum = pack("N", crc32($sign . $data));
-        $phys = $len . $sign . $data . $checksum;
-        $pos = strpos($img_content, "pHYs");
+        $phys     = $len . $sign . $data . $checksum;
+        $pos      = strpos($img_content, "pHYs");
         log_info('$pos:', $pos);
         if ($pos > 0) {
             //修改pHYs数据块
@@ -410,8 +398,7 @@ class ClImage
         file_put_contents(empty($saved_image_absolute_file) ? $image_absolute_file : $saved_image_absolute_file, $img_content);
     }
 
-    public static function convertToPrint($filename)
-    {
+    public static function convertToPrint($filename) {
 // ob_start();
 // $im = imagecreatefrompng($filename);
 // imagepng($im);
@@ -427,7 +414,7 @@ class ClImage
         $data = pack("NNC", 300 * 39.37, 300 * 39.37, 0x01);
 //CRC检验码由数据块符号和数据域计算得到
         $checksum = pack("N", crc32($sign . $data));
-        $phys = $len . $sign . $data . $checksum;
+        $phys     = $len . $sign . $data . $checksum;
 
         $pos = strpos($file, "pHYs");
         if ($pos > 0) {
@@ -446,8 +433,7 @@ class ClImage
 
     }
 
-    public static function read_png_dpi($source)
-    {
+    public static function read_png_dpi($source) {
         $fh = fopen($source, 'rb');
         if (!$fh)
             return false;
@@ -456,8 +442,8 @@ class ClImage
 
         $buf = array();
 
-        $x = 0;
-        $y = 0;
+        $x     = 0;
+        $y     = 0;
         $units = 0;
 
         while (!feof($fh)) {
@@ -471,8 +457,8 @@ class ClImage
                 $buf[2] == ord('Y') &&
                 $buf[3] == ord('s')
             ) {
-                $x = ($buf[4] << 24) + ($buf[5] << 16) + ($buf[6] << 8) + $buf[7];
-                $y = ($buf[8] << 24) + ($buf[9] << 16) + ($buf[10] << 8) + $buf[11];
+                $x     = ($buf[4] << 24) + ($buf[5] << 16) + ($buf[6] << 8) + $buf[7];
+                $y     = ($buf[8] << 24) + ($buf[9] << 16) + ($buf[10] << 8) + $buf[11];
                 $units = $buf[12];
                 break;
             }
@@ -504,8 +490,7 @@ class ClImage
      * @param int $size_factor
      * @return string
      */
-    public static function barcode($text = "0", $bar_height_or_width = 60, $code_type = "code128", $size_factor = 1)
-    {
+    public static function barcode($text = "0", $bar_height_or_width = 60, $code_type = "code128", $size_factor = 1) {
         $file_path = '/static/images/barcode/' . $code_type . '/' . $bar_height_or_width . '/' . $size_factor . '/' . $text . '.png';
         if (is_file(DOCUMENT_ROOT_PATH . $file_path)) {
             return $file_path;
@@ -515,28 +500,28 @@ class ClImage
         if (in_array(strtolower($code_type), array("code128", "code128b"))) {
             $chk_sum = 104;
             // Must not change order of array elements as the checksum depends on the array's key to validate final code
-            $code_array = array(" " => "212222", "!" => "222122", "\"" => "222221", "#" => "121223", "$" => "121322", "%" => "131222", "&" => "122213", "'" => "122312", "(" => "132212", ")" => "221213", "*" => "221312", "+" => "231212", "," => "112232", "-" => "122132", "." => "122231", "/" => "113222", "0" => "123122", "1" => "123221", "2" => "223211", "3" => "221132", "4" => "221231", "5" => "213212", "6" => "223112", "7" => "312131", "8" => "311222", "9" => "321122", ":" => "321221", ";" => "312212", "<" => "322112", "=" => "322211", ">" => "212123", "?" => "212321", "@" => "232121", "A" => "111323", "B" => "131123", "C" => "131321", "D" => "112313", "E" => "132113", "F" => "132311", "G" => "211313", "H" => "231113", "I" => "231311", "J" => "112133", "K" => "112331", "L" => "132131", "M" => "113123", "N" => "113321", "O" => "133121", "P" => "313121", "Q" => "211331", "R" => "231131", "S" => "213113", "T" => "213311", "U" => "213131", "V" => "311123", "W" => "311321", "X" => "331121", "Y" => "312113", "Z" => "312311", "[" => "332111", "\\" => "314111", "]" => "221411", "^" => "431111", "_" => "111224", "\`" => "111422", "a" => "121124", "b" => "121421", "c" => "141122", "d" => "141221", "e" => "112214", "f" => "112412", "g" => "122114", "h" => "122411", "i" => "142112", "j" => "142211", "k" => "241211", "l" => "221114", "m" => "413111", "n" => "241112", "o" => "134111", "p" => "111242", "q" => "121142", "r" => "121241", "s" => "114212", "t" => "124112", "u" => "124211", "v" => "411212", "w" => "421112", "x" => "421211", "y" => "212141", "z" => "214121", "{" => "412121", "|" => "111143", "}" => "111341", "~" => "131141", "DEL" => "114113", "FNC 3" => "114311", "FNC 2" => "411113", "SHIFT" => "411311", "CODE C" => "113141", "FNC 4" => "114131", "CODE A" => "311141", "FNC 1" => "411131", "Start A" => "211412", "Start B" => "211214", "Start C" => "211232", "Stop" => "2331112");
-            $code_keys = array_keys($code_array);
+            $code_array  = array(" " => "212222", "!" => "222122", "\"" => "222221", "#" => "121223", "$" => "121322", "%" => "131222", "&" => "122213", "'" => "122312", "(" => "132212", ")" => "221213", "*" => "221312", "+" => "231212", "," => "112232", "-" => "122132", "." => "122231", "/" => "113222", "0" => "123122", "1" => "123221", "2" => "223211", "3" => "221132", "4" => "221231", "5" => "213212", "6" => "223112", "7" => "312131", "8" => "311222", "9" => "321122", ":" => "321221", ";" => "312212", "<" => "322112", "=" => "322211", ">" => "212123", "?" => "212321", "@" => "232121", "A" => "111323", "B" => "131123", "C" => "131321", "D" => "112313", "E" => "132113", "F" => "132311", "G" => "211313", "H" => "231113", "I" => "231311", "J" => "112133", "K" => "112331", "L" => "132131", "M" => "113123", "N" => "113321", "O" => "133121", "P" => "313121", "Q" => "211331", "R" => "231131", "S" => "213113", "T" => "213311", "U" => "213131", "V" => "311123", "W" => "311321", "X" => "331121", "Y" => "312113", "Z" => "312311", "[" => "332111", "\\" => "314111", "]" => "221411", "^" => "431111", "_" => "111224", "\`" => "111422", "a" => "121124", "b" => "121421", "c" => "141122", "d" => "141221", "e" => "112214", "f" => "112412", "g" => "122114", "h" => "122411", "i" => "142112", "j" => "142211", "k" => "241211", "l" => "221114", "m" => "413111", "n" => "241112", "o" => "134111", "p" => "111242", "q" => "121142", "r" => "121241", "s" => "114212", "t" => "124112", "u" => "124211", "v" => "411212", "w" => "421112", "x" => "421211", "y" => "212141", "z" => "214121", "{" => "412121", "|" => "111143", "}" => "111341", "~" => "131141", "DEL" => "114113", "FNC 3" => "114311", "FNC 2" => "411113", "SHIFT" => "411311", "CODE C" => "113141", "FNC 4" => "114131", "CODE A" => "311141", "FNC 1" => "411131", "Start A" => "211412", "Start B" => "211214", "Start C" => "211232", "Stop" => "2331112");
+            $code_keys   = array_keys($code_array);
             $code_values = array_flip($code_keys);
             for ($X = 1; $X <= strlen($text); $X++) {
-                $activeKey = substr($text, ($X - 1), 1);
+                $activeKey   = substr($text, ($X - 1), 1);
                 $code_string .= $code_array[$activeKey];
-                $chk_sum = ($chk_sum + ($code_values[$activeKey] * $X));
+                $chk_sum     = ($chk_sum + ($code_values[$activeKey] * $X));
             }
             $code_string .= $code_array[$code_keys[($chk_sum - (intval($chk_sum / 103) * 103))]];
 
             $code_string = "211214" . $code_string . "2331112";
         } elseif (strtolower($code_type) == "code128a") {
             $chk_sum = 103;
-            $text = strtoupper($text); // Code 128A doesn't support lower case
+            $text    = strtoupper($text); // Code 128A doesn't support lower case
             // Must not change order of array elements as the checksum depends on the array's key to validate final code
-            $code_array = array(" " => "212222", "!" => "222122", "\"" => "222221", "#" => "121223", "$" => "121322", "%" => "131222", "&" => "122213", "'" => "122312", "(" => "132212", ")" => "221213", "*" => "221312", "+" => "231212", "," => "112232", "-" => "122132", "." => "122231", "/" => "113222", "0" => "123122", "1" => "123221", "2" => "223211", "3" => "221132", "4" => "221231", "5" => "213212", "6" => "223112", "7" => "312131", "8" => "311222", "9" => "321122", ":" => "321221", ";" => "312212", "<" => "322112", "=" => "322211", ">" => "212123", "?" => "212321", "@" => "232121", "A" => "111323", "B" => "131123", "C" => "131321", "D" => "112313", "E" => "132113", "F" => "132311", "G" => "211313", "H" => "231113", "I" => "231311", "J" => "112133", "K" => "112331", "L" => "132131", "M" => "113123", "N" => "113321", "O" => "133121", "P" => "313121", "Q" => "211331", "R" => "231131", "S" => "213113", "T" => "213311", "U" => "213131", "V" => "311123", "W" => "311321", "X" => "331121", "Y" => "312113", "Z" => "312311", "[" => "332111", "\\" => "314111", "]" => "221411", "^" => "431111", "_" => "111224", "NUL" => "111422", "SOH" => "121124", "STX" => "121421", "ETX" => "141122", "EOT" => "141221", "ENQ" => "112214", "ACK" => "112412", "BEL" => "122114", "BS" => "122411", "HT" => "142112", "LF" => "142211", "VT" => "241211", "FF" => "221114", "CR" => "413111", "SO" => "241112", "SI" => "134111", "DLE" => "111242", "DC1" => "121142", "DC2" => "121241", "DC3" => "114212", "DC4" => "124112", "NAK" => "124211", "SYN" => "411212", "ETB" => "421112", "CAN" => "421211", "EM" => "212141", "SUB" => "214121", "ESC" => "412121", "FS" => "111143", "GS" => "111341", "RS" => "131141", "US" => "114113", "FNC 3" => "114311", "FNC 2" => "411113", "SHIFT" => "411311", "CODE C" => "113141", "CODE B" => "114131", "FNC 4" => "311141", "FNC 1" => "411131", "Start A" => "211412", "Start B" => "211214", "Start C" => "211232", "Stop" => "2331112");
-            $code_keys = array_keys($code_array);
+            $code_array  = array(" " => "212222", "!" => "222122", "\"" => "222221", "#" => "121223", "$" => "121322", "%" => "131222", "&" => "122213", "'" => "122312", "(" => "132212", ")" => "221213", "*" => "221312", "+" => "231212", "," => "112232", "-" => "122132", "." => "122231", "/" => "113222", "0" => "123122", "1" => "123221", "2" => "223211", "3" => "221132", "4" => "221231", "5" => "213212", "6" => "223112", "7" => "312131", "8" => "311222", "9" => "321122", ":" => "321221", ";" => "312212", "<" => "322112", "=" => "322211", ">" => "212123", "?" => "212321", "@" => "232121", "A" => "111323", "B" => "131123", "C" => "131321", "D" => "112313", "E" => "132113", "F" => "132311", "G" => "211313", "H" => "231113", "I" => "231311", "J" => "112133", "K" => "112331", "L" => "132131", "M" => "113123", "N" => "113321", "O" => "133121", "P" => "313121", "Q" => "211331", "R" => "231131", "S" => "213113", "T" => "213311", "U" => "213131", "V" => "311123", "W" => "311321", "X" => "331121", "Y" => "312113", "Z" => "312311", "[" => "332111", "\\" => "314111", "]" => "221411", "^" => "431111", "_" => "111224", "NUL" => "111422", "SOH" => "121124", "STX" => "121421", "ETX" => "141122", "EOT" => "141221", "ENQ" => "112214", "ACK" => "112412", "BEL" => "122114", "BS" => "122411", "HT" => "142112", "LF" => "142211", "VT" => "241211", "FF" => "221114", "CR" => "413111", "SO" => "241112", "SI" => "134111", "DLE" => "111242", "DC1" => "121142", "DC2" => "121241", "DC3" => "114212", "DC4" => "124112", "NAK" => "124211", "SYN" => "411212", "ETB" => "421112", "CAN" => "421211", "EM" => "212141", "SUB" => "214121", "ESC" => "412121", "FS" => "111143", "GS" => "111341", "RS" => "131141", "US" => "114113", "FNC 3" => "114311", "FNC 2" => "411113", "SHIFT" => "411311", "CODE C" => "113141", "CODE B" => "114131", "FNC 4" => "311141", "FNC 1" => "411131", "Start A" => "211412", "Start B" => "211214", "Start C" => "211232", "Stop" => "2331112");
+            $code_keys   = array_keys($code_array);
             $code_values = array_flip($code_keys);
             for ($X = 1; $X <= strlen($text); $X++) {
-                $activeKey = substr($text, ($X - 1), 1);
+                $activeKey   = substr($text, ($X - 1), 1);
                 $code_string .= $code_array[$activeKey];
-                $chk_sum = ($chk_sum + ($code_values[$activeKey] * $X));
+                $chk_sum     = ($chk_sum + ($code_values[$activeKey] * $X));
             }
             $code_string .= $code_array[$code_keys[($chk_sum - (intval($chk_sum / 103) * 103))]];
 
@@ -595,11 +580,11 @@ class ClImage
             $code_length = $code_length + (integer)(substr($code_string, ($i - 1), 1));
         }
         $text_height = 30;
-        $img_width = $code_length * $size_factor;
-        $img_height = $bar_height_or_width - $text_height;
-        $image = imagecreate($img_width, $bar_height_or_width);
-        $black = imagecolorallocate($image, 0, 0, 0);
-        $white = imagecolorallocate($image, 255, 255, 255);
+        $img_width   = $code_length * $size_factor;
+        $img_height  = $bar_height_or_width - $text_height;
+        $image       = imagecreate($img_width, $bar_height_or_width);
+        $black       = imagecolorallocate($image, 0, 0, 0);
+        $white       = imagecolorallocate($image, 255, 255, 255);
         imagefill($image, 0, 0, $white);
         $font = 5;
         imagestring($image, $font, ceil(($img_width - imagefontwidth($font) * strlen($text)) / 2), $img_height + 5, $text, $black);
@@ -629,19 +614,18 @@ class ClImage
      * @param int $padding_left 生成新图的padding
      * @return string
      */
-    public static function mergeImages($source_absolute_img, $with_absolute_img, $x = 0, $y = 0, $save_absolute_file = '', $padding_top = 0, $padding_right = 0, $padding_bottom = 0, $padding_left = 0)
-    {
+    public static function mergeImages($source_absolute_img, $with_absolute_img, $x = 0, $y = 0, $save_absolute_file = '', $padding_top = 0, $padding_right = 0, $padding_bottom = 0, $padding_left = 0) {
         if (empty($save_absolute_file)) {
             $save_absolute_file = $source_absolute_img;
         }
         $source = imagecreatefromstring(file_get_contents($source_absolute_img));
         imagesavealpha($source, true);
-        $source_width = imagesx($source);//图片宽度
-        $source_height = imagesy($source);//图片高度
-        $with_img = imagecreatefromstring(file_get_contents($with_absolute_img));
-        $with_img_width = imagesx($with_img);//图片宽度
+        $source_width    = imagesx($source);//图片宽度
+        $source_height   = imagesy($source);//图片高度
+        $with_img        = imagecreatefromstring(file_get_contents($with_absolute_img));
+        $with_img_width  = imagesx($with_img);//图片宽度
         $with_img_height = imagesy($with_img);//图片高度
-        $new_img_width = $source_width + $padding_left + $padding_right;
+        $new_img_width   = $source_width + $padding_left + $padding_right;
         if ($x + $with_img_width > $source_width) {
             $new_img_width += $x + $with_img_width - $source_width;
         }
@@ -673,8 +657,7 @@ class ClImage
      * @param int $y -1/自动居中
      * @return mixed
      */
-    public static function createWithString($string, $save_absolute_url = '', $width = 0, $height = 0, $x = -1, $y = -1)
-    {
+    public static function createWithString($string, $save_absolute_url = '', $width = 0, $height = 0, $x = -1, $y = -1) {
         $font = 10;
         if ($width == 0) {
             $width = imagefontwidth($font) * strlen($string);
@@ -715,25 +698,24 @@ class ClImage
      * @param int $quality 图片质量
      * @return mixed
      */
-    public static function png2jpg($file_absolute_url, $is_delete = true, $quality = 90)
-    {
-        $src_file = $file_absolute_url;
+    public static function png2jpg($file_absolute_url, $is_delete = true, $quality = 90) {
+        $src_file                     = $file_absolute_url;
         $add_server_document_root_dir = false;
         if (!is_file($src_file)) {
             if (is_file(DOCUMENT_ROOT_PATH . $src_file)) {
                 $add_server_document_root_dir = true;
-                $src_file = DOCUMENT_ROOT_PATH . $src_file;
-            }else{
+                $src_file                     = DOCUMENT_ROOT_PATH . $src_file;
+            } else {
                 return $file_absolute_url;
             }
         }
         $src_file_ext = ClFile::getSuffix($src_file);
         if ($src_file_ext == '.png') {
-            $dst_file = str_replace('.png', '.jpg', $src_file);
+            $dst_file   = str_replace('.png', '.jpg', $src_file);
             $photo_size = GetImageSize($src_file);
-            $pw = $photo_size[0];
-            $ph = $photo_size[1];
-            $dst_image = ImageCreateTrueColor($pw, $ph);
+            $pw         = $photo_size[0];
+            $ph         = $photo_size[1];
+            $dst_image  = ImageCreateTrueColor($pw, $ph);
             imagecolorallocate($dst_image, 255, 255, 255);
             //读取图片  
             $src_image = ImageCreateFromPNG($src_file);

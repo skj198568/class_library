@@ -15,8 +15,7 @@ use think\Exception;
  * Class ClHttp 类库Http
  * @package Common\Common
  */
-class ClHttp
-{
+class ClHttp {
 
     /**
      * http结果格式
@@ -38,8 +37,7 @@ class ClHttp
      * @param bool $with_protocol
      * @return string
      */
-    public static function getServerDomain($with_protocol = true)
-    {
+    public static function getServerDomain($with_protocol = true) {
         $protocol = '';
         if ($with_protocol) {
             $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
@@ -51,8 +49,7 @@ class ClHttp
      * 获取当前请求路径
      * @return string
      */
-    public static function getCurrentRequest()
-    {
+    public static function getCurrentRequest() {
         return self::getServerDomain() . $_SERVER['REQUEST_URI'];
     }
 
@@ -68,8 +65,7 @@ class ClHttp
      * @param int $timeout 超时时间
      * @return bool
      */
-    public static function noBlockingRequest($ip, $url, $params = array(), $timeout = 15)
-    {
+    public static function noBlockingRequest($ip, $url, $params = array(), $timeout = 15) {
         if (config('app_debug')) {
             log_info($ip, $url, $params);
         }
@@ -78,11 +74,11 @@ class ClHttp
         !isset($matches['path']) && $matches['path'] = '';
         !isset($matches['query']) && $matches['query'] = '';
         !isset($matches['port']) && $matches['port'] = '';
-        $host = $matches['host'];
-        $path = $matches['path'] ? $matches['path'] . ($matches['query'] ? '?' . $matches['query'] : '') : '/';
-        $port = !empty($matches['port']) ? $matches['port'] : 80;
+        $host   = $matches['host'];
+        $path   = $matches['path'] ? $matches['path'] . ($matches['query'] ? '?' . $matches['query'] : '') : '/';
+        $port   = !empty($matches['port']) ? $matches['port'] : 80;
         $cookie = '';
-        $post = '';
+        $post   = '';
         if (is_array($params) && count($params) > 0) {
             foreach ($params as $name => $value) {
                 if (empty($post)) {
@@ -120,10 +116,10 @@ class ClHttp
         //错误
         if (empty($fp)) {
             log_info('error:', array(
-                'ip:' => $ip,
-                'params:' => $params,
+                'ip:'      => $ip,
+                'params:'  => $params,
                 'timeout:' => $timeout,
-                'err_no:' => $err_no,
+                'err_no:'  => $err_no,
                 'err_str:' => $err_str
             ));
             return false;
@@ -144,8 +140,7 @@ class ClHttp
      * @param string $result_type 结果格式
      * @return mixed
      */
-    public static function http($url, $params = [], $duration = 0, $is_debug = false, $result_type = 'json')
-    {
+    public static function http($url, $params = [], $duration = 0, $is_debug = false, $result_type = 'json') {
         $config = ['post' => $params];
         if ($result_type == 'json') {
             $config['content_type'] = 'application/json';
@@ -178,8 +173,7 @@ class ClHttp
      * @param $url
      * @param $params
      */
-    public static function httpRc($url, $params)
-    {
+    public static function httpRc($url, $params) {
         ClCache::remove($url, $params);
     }
 
@@ -191,8 +185,7 @@ class ClHttp
      * @param string $result_type
      * @return mixed|string
      */
-    public static function httpForm($url, $params = array(), $is_debug = false, $result_type = 'json')
-    {
+    public static function httpForm($url, $params = array(), $is_debug = false, $result_type = 'json') {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -215,8 +208,7 @@ class ClHttp
      * 获取服务器根目录
      * @return mixed
      */
-    public static function getServerDocumentRoot()
-    {
+    public static function getServerDocumentRoot() {
         return $_SERVER['DOCUMENT_ROOT'];
     }
 
@@ -228,8 +220,7 @@ class ClHttp
      * @param bool $is_post 是否是post请求
      * @return mixed
      */
-    public static function simulateLogin($url, $cookie_create_key, $params, $is_post = true)
-    {
+    public static function simulateLogin($url, $cookie_create_key, $params, $is_post = true) {
         $curl = curl_init();//初始化curl模块
         curl_setopt($curl, CURLOPT_URL, $url);//登录提交的地址
         curl_setopt($curl, CURLOPT_HEADER, 0);//是否显示头信息
@@ -254,8 +245,7 @@ class ClHttp
      * @param bool $is_debug
      * @return mixed
      */
-    public static function simulateRequest($url, $cookie, $params, $is_post = true, $referer = '', $is_debug = false)
-    {
+    public static function simulateRequest($url, $cookie, $params, $is_post = true, $referer = '', $is_debug = false) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -276,11 +266,11 @@ class ClHttp
         curl_close($ch);
         if ($is_debug) {
             log_info([
-                'url' => $url,
-                'cookie' => $cookie,
-                'params' => $params,
+                'url'     => $url,
+                'cookie'  => $cookie,
+                'params'  => $params,
                 'is_post' => $is_post,
-                'result' => $rs
+                'result'  => $rs
             ]);
         }
         return $rs;
@@ -291,8 +281,7 @@ class ClHttp
      * @param $cookie_create_key
      * @return string
      */
-    private static function simulateGetCookieFile($cookie_create_key)
-    {
+    private static function simulateGetCookieFile($cookie_create_key) {
         $cookie_file = DOCUMENT_ROOT_PATH . '/Cookie/' . $cookie_create_key . '.cookie';
         if (!is_file($cookie_file)) {
             //创建文件夹
@@ -308,8 +297,7 @@ class ClHttp
      * 获取http所有的状态码
      * @return array
      */
-    public static function getHttpStatusAllCodes()
-    {
+    public static function getHttpStatusAllCodes() {
         return array(
             #-------------------------------------
             # Define 100 series http codes (informational)
@@ -379,8 +367,7 @@ class ClHttp
      * @param $code
      * @return string
      */
-    public static function getHttpStatusByCode($code)
-    {
+    public static function getHttpStatusByCode($code) {
         $code = intval($code);
         if (empty($code)) {
             return '';
@@ -399,11 +386,10 @@ class ClHttp
      * @param bool $is_debug :是否debug
      * @return string:返回上传结果
      */
-    public static function uploadFile($url, $params, $name, $filename, $file_absolute_url, $is_debug = false)
-    {
+    public static function uploadFile($url, $params, $name, $filename, $file_absolute_url, $is_debug = false) {
         // 设置分割标识
         $boundary = '---------------------------' . ClString::toCrc32($file_absolute_url);
-        $data = '--' . $boundary . "\r\n";
+        $data     = '--' . $boundary . "\r\n";
         // form data
         $form_data = '';
         foreach ($params as $key => $val) {
@@ -418,11 +404,11 @@ class ClHttp
         }
         // file data
         $file_data = '';
-        $files = array(
+        $files     = array(
             array(
-                'name' => $name,
+                'name'     => $name,
                 'filename' => $filename,
-                'path' => $file_absolute_url
+                'path'     => $file_absolute_url
             )
         );
         foreach ($files as $val) {
@@ -437,12 +423,12 @@ class ClHttp
             return false;
         }
         $data .= $form_data . $file_data . "--\r\n\r\n";
-        $out = "POST " . $url . " http/1.1\r\n";
-        $out .= "host: " . $url . "\r\n";
-        $out .= "content-type: multipart/form-data; boundary=" . $boundary . "\r\n";
-        $out .= "content-length: " . strlen($data) . "\r\n";
-        $out .= "connection: close\r\n\r\n";
-        $out .= $data;
+        $out  = "POST " . $url . " http/1.1\r\n";
+        $out  .= "host: " . $url . "\r\n";
+        $out  .= "content-type: multipart/form-data; boundary=" . $boundary . "\r\n";
+        $out  .= "content-length: " . strlen($data) . "\r\n";
+        $out  .= "connection: close\r\n\r\n";
+        $out  .= $data;
         if ($is_debug) {
             log_info($out);
         }
@@ -456,7 +442,7 @@ class ClHttp
         }
         // 断开连接
         fclose($fs);
-        $pos = strpos($response, "\r\n\r\n");
+        $pos      = strpos($response, "\r\n\r\n");
         $response = substr($response, $pos + 4);
         return $response;
     }
@@ -468,9 +454,8 @@ class ClHttp
      * @param $url
      * @return mixed
      */
-    public static function httpFake($ip, $port, $url)
-    {
-        $ch = curl_init();
+    public static function httpFake($ip, $port, $url) {
+        $ch      = curl_init();
         $timeout = 5;
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -490,8 +475,7 @@ class ClHttp
      * @param string $user_agent
      * @return array 返回的数组第一个为浏览器名称，第二个是版本号。
      */
-    public static function getBrowser($user_agent = '')
-    {
+    public static function getBrowser($user_agent = '') {
         $sys = empty($user_agent) ? $_SERVER['HTTP_USER_AGENT'] : $user_agent;
         $exp = array();
         if (stripos($sys, 'MQQBrowser')) {

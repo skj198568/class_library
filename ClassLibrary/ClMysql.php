@@ -13,8 +13,7 @@ namespace ClassLibrary;
  * Class ClMysql
  * @package ClassLibrary
  */
-class ClMysql
-{
+class ClMysql {
 
     /**
      * 实例对象
@@ -30,8 +29,7 @@ class ClMysql
      * @param $password
      * @param $database
      */
-    public static function init($host, $port, $user, $password, $database)
-    {
+    public static function init($host, $port, $user, $password, $database) {
         if (empty($port)) {
             self::$mysql_instance = mysqli_connect($host, $user, $password, $database);
         } else {
@@ -45,18 +43,17 @@ class ClMysql
      * @param $sql
      * @return array
      */
-    public static function query($sql)
-    {
+    public static function query($sql) {
         if (self::$mysql_instance == null) {
             exit('please call ClMysql::init() first');
         }
         $result = mysqli_query(self::$mysql_instance, $sql);
-        if(empty($result)){
+        if (empty($result)) {
             return [];
         }
         // 输出每行数据
         $rows = [];
-        while($row = $result->fetch_assoc()) {
+        while ($row = $result->fetch_assoc()) {
             $rows[] = $row;
         }
         return $rows;
@@ -65,8 +62,7 @@ class ClMysql
     /**
      * 关闭链接
      */
-    public static function close()
-    {
+    public static function close() {
         if (self::$mysql_instance != null) {
             mysqli_close(self::$mysql_instance);
         }

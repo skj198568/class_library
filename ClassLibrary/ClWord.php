@@ -14,16 +14,14 @@ namespace ClassLibrary;
  * Class ClWord
  * @package ClassLibrary
  */
-class ClWord
-{
+class ClWord {
 
     /**
      * 导出word文件
      * @param $html_content
      * @param string $file_name
      */
-    public static function export($html_content, $file_name = '')
-    {
+    public static function export($html_content, $file_name = '') {
         header("Cache-Control: no-cache, must-revalidate");
         header("Pragma: no-cache");
         //防止导出乱码

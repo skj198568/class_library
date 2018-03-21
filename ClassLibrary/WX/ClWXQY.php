@@ -18,8 +18,7 @@ use ClassLibrary\ClHttp;
  * Class ClWeiXinQiYe
  * @package ClassLibrary
  */
-class ClWXQY
-{
+class ClWXQY {
 
     /**
      * 缓存安全时间
@@ -101,8 +100,7 @@ class ClWXQY
      * 获取所有的错误信息
      * @return array
      */
-    public static function getAllErrorMsg()
-    {
+    public static function getAllErrorMsg() {
         return array(
             array('code' => -1, 'msg' => '系统繁忙'),
             array('code' => 0, 'msg' => '请求成功'),
@@ -339,10 +337,9 @@ class ClWXQY
      * @param $code
      * @return string
      */
-    public static function getErrorMsgByCode($code)
-    {
+    public static function getErrorMsgByCode($code) {
         $codes = self::getAllErrorMsg();
-        $msg = '';
+        $msg   = '';
         foreach ($codes as $each) {
             if ($each['code'] == $code) {
                 $msg = $each['msg'];
@@ -359,9 +356,8 @@ class ClWXQY
      * @return mixed
      * @throws Exception
      */
-    public static function getAccessToken($corp_id, $secret)
-    {
-        $key = ClCache::getKey($corp_id, $secret);
+    public static function getAccessToken($corp_id, $secret) {
+        $key    = ClCache::getKey($corp_id, $secret);
         $result = cache($key);
         if ($result !== false) {
             return $result;
@@ -388,14 +384,13 @@ class ClWXQY
      * @param $reply_echo_str :解密之后的echostr，当return返回0时有效
      * @return int
      */
-    public static function verifyURL($token, $encoding_aes_key, $corp_id, $msg_signature, $timestamp, $nonce, $echo_str, &$reply_echo_str)
-    {
+    public static function verifyURL($token, $encoding_aes_key, $corp_id, $msg_signature, $timestamp, $nonce, $echo_str, &$reply_echo_str) {
         if (strlen($encoding_aes_key) != 43) {
             return ErrorCode::$IllegalAesKey;
         }
         //verify msg_signature
         $array = SHA1::getSHA1($token, $timestamp, $nonce, $echo_str);
-        $ret = $array[0];
+        $ret   = $array[0];
         if ($ret != 0) {
             return $ret;
         }
@@ -427,11 +422,10 @@ class ClWXQY
      *
      * @return int 成功0，失败返回对应的错误码
      */
-    public static function encryptMsg($token, $encoding_aes_key, $corp_id, $reply_msg, $timestamp, $nonce, &$encrypt_msg)
-    {
+    public static function encryptMsg($token, $encoding_aes_key, $corp_id, $reply_msg, $timestamp, $nonce, &$encrypt_msg) {
         //加密
         $array = PrpCrypt::encrypt($encoding_aes_key, $reply_msg, $corp_id);
-        $ret = $array[0];
+        $ret   = $array[0];
         if ($ret != 0) {
             return $ret;
         }
@@ -441,7 +435,7 @@ class ClWXQY
         $encrypt = $array[1];
         //生成安全签名
         $array = SHA1::getSHA1($token, $timestamp, $nonce, $encrypt);
-        $ret = $array[0];
+        $ret   = $array[0];
         if ($ret != 0) {
             return $ret;
         }
@@ -466,25 +460,24 @@ class ClWXQY
      * @param &$msg string:解密后的原文，当return返回0时有效
      * @return int 成功0，失败返回对应的错误码
      */
-    public static function decryptMsg($token, $encoding_aes_key, $corp_id, $msg_signature, $timestamp = null, $nonce, $post_data, &$msg)
-    {
+    public static function decryptMsg($token, $encoding_aes_key, $corp_id, $msg_signature, $timestamp = null, $nonce, $post_data, &$msg) {
         if (strlen($encoding_aes_key) != 43) {
             return ErrorCode::$IllegalAesKey;
         }
         //提取密文
         $array = XMLParse::extract($post_data);
-        $ret = $array[0];
+        $ret   = $array[0];
         if ($ret != 0) {
             return $ret;
         }
         if ($timestamp == null) {
             $timestamp = time();
         }
-        $encrypt = $array[1];
+        $encrypt      = $array[1];
         $to_user_name = $array[2];
         //验证安全签名
         $array = SHA1::getSHA1($token, $timestamp, $nonce, $encrypt);
-        $ret = $array[0];
+        $ret   = $array[0];
         if ($ret != 0) {
             return $ret;
         }
@@ -505,8 +498,7 @@ class ClWXQY
      * @param $access_token
      * @return mixed
      */
-    public static function getServerIps($access_token)
-    {
+    public static function getServerIps($access_token) {
         $ips = ClHttp::http(self::URL . '/getcallbackip?access_token=' . $access_token, array(), 3600);
         return $ips['ip_list'];
     }
@@ -521,13 +513,12 @@ class ClWXQY
      * @return array("errcode": 0, "errmsg": "created", "id": 2)
      * @return bool|int 成功返回部门id，失败返回false
      */
-    public static function departmentCreate($access_token, $id, $name, $parent_id, $order)
-    {
+    public static function departmentCreate($access_token, $id, $name, $parent_id, $order) {
         $r = ClHttp::http(self::URL . '/department/create?access_token=' . $access_token, array(
-            'name' => $name,
+            'name'     => $name,
             'parentid' => $parent_id,
-            'order' => $order,
-            'id' => $id
+            'order'    => $order,
+            'id'       => $id
         ));
         if ($r['errcode'] == 0) {
             return $r['id'];
@@ -544,8 +535,7 @@ class ClWXQY
      * @param string $order :在父部门中的次序值。order值小的排序靠前。
      * @return boolean
      */
-    public static function departmentUpdate($access_token, $id, $name = '', $parent_id = '', $order = '')
-    {
+    public static function departmentUpdate($access_token, $id, $name = '', $parent_id = '', $order = '') {
         $post = array(
             'id' => $id
         );
@@ -568,8 +558,7 @@ class ClWXQY
      * @param $id :部门id
      * @return boolean
      */
-    public static function departmentDelete($access_token, $id)
-    {
+    public static function departmentDelete($access_token, $id) {
         $r = ClHttp::http(self::URL . '/department/delete?access_token=' . $access_token, array('id' => $id));
         return $r['errcode'] == 0 ? true : false;
     }
@@ -580,8 +569,7 @@ class ClWXQY
      * @param $id
      * @return bool/array
      */
-    public static function departmentGet($access_token, $id)
-    {
+    public static function departmentGet($access_token, $id) {
         $r = ClHttp::http(self::URL . '/department/list?access_token=' . $access_token, array('id' => $id));
         return $r['errcode'] == 0 ? $r['department'] : false;
     }
@@ -591,8 +579,7 @@ class ClWXQY
      * @param $gender
      * @return int
      */
-    public static function getSexFromGender($gender)
-    {
+    public static function getSexFromGender($gender) {
         return $gender == 1 ? 1 : 0;
     }
 
@@ -601,8 +588,7 @@ class ClWXQY
      * @param $sex
      * @return int
      */
-    public static function getGenderFormSex($sex)
-    {
+    public static function getGenderFormSex($sex) {
         return $sex == 1 ? 1 : 2;
     }
 
@@ -621,20 +607,19 @@ class ClWXQY
      * @param $ext_attr :扩展属性。扩展属性需要在WEB管理端创建后才生效，否则忽略未知属性的赋值，array(array('name' => '', 'value' => ''), array('name' => '', 'value' => ''))
      * @return bool
      */
-    public static function userCreate($access_token, $user_id, $name, $department = array(), $position = '', $mobile = '', $sex = 1, $email = '', $wei_xin_id = '', $avatar_media_id = '', $ext_attr = array())
-    {
+    public static function userCreate($access_token, $user_id, $name, $department = array(), $position = '', $mobile = '', $sex = 1, $email = '', $wei_xin_id = '', $avatar_media_id = '', $ext_attr = array()) {
         $post = array(
-            'userid' => $user_id,
-            'name' => $name,
-            'department' => $department,
-            'mobile' => $mobile,
-            'gender' => self::getGenderFormSex($sex),
-            'email' => $email,
-            'winxinid' => $wei_xin_id,
+            'userid'         => $user_id,
+            'name'           => $name,
+            'department'     => $department,
+            'mobile'         => $mobile,
+            'gender'         => self::getGenderFormSex($sex),
+            'email'          => $email,
+            'winxinid'       => $wei_xin_id,
             'avatar_mediaid' => $avatar_media_id,
-            'extattr' => array('attrs' => $ext_attr)
+            'extattr'        => array('attrs' => $ext_attr)
         );
-        $r = ClHttp::http(self::URL . '/user/create?access_token=' . $access_token, $post);
+        $r    = ClHttp::http(self::URL . '/user/create?access_token=' . $access_token, $post);
         return $r['errcode'] == 0 ? true : false;
     }
 
@@ -653,20 +638,19 @@ class ClWXQY
      * @param $ext_attr :扩展属性。扩展属性需要在WEB管理端创建后才生效，否则忽略未知属性的赋值，array(array('name' => '', 'value' => ''), array('name' => '', 'value' => ''))
      * @return bool
      */
-    public static function userUpdate($access_token, $user_id, $name, $department = array(), $position = '', $mobile = '', $sex = 1, $email = '', $wei_xin_id = '', $avatar_media_id = '', $ext_attr = array())
-    {
+    public static function userUpdate($access_token, $user_id, $name, $department = array(), $position = '', $mobile = '', $sex = 1, $email = '', $wei_xin_id = '', $avatar_media_id = '', $ext_attr = array()) {
         $post = array(
-            'userid' => $user_id,
-            'name' => $name,
-            'department' => $department,
-            'mobile' => $mobile,
-            'gender' => self::getGenderFormSex($sex),
-            'email' => $email,
-            'winxinid' => $wei_xin_id,
+            'userid'         => $user_id,
+            'name'           => $name,
+            'department'     => $department,
+            'mobile'         => $mobile,
+            'gender'         => self::getGenderFormSex($sex),
+            'email'          => $email,
+            'winxinid'       => $wei_xin_id,
             'avatar_mediaid' => $avatar_media_id,
-            'extattr' => array('attrs' => $ext_attr)
+            'extattr'        => array('attrs' => $ext_attr)
         );
-        $r = ClHttp::http(self::URL . '/user/update?access_token=' . $access_token, $post);
+        $r    = ClHttp::http(self::URL . '/user/update?access_token=' . $access_token, $post);
         return $r['errcode'] == 0 ? true : false;
     }
 
@@ -676,8 +660,7 @@ class ClWXQY
      * @param $user_id
      * @return bool
      */
-    public static function userDelete($access_token, $user_id)
-    {
+    public static function userDelete($access_token, $user_id) {
         $r = ClHttp::http(self::URL . '/user/delete?access_token=' . $access_token, array(
             'userid' => $user_id
         ));
@@ -690,8 +673,7 @@ class ClWXQY
      * @param $user_ids : array(1, 2, 3)
      * @return bool
      */
-    public static function userDeleteList($access_token, $user_ids)
-    {
+    public static function userDeleteList($access_token, $user_ids) {
         $r = ClHttp::http(self::URL . '/user/batchdelete?access_token=' . $access_token, array(
             'useridlist' => $user_ids
         ));
@@ -704,8 +686,7 @@ class ClWXQY
      * @param $user_id
      * @return bool|array()
      */
-    public static function userGet($access_token, $user_id)
-    {
+    public static function userGet($access_token, $user_id) {
         $r = ClHttp::http(self::URL . '/user/get?access_token=' . $access_token . '&userid=' . $user_id);
         return $r['errcode'] == 0 ? $r : false;
     }
@@ -719,10 +700,9 @@ class ClWXQY
      * @param bool $is_simple : 是否是获取简单信息，否，则获取用户所有信息
      * @return bool
      */
-    public static function userGetByDepartment($access_token, $department_id, $fetch_child = 1, $status = 0, $is_simple = true)
-    {
+    public static function userGetByDepartment($access_token, $department_id, $fetch_child = 1, $status = 0, $is_simple = true) {
         $action = $is_simple ? 'simplelist' : 'list';
-        $r = ClHttp::http(self::URL . "/user/$action?access_token=$access_token&department_id=$department_id&fetch_child=$fetch_child&status=$status");
+        $r      = ClHttp::http(self::URL . "/user/$action?access_token=$access_token&department_id=$department_id&fetch_child=$fetch_child&status=$status");
         return $r['errcode'] == 0 ? $r['userlist'] : false;
     }
 
@@ -732,8 +712,7 @@ class ClWXQY
      * @param $user_id
      * @return bool|int 1:微信邀请 2.邮件邀请
      */
-    public static function userInvite($access_token, $user_id)
-    {
+    public static function userInvite($access_token, $user_id) {
         $r = ClHttp::http(self::URL . "/invite/send?access_token=$access_token", array(
             'userid' => $user_id
         ));
@@ -747,11 +726,10 @@ class ClWXQY
      * @param $tag_name :标签名称，长度为1~64个字节，标签名不可与其他标签重名。
      * @return bool|int
      */
-    public static function tagCreate($access_token, $tag_id, $tag_name)
-    {
+    public static function tagCreate($access_token, $tag_id, $tag_name) {
         $r = ClHttp::http(self::URL . "/tag/create?access_token=$access_token", array(
             'tagname' => $tag_name,
-            'tagid' => $tag_id
+            'tagid'   => $tag_id
         ));
         return $r['errcode'] == 0 ? $r['tagid'] : false;
     }
@@ -763,11 +741,10 @@ class ClWXQY
      * @param $tag_name :标签名称，长度为1~64个字节，标签名不可与其他标签重名。
      * @return bool
      */
-    public static function tagUpdate($access_token, $tag_id, $tag_name)
-    {
+    public static function tagUpdate($access_token, $tag_id, $tag_name) {
         $r = ClHttp::http(self::URL . "/tag/update?access_token=$access_token", array(
             'tagname' => $tag_name,
-            'tagid' => $tag_id
+            'tagid'   => $tag_id
         ));
         return $r['errcode'] == 0 ? true : false;
     }
@@ -778,8 +755,7 @@ class ClWXQY
      * @param $tag_id :标签id
      * @return bool
      */
-    public static function tagDelete($access_token, $tag_id)
-    {
+    public static function tagDelete($access_token, $tag_id) {
         $r = ClHttp::http(self::URL . "/tag/delete?access_token=$access_token&tagid=$tag_id");
         return $r['errcode'] == 0 ? true : false;
     }
@@ -790,8 +766,7 @@ class ClWXQY
      * @param $tag_id
      * @return bool|array:array('partylist' => '部门列表')
      */
-    public static function tagGet($access_token, $tag_id)
-    {
+    public static function tagGet($access_token, $tag_id) {
         $r = ClHttp::http(self::URL . "/tag/get?access_token=$access_token&tagid=$tag_id");
         return $r['errcode'] == 0 ? $r : false;
     }
@@ -804,11 +779,10 @@ class ClWXQY
      * @param array $party_list :企业部门ID列表，array(3, 5)，注意：userlist、partylist不能同时为空，单次请求长度不超过100
      * @return bool
      */
-    public static function tagUsersAdd($access_token, $tag_id, array $user_list, array $party_list)
-    {
+    public static function tagUsersAdd($access_token, $tag_id, array $user_list, array $party_list) {
         $r = ClHttp::http(self::URL . "/tag/addtagusers?access_token=$access_token", array(
-            'tagid' => $tag_id,
-            'userlist' => $user_list,
+            'tagid'     => $tag_id,
+            'userlist'  => $user_list,
             'partylist' => $party_list
         ));
         return $r['errcode'] == 0 ? true : false;
@@ -822,11 +796,10 @@ class ClWXQY
      * @param array $party_list :企业部门ID列表，array(3, 5)，注意：userlist、partylist不能同时为空，单次请求长度不超过100
      * @return bool
      */
-    public static function tagUsersDelete($access_token, $tag_id, array $user_list, array $party_list)
-    {
+    public static function tagUsersDelete($access_token, $tag_id, array $user_list, array $party_list) {
         $r = ClHttp::http(self::URL . "/tag/deltagusers?access_token=$access_token", array(
-            'tagid' => $tag_id,
-            'userlist' => $user_list,
+            'tagid'     => $tag_id,
+            'userlist'  => $user_list,
             'partylist' => $party_list
         ));
         return $r['errcode'] == 0 ? true : false;
@@ -837,8 +810,7 @@ class ClWXQY
      * @param $access_token
      * @return bool|array
      */
-    public static function tagList($access_token)
-    {
+    public static function tagList($access_token) {
         $r = ClHttp::http(self::URL . "/tag/list?access_token=$access_token");
         return $r['errcode'] == 0 ? $r['taglist'] : false;
     }
@@ -854,15 +826,14 @@ class ClWXQY
      * @param $call_back_encoding_aes_key :用于消息体的加密，是AES密钥的Base64编码
      * @return bool
      */
-    public static function batchInvite($access_token, array $to_users, array $to_parties, array $to_tags, $call_back_url, $call_back_token, $call_back_encoding_aes_key)
-    {
+    public static function batchInvite($access_token, array $to_users, array $to_parties, array $to_tags, $call_back_url, $call_back_token, $call_back_encoding_aes_key) {
         $r = ClHttp::http(self::URL . "/batch/inviteuser?access_token=$access_token", array(
-            'touser' => implode('|', $to_users),
-            'toparty' => implode('|', $to_parties),
-            'totag' => implode('|', $to_tags),
+            'touser'   => implode('|', $to_users),
+            'toparty'  => implode('|', $to_parties),
+            'totag'    => implode('|', $to_tags),
             'callback' => array(
-                'url' => $call_back_url,
-                'token' => $call_back_token,
+                'url'            => $call_back_url,
+                'token'          => $call_back_token,
                 'encodingaeskey' => $call_back_encoding_aes_key
             )
         ));
@@ -883,8 +854,7 @@ class ClWXQY
      * @param $file_absolute_url
      * @return bool|mixed array('type' => '文件类型', 'media_id' => '媒体文件上传后获取的唯一标识', 'created_at ' => '媒体上传时间戳')
      */
-    public static function mediaUpload($access_token, $type, $name, $filename, $file_absolute_url)
-    {
+    public static function mediaUpload($access_token, $type, $name, $filename, $file_absolute_url) {
         $r = ClHttp::uploadFile(self::URL . "/media/upload?access_token=$access_token&type=$type", array(), $name, $filename, $file_absolute_url);
         $r = json_decode($r, true);
         return $r['errcode'] == 0 ? $r : false;
@@ -896,8 +866,7 @@ class ClWXQY
      * @param $media_id
      * @param $local_file_absolute_url
      */
-    public static function mediaGet($access_token, $media_id, $local_file_absolute_url)
-    {
+    public static function mediaGet($access_token, $media_id, $local_file_absolute_url) {
         Http::curlDownload(self::URL . "/media/get?access_token=$access_token&media_id=$media_id", $local_file_absolute_url);
     }
 
@@ -935,8 +904,7 @@ class ClWXQY
      * "isreportenter":0  //是否上报用户进入应用事件。0：不接收；1：接收
      * )
      */
-    public static function agentGet($access_token, $agent_id)
-    {
+    public static function agentGet($access_token, $agent_id) {
         $r = ClHttp::http(self::URL . "/agent/get?access_token=$access_token&agentid=$agent_id");
         return $r['errcode'] == 0 ? $r : false;
     }
@@ -954,17 +922,16 @@ class ClWXQY
      * @param $is_report_enter :是否上报用户进入应用事件。0：不接收；1：接收
      * @return bool
      */
-    public static function agentSet($access_token, $agent_id, $report_location_flag, $logo_media_id, $name, $description, $redirect_domain, $is_report_user, $is_report_enter)
-    {
+    public static function agentSet($access_token, $agent_id, $report_location_flag, $logo_media_id, $name, $description, $redirect_domain, $is_report_user, $is_report_enter) {
         $r = ClHttp::http(self::URL . "/agent/set?access_token=$access_token", array(
-            'agentid' => $agent_id,
+            'agentid'              => $agent_id,
             'report_location_flag' => $report_location_flag,
-            'logo_mediaid' => $logo_media_id,
-            'name' => $name,
-            'description' => $description,
-            'redirect_domain' => $redirect_domain,
-            'isreportuser' => $is_report_user,
-            'isreportenter' => $is_report_enter
+            'logo_mediaid'         => $logo_media_id,
+            'name'                 => $name,
+            'description'          => $description,
+            'redirect_domain'      => $redirect_domain,
+            'isreportuser'         => $is_report_user,
+            'isreportenter'        => $is_report_enter
         ));
         return $r['errcode'] == 0 ? true : false;
     }
@@ -999,8 +966,7 @@ class ClWXQY
      * "round_logo_url": "url" //圆形头像url
      * ))
      */
-    public static function agentList($access_token)
-    {
+    public static function agentList($access_token) {
         $r = ClHttp::http(self::URL . "/agent/list?access_token=$access_token");
         return $r['errcode'] == 0 ? $r['agentlist'] : false;
     }
@@ -1016,18 +982,17 @@ class ClWXQY
      * @param $is_safe :表示是否是保密消息，0表示否，1表示是，默认0
      * @return bool
      */
-    public static function msgSendText($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $content, $is_safe = 0)
-    {
+    public static function msgSendText($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $content, $is_safe = 0) {
         $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
-            "touser" => is_array($to_users) ? implode('|', $to_users) : '@all',
+            "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
-            "totag" => is_array($to_tags) ? implode('|', $to_tags) : '',
+            "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
             "msgtype" => "text",
             "agentid" => $agent_id,
-            "text" => array(
+            "text"    => array(
                 "content" => $content
             ),
-            "safe" => $is_safe
+            "safe"    => $is_safe
         ));
         return $r['errcode'] == 0 ? true : false;
     }
@@ -1043,18 +1008,17 @@ class ClWXQY
      * @param int $is_safe :表示是否是保密消息，0表示否，1表示是，默认0
      * @return bool
      */
-    public static function msgSendImage($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $is_safe = 0)
-    {
+    public static function msgSendImage($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $is_safe = 0) {
         $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
-            "touser" => is_array($to_users) ? implode('|', $to_users) : '@all',
+            "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
-            "totag" => is_array($to_tags) ? implode('|', $to_tags) : '',
+            "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
             "msgtype" => "image",
             "agentid" => $agent_id,
-            "image" => array(
+            "image"   => array(
                 "media_id" => $media_id
             ),
-            "safe" => $is_safe
+            "safe"    => $is_safe
         ));
         return $r['errcode'] == 0 ? true : false;
     }
@@ -1070,18 +1034,17 @@ class ClWXQY
      * @param int $is_safe :表示是否是保密消息，0表示否，1表示是，默认0
      * @return bool
      */
-    public static function msgSendVoice($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $is_safe = 0)
-    {
+    public static function msgSendVoice($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $is_safe = 0) {
         $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
-            "touser" => is_array($to_users) ? implode('|', $to_users) : '@all',
+            "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
-            "totag" => is_array($to_tags) ? implode('|', $to_tags) : '',
+            "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
             "msgtype" => "voice",
             "agentid" => $agent_id,
-            "voice" => array(
+            "voice"   => array(
                 "media_id" => $media_id
             ),
-            "safe" => $is_safe
+            "safe"    => $is_safe
         ));
         return $r['errcode'] == 0 ? true : false;
     }
@@ -1099,20 +1062,19 @@ class ClWXQY
      * @param int $is_safe :表示是否是保密消息，0表示否，1表示是，默认0
      * @return bool
      */
-    public static function msgSendVideo($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $title = '', $desc = '', $is_safe = 0)
-    {
+    public static function msgSendVideo($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $title = '', $desc = '', $is_safe = 0) {
         $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
-            "touser" => is_array($to_users) ? implode('|', $to_users) : '@all',
+            "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
-            "totag" => is_array($to_tags) ? implode('|', $to_tags) : '',
+            "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
             "msgtype" => "video",
             "agentid" => $agent_id,
-            "video" => array(
-                "media_id" => $media_id,
-                'title' => $title,
+            "video"   => array(
+                "media_id"    => $media_id,
+                'title'       => $title,
                 'description' => $desc
             ),
-            "safe" => $is_safe
+            "safe"    => $is_safe
         ));
         return $r['errcode'] == 0 ? true : false;
     }
@@ -1128,18 +1090,17 @@ class ClWXQY
      * @param int $is_safe :表示是否是保密消息，0表示否，1表示是，默认0
      * @return bool
      */
-    public static function msgSendFile($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $is_safe = 0)
-    {
+    public static function msgSendFile($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $is_safe = 0) {
         $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
-            "touser" => is_array($to_users) ? implode('|', $to_users) : '@all',
+            "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
-            "totag" => is_array($to_tags) ? implode('|', $to_tags) : '',
+            "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
             "msgtype" => "file",
             "agentid" => $agent_id,
-            "file" => array(
+            "file"    => array(
                 "media_id" => $media_id,
             ),
-            "safe" => $is_safe
+            "safe"    => $is_safe
         ));
         return $r['errcode'] == 0 ? true : false;
     }
@@ -1155,18 +1116,17 @@ class ClWXQY
      * @param int $is_safe :表示是否是保密消息，0表示否，1表示是，默认0
      * @return bool
      */
-    public static function msgSendNews($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, array $news, $is_safe = 0)
-    {
+    public static function msgSendNews($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, array $news, $is_safe = 0) {
         $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
-            "touser" => is_array($to_users) ? implode('|', $to_users) : '@all',
+            "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
-            "totag" => is_array($to_tags) ? implode('|', $to_tags) : '',
+            "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
             "msgtype" => "news",
             "agentid" => $agent_id,
-            "news" => array(
+            "news"    => array(
                 'articles' => $news
             ),
-            "safe" => $is_safe
+            "safe"    => $is_safe
         ));
         return $r['errcode'] == 0 ? true : false;
     }
@@ -1182,18 +1142,17 @@ class ClWXQY
      * @param int $is_safe :表示是否是保密消息，0表示否，1表示是，默认0
      * @return bool
      */
-    public static function msgSendMpNews($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, array $news, $is_safe = 0)
-    {
+    public static function msgSendMpNews($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, array $news, $is_safe = 0) {
         $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
-            "touser" => is_array($to_users) ? implode('|', $to_users) : '@all',
+            "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
-            "totag" => is_array($to_tags) ? implode('|', $to_tags) : '',
+            "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
             "msgtype" => "mpnews",
             "agentid" => $agent_id,
-            "mpnews" => array(
+            "mpnews"  => array(
                 'articles' => $news
             ),
-            "safe" => $is_safe
+            "safe"    => $is_safe
         ));
         return $r['errcode'] == 0 ? true : false;
     }
@@ -1209,18 +1168,17 @@ class ClWXQY
      * @param int $is_safe :表示是否是保密消息，0表示否，1表示是，默认0
      * @return bool
      */
-    public static function msgSendMpNewsUseMedia($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $is_safe = 0)
-    {
+    public static function msgSendMpNewsUseMedia($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $is_safe = 0) {
         $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
-            "touser" => is_array($to_users) ? implode('|', $to_users) : '@all',
+            "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
-            "totag" => is_array($to_tags) ? implode('|', $to_tags) : '',
+            "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
             "msgtype" => "mpnews",
             "agentid" => $agent_id,
-            "mpnews" => array(
+            "mpnews"  => array(
                 'media_id' => $media_id
             ),
-            "safe" => $is_safe
+            "safe"    => $is_safe
         ));
         return $r['errcode'] == 0 ? true : false;
     }
@@ -1288,8 +1246,7 @@ class ClWXQY
      * ))
      * @return bool
      */
-    public static function menuCreate($access_token, $agent_id, array $buttons)
-    {
+    public static function menuCreate($access_token, $agent_id, array $buttons) {
         $r = ClHttp::http(self::URL . "/menu/create?access_token=$access_token&agentid=$agent_id", array(
             'button' => array(
                 $buttons
@@ -1304,8 +1261,7 @@ class ClWXQY
      * @param $agent_id
      * @return bool
      */
-    public static function menuDelete($access_token, $agent_id)
-    {
+    public static function menuDelete($access_token, $agent_id) {
         $r = ClHttp::http(self::URL . "/menu/delete?access_token=$access_token&agentid=$agent_id");
         return $r['errcode'] == 0 ? true : false;
     }
@@ -1316,8 +1272,7 @@ class ClWXQY
      * @param $agent_id
      * @return mixed
      */
-    public static function menuGet($access_token, $agent_id)
-    {
+    public static function menuGet($access_token, $agent_id) {
         $r = ClHttp::http(self::URL . "/menu/get?access_token=$access_token&agentid=$agent_id");
         return $r;
     }
@@ -1329,14 +1284,12 @@ class ClWXQY
      * @param $state :重定向后会带上state参数，企业可以填写a-zA-Z0-9的参数值，长度不可超过128个字节
      * @return string
      */
-    public static function oauthGetCodeUrl($corp_id, $redirect_uri, $state)
-    {
+    public static function oauthGetCodeUrl($corp_id, $redirect_uri, $state) {
         $redirect_uri = urlencode($redirect_uri);
         return "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$corp_id&redirect_uri=$redirect_uri&response_type=code&scope=snsapi_base&state=$state#wechat_redirect";
     }
 
-    public static function oauthGetUserInfo($access_token, $code)
-    {
+    public static function oauthGetUserInfo($access_token, $code) {
         $r = ClHttp::http(self::URL . "/user/getuserinfo?access_token=$access_token&code=$code");
         return isset($r['errcode']) ? false : $r;
     }
@@ -1348,8 +1301,7 @@ class ClWXQY
      * @param string $agent_id :需要发送红包的应用ID，若只是使用微信支付和企业转账，则无需该参数
      * @return bool|string
      */
-    public static function convertUserIdToOpenId($access_token, $user_id, $agent_id = '')
-    {
+    public static function convertUserIdToOpenId($access_token, $user_id, $agent_id = '') {
         $post = array(
             'userid' => $user_id
         );
@@ -1366,8 +1318,7 @@ class ClWXQY
      * @param $open_id :在使用微信支付、微信红包和企业转账之后，返回结果的openid
      * @return bool|string
      */
-    public static function convertOpenIdToUserId($access_token, $open_id)
-    {
+    public static function convertOpenIdToUserId($access_token, $open_id) {
         $r = ClHttp::http(self::URL . "/user/convert_to_userid?access_token=$access_token", array(
             'openid' => $open_id
         ));
@@ -1380,10 +1331,9 @@ class ClWXQY
      * @return mixed
      * @throws Exception
      */
-    public static function jsApiTicketGet($access_token)
-    {
+    public static function jsApiTicketGet($access_token) {
         $key = ClCache::getKey($access_token);
-        $r = cache($key);
+        $r   = cache($key);
         if ($r !== false) {
             return $r;
         }
@@ -1404,11 +1354,10 @@ class ClWXQY
      * @return string
      * @throws Exception
      */
-    public static function jsApiSignatureGet($access_token, $nonce_str, $timestamp)
-    {
+    public static function jsApiSignatureGet($access_token, $nonce_str, $timestamp) {
         $js_api_ticket = self::jsApiTicketGet($access_token);
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-        $url = "$protocol$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $protocol      = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+        $url           = "$protocol$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
         return sha1("jsapi_ticket=$js_api_ticket&noncestr=$nonce_str&timestamp=$timestamp&url=$url");
     }
 

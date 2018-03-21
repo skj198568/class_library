@@ -13,8 +13,7 @@ namespace ClassLibrary;
  * Class ClGeoLocation
  * @package ClassLibrary
  */
-class ClGeo
-{
+class ClGeo {
 
     /**
      * 地球平均半径
@@ -30,8 +29,7 @@ class ClGeo
      * @param integer $b_jing b点经度
      * @return float
      */
-    public static function getDistance($a_wei, $a_jing, $b_wei, $b_jing)
-    {
+    public static function getDistance($a_wei, $a_jing, $b_wei, $b_jing) {
         //将角度转为弧度
         $radLat1 = deg2rad($a_wei);
         $radLat2 = deg2rad($b_wei);
@@ -50,8 +48,7 @@ class ClGeo
      * @param string $qq_developer_key qq开发者key
      * @return bool|mixed
      */
-    public static function getByAddressWithQQMap($address, $qq_developer_key = '')
-    {
+    public static function getByAddressWithQQMap($address, $qq_developer_key = '') {
         $r = ClHttp::http(sprintf('http://apis.map.qq.com/ws/geocoder/v1/?address=%s&key=%s', urlencode($address), $qq_developer_key));
         return $r['status'] == 0 ? $r['result'] : false;
     }
@@ -62,7 +59,7 @@ class ClGeo
      * @param string $bai_du_developer_key 百度开发者key
      * @return bool|mixed
      */
-    public static function getByAddressWithBaiDu($address, $bai_du_developer_key = ''){
+    public static function getByAddressWithBaiDu($address, $bai_du_developer_key = '') {
         $r = ClHttp::http(sprintf('http://api.map.baidu.com/geocoder/v2/?address=%s&output=json&ak=%s', urlencode($address), $bai_du_developer_key));
         return $r['status'] == 0 ? $r['result'] : false;
     }

@@ -12,8 +12,7 @@ namespace ClassLibrary;
 use think\Cache;
 use think\Request;
 
-class ClMergeResource
-{
+class ClMergeResource {
 
     /**
      * 未找到的资源文件
@@ -33,22 +32,21 @@ class ClMergeResource
      * @param array $un_merge_module 忽略的模块
      * @return bool|mixed
      */
-    public static function merge($content, $un_merge_module = [])
-    {
+    public static function merge($content, $un_merge_module = []) {
         if (!empty($un_merge_module) && in_array(request()->controller(), $un_merge_module)) {
             return $content;
         }
         $key = '';
         //非本地局域网请求
-        if(!self::isLocalRequest()){
-            $key = ClCache::getKey(ClString::toCrc32($content));
+        if (!self::isLocalRequest()) {
+            $key           = ClCache::getKey(ClString::toCrc32($content));
             $merge_content = Cache::get($key);
-            if($merge_content !== false){
+            if ($merge_content !== false) {
                 return $merge_content;
             }
         }
         //替换掉所有的版本控制
-        $content = str_replace('?v=<?php echo VERSION;?>', '', $content);
+        $content  = str_replace('?v=<?php echo VERSION;?>', '', $content);
         $js_files = ClString::parseToArray($content, '<script ', '</script>');
         //去除重复js
         $js_files = array_unique($js_files);
@@ -72,7 +70,7 @@ class ClMergeResource
         }
         $js_files = array_values($js_files);
         if (count($js_files) > 0) {
-            if(!self::isLocalRequest()){
+            if (!self::isLocalRequest()) {
                 //非局域网请求
                 //合并js
                 $merge_js_file = self::mergeJs($js_files);
@@ -86,11 +84,11 @@ class ClMergeResource
                         $content = str_replace($v, '', $content);
                     }
                 }
-            }else{
+            } else {
                 //局域网请求
-                foreach($js_files as $each){
+                foreach ($js_files as $each) {
                     //替换
-                    $content = str_replace($each, str_replace(ClString::getBetween($each, '.js', '"'), '.js?v='.md5_file(self::getJsAbsolutePath($each)).'"', $each), $content);
+                    $content = str_replace($each, str_replace(ClString::getBetween($each, '.js', '"'), '.js?v=' . md5_file(self::getJsAbsolutePath($each)) . '"', $each), $content);
                 }
             }
         }
@@ -110,7 +108,7 @@ class ClMergeResource
         }
         $css_files = array_values($css_files);
         if (count($css_files) > 0) {
-            if(!self::isLocalRequest()){
+            if (!self::isLocalRequest()) {
                 //合并css文件
                 $merge_css_file = sprintf('<link rel="stylesheet" href="%s"/>', self::mergeCss($css_files));
                 //替换css文件
@@ -123,11 +121,11 @@ class ClMergeResource
                         $content = str_replace($v, '', $content);
                     }
                 }
-            }else{
+            } else {
                 //局域网请求
-                foreach($css_files as $each){
+                foreach ($css_files as $each) {
                     //替换
-                    $content = str_replace($each, str_replace(ClString::getBetween($each, '.css', '"'), '.css?v='.md5_file(self::getCssAbsolutePath($each)).'"', $each), $content);
+                    $content = str_replace($each, str_replace(ClString::getBetween($each, '.css', '"'), '.css?v=' . md5_file(self::getCssAbsolutePath($each)) . '"', $each), $content);
                 }
             }
         }
@@ -136,7 +134,7 @@ class ClMergeResource
         }
         //处理资源的images base64处理
         $content = self::dealBase64Images($content);
-        if(!self::isLocalRequest() && !empty($key)){
+        if (!self::isLocalRequest() && !empty($key)) {
             //写入缓存
             Cache::set($key, $content);
         }
@@ -147,7 +145,7 @@ class ClMergeResource
      * 是否是局域网请求
      * @return bool
      */
-    private static function isLocalRequest(){
+    private static function isLocalRequest() {
         return in_array(strtok(request()->ip(), '.'), ['0', '10', '127', '168', '192']);
     }
 
@@ -156,18 +154,17 @@ class ClMergeResource
      * @param $js_files
      * @return mixed
      */
-    private static function mergeJs($js_files)
-    {
+    private static function mergeJs($js_files) {
         //合并js文件
         $js_temp_file = DOCUMENT_ROOT_PATH . '/resource/js/' . ClString::toCrc32(json_encode($js_files)) . '/temp.js';
         //创建文件夹
         ClFile::dirCreate($js_temp_file);
         $js_temp_file_handle = fopen($js_temp_file, 'w+');
-        $js_path = '';
+        $js_path             = '';
         foreach ($js_files as $v) {
             $js_path = self::getJsAbsolutePath($v);
             if (is_file($js_path)) {
-                fputs($js_temp_file_handle, file_get_contents($js_path)."\n");
+                fputs($js_temp_file_handle, file_get_contents($js_path) . "\n");
             }
         }
         fclose($js_temp_file_handle);
@@ -182,8 +179,7 @@ class ClMergeResource
      * @param $js
      * @return string
      */
-    private static function getJsAbsolutePath($js)
-    {
+    private static function getJsAbsolutePath($js) {
         return DOCUMENT_ROOT_PATH . ClString::getBetween($js, 'src="', '.js', false) . '.js';
     }
 
@@ -193,27 +189,26 @@ class ClMergeResource
      * @param $js
      * @return bool
      */
-    private static function moveApplicationJs($content, $js)
-    {
+    private static function moveApplicationJs($content, $js) {
         $js_file_right = ClString::getBetween($js, 'src="', '.js', false) . '.js';
-        while (strpos($js_file_right, '//') !== false){
+        while (strpos($js_file_right, '//') !== false) {
             $js_file_right = str_replace('//', '/', $js_file_right);
         }
-        if (!is_file(DOCUMENT_ROOT_PATH .'/'. $js_file_right)) {
+        if (!is_file(DOCUMENT_ROOT_PATH . '/' . $js_file_right)) {
             return $content;
         }
         //格式化new_js
-        $new_js = '/resource/logic/'.$js_file_right;
-        while (strpos($new_js, '..')){
+        $new_js = '/resource/logic/' . $js_file_right;
+        while (strpos($new_js, '..')) {
             $new_js = str_replace('..', '', $new_js);
         }
-        while (strpos($new_js, '//') !== false){
+        while (strpos($new_js, '//') !== false) {
             $new_js = str_replace('//', '/', $new_js);
         }
         //创建文件夹
-        ClFile::dirCreate(DOCUMENT_ROOT_PATH.$new_js);
+        ClFile::dirCreate(DOCUMENT_ROOT_PATH . $new_js);
         //复制文件
-        copy(DOCUMENT_ROOT_PATH . '/' . $js_file_right, DOCUMENT_ROOT_PATH.$new_js);
+        copy(DOCUMENT_ROOT_PATH . '/' . $js_file_right, DOCUMENT_ROOT_PATH . $new_js);
         //替换js文件
         $content = str_replace($js, sprintf('<script src="%s?v=%s"></script>', $new_js, md5_file(DOCUMENT_ROOT_PATH . $new_js)), $content);
         return $content;
@@ -224,19 +219,18 @@ class ClMergeResource
      * @param $css_files
      * @return mixed
      */
-    private static function mergeCss($css_files)
-    {
+    private static function mergeCss($css_files) {
         //合并js文件
         $temp_file = DOCUMENT_ROOT_PATH . '/resource/css/' . ClString::toCrc32(json_encode($css_files)) . '/temp.css';
         //创建文件夹
         ClFile::dirCreate($temp_file);
         $temp_file_handle = fopen($temp_file, 'w+');
-        $file_path = '';
-        $file_content = '';
-        $resource_files = [];
+        $file_path        = '';
+        $file_content     = '';
+        $resource_files   = [];
         foreach ($css_files as $v) {
-            $file_path = self::getCssAbsolutePath($v);
-            $file_content = file_get_contents($file_path);
+            $file_path      = self::getCssAbsolutePath($v);
+            $file_content   = file_get_contents($file_path);
             $resource_files = ClString::parseToArray($file_content, 'url\(', '\)');
             if (!empty($resource_files)) {
                 foreach ($resource_files as $resource_file) {
@@ -248,7 +242,7 @@ class ClMergeResource
                 }
             }
             if (is_file($file_path)) {
-                fputs($temp_file_handle, $file_content."\n");
+                fputs($temp_file_handle, $file_content . "\n");
             }
         }
         fclose($temp_file_handle);
@@ -263,8 +257,7 @@ class ClMergeResource
      * @param $file
      * @return string
      */
-    private static function getCssAbsolutePath($file)
-    {
+    private static function getCssAbsolutePath($file) {
         return DOCUMENT_ROOT_PATH . ClString::getBetween($file, 'href="', '"', false);
     }
 
@@ -274,8 +267,7 @@ class ClMergeResource
      * @param $relative_path
      * @return mixed|string
      */
-    private static function getCssResourcePath($absolute_path, $relative_path)
-    {
+    private static function getCssResourcePath($absolute_path, $relative_path) {
         $relative_path_temp = $relative_path;
         //图片资源忽略
         if (strpos($relative_path, 'data:image') !== false) {
@@ -307,8 +299,8 @@ class ClMergeResource
             }
         }
         $absolute_path_array = array_merge($absolute_path_array, $relative_path_array);
-        $absolute_path = implode('/', $absolute_path_array);
-        $absolute_path_true = '';
+        $absolute_path       = implode('/', $absolute_path_array);
+        $absolute_path_true  = '';
         if (strpos($absolute_path, '?') !== false || strpos($absolute_path, '#') !== false) {
             if (strpos($absolute_path, '?') !== false) {
                 $absolute_path_true = ClString::split($absolute_path, '?', true, false);
@@ -341,25 +333,25 @@ class ClMergeResource
      * @param $content
      * @return mixed
      */
-    private static function dealBase64Images($content){
-        if(self::$image_base64_max_size == 0){
+    private static function dealBase64Images($content) {
+        if (self::$image_base64_max_size == 0) {
             return $content;
         }
-        $image_files = ClString::parseToArray($content, '<img ', '>');
-        $image_search = [];
+        $image_files   = ClString::parseToArray($content, '<img ', '>');
+        $image_search  = [];
         $image_replace = [];
-        if(!empty($image_files)){
+        if (!empty($image_files)) {
             $image_url = '';
-            foreach($image_files as $image_each){
+            foreach ($image_files as $image_each) {
                 $image_url = ClString::getBetween($image_each, '"', '"', false);
-                if(is_file(DOCUMENT_ROOT_PATH.$image_url) && filesize(DOCUMENT_ROOT_PATH.$image_url) <= self::$image_base64_max_size){
-                    $image_search[] = $image_url;
-                    $image_replace[] = ClImage::base64Encode(DOCUMENT_ROOT_PATH.$image_url);
+                if (is_file(DOCUMENT_ROOT_PATH . $image_url) && filesize(DOCUMENT_ROOT_PATH . $image_url) <= self::$image_base64_max_size) {
+                    $image_search[]  = $image_url;
+                    $image_replace[] = ClImage::base64Encode(DOCUMENT_ROOT_PATH . $image_url);
                 }
             }
             log_info($image_search);
             //替换
-            if(!empty($image_search)){
+            if (!empty($image_search)) {
                 $content = str_replace($image_search, $image_replace, $content);
             }
         }

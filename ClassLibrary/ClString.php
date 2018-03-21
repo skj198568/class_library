@@ -586,17 +586,30 @@ class ClString {
                         $tab_count--;
                         $result = trim($result) . $newline . str_repeat($tab, $tab_count) . $char;
                         break;
+                    case '[':
+                        if (isset($json[$k_char + 1]) && $json[$k_char + 1] != '{' && $json[$k_char + 1] != ']' && $json[$k_char + 1] != '[' && (isset($json[$k_char - 1]) && $json[$k_char - 1] != '[')) {
+                            $tab_count++;
+                            $result .= $char . $newline . str_repeat($tab, $tab_count);
+                        } else {
+                            $result .= $char;
+                        }
+                        break;
                     case ',':
                         //判断+1字符串为"时，才换行
-                        if (isset($json[$k_char + 1]) && $json[$k_char + 1] == '"') {
+                        if (isset($json[$k_char + 1]) && ($json[$k_char + 1] == '"' || $json[$k_char + 1] == '{')) {
                             $result .= $char . $newline . str_repeat($tab, $tab_count);
                         } else {
                             $result .= $char;
                         }
                         break;
                     case '"':
-                        $in_quote = !$in_quote;
-                        $result   .= $char;
+                        if (isset($json[$k_char + 1]) && $json[$k_char + 1] == ']') {
+                            $tab_count--;
+                            $result .= $char . $newline . str_repeat($tab, $tab_count);
+                        } else {
+                            $in_quote = !$in_quote;
+                            $result   .= $char;
+                        }
                         break;
                     case '\\':
                         if ($in_quote) {
@@ -610,7 +623,7 @@ class ClString {
             }
         }
         if ($html) {
-            $result = explode('<br/>', $result);
+            $result = explode($newline, $result);
             foreach ($result as $k => $v) {
                 $has_comma = false;
                 //最后一个,号处理
@@ -625,8 +638,12 @@ class ClString {
                         $left = '<span style="color:red;">[</span><span style="color: blue;">{</span>';
                     } elseif ($left == '{') {
                         $left = '<span style="color: blue;">{</span>';
+                    } elseif ($left == '[') {
+                        $left = '<span style="color: red;">[</span>';
+                    } elseif ($left == '[]') {
+                        $left = '<span style="color: red;">[]</span>';
                     }
-                    $v = sprintf('%s:%s', sprintf('<span style="color: #92278f;">%s</span>', $pre), sprintf('<span style="color: #3ab54a;">%s</span>', $left));
+                    $v = sprintf('%s:%s', sprintf('<span style="color: blue;">%s</span>', $pre), $left);
                 } else if (str_replace('&nbsp;', '', $v) == '{') {
                     $v = str_replace('{', '<span style="color: blue;">{</span>', $v);
                 } else if (str_replace('&nbsp;', '', $v) == '[{') {
@@ -645,10 +662,14 @@ class ClString {
                 }
                 $result[$k] = $v;
             }
-            $result = implode('<br/>', $result);
+            $result = implode($newline, $result);
         }
         //替换转义字符
-        $result = str_replace(['\/', '\"'], ['/', '"'], $result);
+        if ($html) {
+            $result = str_replace(['\/', '\"'], ['<span style="color: red;">/</span>', '"'], $result);
+        } else {
+            $result = str_replace(['\/', '\"'], ['/', '"'], $result);
+        }
         return $result;
     }
 

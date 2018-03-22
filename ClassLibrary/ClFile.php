@@ -15,7 +15,8 @@ use think\exception\ErrorException;
  * Class ClFile(文件类库)
  * @package Common\Common
  */
-class ClFile {
+class ClFile
+{
 
     /**
      * 无限新建文件夹，支持linux和windows目录
@@ -23,7 +24,8 @@ class ClFile {
      * @param bool $is_file 传入的是否是文件，如果是文件则不进行文件、文件夹的自动判断
      * @return string
      */
-    public static function dirCreate($absolute_file_name, $is_file = false) {
+    public static function dirCreate($absolute_file_name, $is_file = false)
+    {
         $file_name = trim(str_replace('\\', '/', $absolute_file_name), '/');
         $dir_array = explode('/', $file_name);
         if (ClSystem::isWin()) {
@@ -78,7 +80,8 @@ class ClFile {
      * @param int $target_chmod
      * @return bool
      */
-    public static function checkChmod($file_path, $target_chmod = 0777) {
+    public static function checkChmod($file_path, $target_chmod = 0777)
+    {
         $mod = substr(base_convert(@fileperms($file_path), 10, 8), -4);
         return ($mod == $target_chmod) || ($mod == strval($target_chmod));
     }
@@ -88,7 +91,8 @@ class ClFile {
      * @param $dir
      * @return array
      */
-    public static function dirGet($dir) {
+    public static function dirGet($dir)
+    {
         $data = array();
         if (is_dir($dir)) {
             $dp = dir($dir);
@@ -108,7 +112,8 @@ class ClFile {
      * @param string $dir
      * @return string
      */
-    public static function dirGetFather($dir) {
+    public static function dirGetFather($dir)
+    {
         return dirname($dir);
     }
 
@@ -119,7 +124,8 @@ class ClFile {
      * @param array $ignore_dir_or_file : 忽略的文件或文件夹
      * @return array
      */
-    public static function dirGetFiles($dir, $file_types = array(), $ignore_dir_or_file = []) {
+    public static function dirGetFiles($dir, $file_types = array(), $ignore_dir_or_file = [])
+    {
         foreach (['.', '..'] as $each) {
             if (!in_array($each, $ignore_dir_or_file)) {
                 $ignore_dir_or_file[] = $each;
@@ -166,7 +172,8 @@ class ClFile {
      * @param bool|false $has_suffix 是否带有后缀
      * @return array|string
      */
-    public static function getName($file, $has_suffix = false) {
+    public static function getName($file, $has_suffix = false)
+    {
         $file = trim($file);
         $file = basename($file);
         if ($has_suffix) {
@@ -194,7 +201,8 @@ class ClFile {
      * @param bool $with_point 是否包含.
      * @return string
      */
-    public static function getSuffix($file, $with_point = true) {
+    public static function getSuffix($file, $with_point = true)
+    {
         $suffix = isset(pathinfo($file)['extension']) ? strtolower(pathinfo($file)['extension']) : '';
         if ($with_point && !empty($suffix)) {
             $suffix = '.' . $suffix;
@@ -208,10 +216,11 @@ class ClFile {
      * @param string $name 用户看到的文件名
      * @return void
      */
-    public static function downloadForClient($file, $name = '') {
+    public static function downloadForClient($file, $name = '')
+    {
         $fileName = $name ? $name : self::getName($file, true);
         $filePath = realpath($file);
-        $fp       = fopen($filePath, 'rb');
+        $fp = fopen($filePath, 'rb');
         if (!$filePath || !$fp) {
             header('HTTP/1.1 404 Not Found');
             echo "Error: 404 Not Found.(server file path error)<!-- Padding --><!-- Padding --><!-- Padding --><!-- Padding --><!-- Padding --><!-- Padding --><!-- Padding --><!-- Padding --><!-- Padding --><!-- Padding --><!-- Padding --><!-- Padding --><!-- Padding --><!-- Padding -->";
@@ -245,7 +254,8 @@ class ClFile {
      * @param $url
      * @return string
      */
-    public static function getLocalAbsoluteUrlByRemoteUrl($url) {
+    public static function getLocalAbsoluteUrlByRemoteUrl($url)
+    {
         if (strpos($url, 'http') === false) {
             return $url;
         }
@@ -261,7 +271,8 @@ class ClFile {
      * @param $url
      * @return mixed
      */
-    public static function getLocalUrlByRemoteUrl($url) {
+    public static function getLocalUrlByRemoteUrl($url)
+    {
         return str_replace(DOCUMENT_ROOT_PATH, '', self::getLocalAbsoluteUrlByRemoteUrl($url));
     }
 
@@ -270,7 +281,8 @@ class ClFile {
      * @param $path
      * @return array|mixed|string
      */
-    public static function pathChineseToEnglish($path) {
+    public static function pathChineseToEnglish($path)
+    {
         //先转码
         $path = ClString::encoding($path, 'UTF-8');
         $path = str_replace('\\', '/', $path);
@@ -300,7 +312,8 @@ class ClFile {
      * @param $filename
      * @return string
      */
-    public static function getMimeType($filename) {
+    public static function getMimeType($filename)
+    {
         $path_info = pathinfo($filename);
         switch ($path_info['extension']) {
             case 'htm':
@@ -348,13 +361,14 @@ class ClFile {
      * @param string $file_save_dir 文件保存绝对路径或相对路径，如果是相对路径，则会自动拼接成绝对路径
      * @return array
      */
-    public static function uploadDealClient($file_save_dir = '') {
-        if (strpos($file_save_dir, DOCUMENT_ROOT_PATH) === false) {
+    public static function uploadDealClient($file_save_dir = '')
+    {
+        if (!empty($file_save_dir) && strpos($file_save_dir, DOCUMENT_ROOT_PATH) === false) {
             $file_save_dir = DOCUMENT_ROOT_PATH . '/' . ltrim($file_save_dir, '/');
         }
         $file_size = input('post.file_size', '', 'trim');
         $file_name = input('post.name', '', 'trim,strval');
-        $chunk     = input('post.chunk', 'no', 'trim');
+        $chunk = input('post.chunk', 'no', 'trim');
         $root_path = sprintf(DOCUMENT_ROOT_PATH . '/upload/%s/', date('Y/m/d'));
         if (!is_dir($root_path)) {
             ClFile::dirCreate($root_path);
@@ -368,13 +382,13 @@ class ClFile {
             if (!empty($_FILES['file']['error'])) {
                 $return = array(
                     'result' => false,
-                    'msg'    => $_FILES['file']['error']
+                    'msg' => $_FILES['file']['error']
                 );
             } else {
                 $return = array(
                     'result' => true,
-                    'msg'    => '上传成功',
-                    'file'   => str_replace(DOCUMENT_ROOT_PATH, '', $save_file)
+                    'msg' => '上传成功',
+                    'file' => str_replace(DOCUMENT_ROOT_PATH, '', $save_file)
                 );
             }
             return $return;
@@ -383,7 +397,7 @@ class ClFile {
         $chunks = input('post.chunks/d', null, 'trim');
         //目标文件
         $destination_file = ($file_save_dir == '' ? $root_path : $file_save_dir) . (ClString::toCrc32($file_size . $file_name . $chunks) . '_temp' . self::getSuffix($file_name));
-        $chunks           = input('post.chunks', null, 'trim,intval');
+        $chunks = input('post.chunks', null, 'trim,intval');
         if ($_FILES['file']['error'] == 0) {
             $f = null;
             if ($chunk == 0) {
@@ -401,7 +415,7 @@ class ClFile {
             if ($chunk + 1 < $chunks) {
                 return array(
                     'result' => true,
-                    'msg'    => '上传成功'
+                    'msg' => '上传成功'
                 );
             } else {
                 //判断文件是否已经存在
@@ -423,8 +437,8 @@ class ClFile {
                 $destination_file = $temp_name;
                 return [
                     'result' => true,
-                    'msg'    => '上传成功',
-                    'file'   => str_replace(DOCUMENT_ROOT_PATH, '', $destination_file)
+                    'msg' => '上传成功',
+                    'file' => str_replace(DOCUMENT_ROOT_PATH, '', $destination_file)
                 ];
             }
         } else {
@@ -432,7 +446,7 @@ class ClFile {
             log_info($_FILES);
             return [
                 'result' => false,
-                'msg'    => $_FILES['file']['error']
+                'msg' => $_FILES['file']['error']
             ];
         }
     }
@@ -442,7 +456,8 @@ class ClFile {
      * @param $remote_file_url
      * @return int
      */
-    public static function getRemoteFileSize($remote_file_url) {
+    public static function getRemoteFileSize($remote_file_url)
+    {
         try {
             $header = get_headers($remote_file_url, true);
         } catch (ErrorException $e) {
@@ -461,7 +476,8 @@ class ClFile {
      * @param string $local_absolute_file 本地文件绝对地址
      * @return bool|string 下载的文件绝对地址
      */
-    public static function catchRemote($remote_file_url, $local_absolute_file = '', $is_file = true) {
+    public static function catchRemote($remote_file_url, $local_absolute_file = '', $is_file = true)
+    {
         if (empty($local_absolute_file)) {
             //本地存储地址
             $local_absolute_file = ClFile::getLocalAbsoluteUrlByRemoteUrl($remote_file_url);
@@ -495,9 +511,9 @@ class ClFile {
 //            //设置id
 //            return false;
 //        }
-        $file_size  = 0;
+        $file_size = 0;
         $local_temp = dirname($local_absolute_file) . '/temp';
-        $f_local    = fopen($local_temp, 'w+');
+        $f_local = fopen($local_temp, 'w+');
         // 输出文件内容
         while (!feof($f_remote)) {
             $content = fread($f_remote, 8192);

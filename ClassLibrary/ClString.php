@@ -8,6 +8,8 @@
  */
 
 namespace ClassLibrary;
+use think\Exception;
+use think\exception\ErrorException;
 
 /**
  * Class ClString 字符串类库
@@ -572,55 +574,59 @@ class ClString {
             $newline = "\n";
         }
         $json = self::toArray($json);
-        foreach ($json as $k_char => $char) {
-            if ($ignore_next) {
-                $result      .= $char;
-                $ignore_next = false;
-            } else {
-                switch ($char) {
-                    case '{':
-                        $tab_count++;
-                        $result .= $char . $newline . str_repeat($tab, $tab_count);
-                        break;
-                    case '}':
-                        $tab_count--;
-                        $result = trim($result) . $newline . str_repeat($tab, $tab_count) . $char;
-                        break;
-                    case '[':
-                        if (isset($json[$k_char + 1]) && $json[$k_char + 1] != '{' && $json[$k_char + 1] != ']' && $json[$k_char + 1] != '[' && (isset($json[$k_char - 1]) && $json[$k_char - 1] != '[')) {
+        try{
+            foreach ($json as $k_char => $char) {
+                if ($ignore_next) {
+                    $result      .= $char;
+                    $ignore_next = false;
+                } else {
+                    switch ($char) {
+                        case '{':
                             $tab_count++;
                             $result .= $char . $newline . str_repeat($tab, $tab_count);
-                        } else {
-                            $result .= $char;
-                        }
-                        break;
-                    case ',':
-                        //判断+1字符串为"时，才换行
-                        if (isset($json[$k_char + 1]) && ($json[$k_char + 1] == '"' || $json[$k_char + 1] == '{')) {
-                            $result .= $char . $newline . str_repeat($tab, $tab_count);
-                        } else {
-                            $result .= $char;
-                        }
-                        break;
-                    case '"':
-                        if (isset($json[$k_char + 1]) && $json[$k_char + 1] == ']') {
+                            break;
+                        case '}':
                             $tab_count--;
-                            $result .= $char . $newline . str_repeat($tab, $tab_count);
-                        } else {
-                            $in_quote = !$in_quote;
-                            $result   .= $char;
-                        }
-                        break;
-                    case '\\':
-                        if ($in_quote) {
-                            $ignore_next = true;
-                        }
-                        $result .= $char;
-                        break;
-                    default:
-                        $result .= $char;
+                            $result = trim($result) . $newline . str_repeat($tab, $tab_count) . $char;
+                            break;
+                        case '[':
+                            if (isset($json[$k_char + 1]) && $json[$k_char + 1] != '{' && $json[$k_char + 1] != ']' && $json[$k_char + 1] != '[' && (isset($json[$k_char - 1]) && $json[$k_char - 1] != '[')) {
+                                $tab_count++;
+                                $result .= $char . $newline . str_repeat($tab, $tab_count);
+                            } else {
+                                $result .= $char;
+                            }
+                            break;
+                        case ',':
+                            //判断+1字符串为"时，才换行
+                            if (isset($json[$k_char + 1]) && ($json[$k_char + 1] == '"' || $json[$k_char + 1] == '{')) {
+                                $result .= $char . $newline . str_repeat($tab, $tab_count);
+                            } else {
+                                $result .= $char;
+                            }
+                            break;
+                        case '"':
+                            if (isset($json[$k_char + 1]) && $json[$k_char + 1] == ']') {
+                                $tab_count--;
+                                $result .= $char . $newline . str_repeat($tab, $tab_count);
+                            } else {
+                                $in_quote = !$in_quote;
+                                $result   .= $char;
+                            }
+                            break;
+                        case '\\':
+                            if ($in_quote) {
+                                $ignore_next = true;
+                            }
+                            $result .= $char;
+                            break;
+                        default:
+                            $result .= $char;
+                    }
                 }
             }
+        }catch (ErrorException $e){
+            return 'json格式错误';
         }
         if ($html) {
             $result = explode($newline, $result);

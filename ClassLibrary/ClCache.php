@@ -107,9 +107,6 @@ class ClCache {
         if (count($args) > 0) {
             $function .= self::createKeyByParams($args);
         }
-        if(strpos($function, 'ExamBatchOrgUserModelGetStudentCount') !== false){
-            log_info('cachecache getKey', $function);
-        }
         //处理无效缓存数据
         self::dealInvalidDataByKey($function);
         //添加
@@ -190,9 +187,6 @@ class ClCache {
      * @return bool
      */
     public static function dealInvalidDataByKey($key) {
-        if(strpos($function, 'ExamBatchOrgUserModelGetStudentCount') !== false){
-            log_info('cachecache getKey', $key);
-        }
         //没有子存储或者缓存不存在
         if (strpos($key, self::$seg_str) === false || cache($key) === false) {
             return false;

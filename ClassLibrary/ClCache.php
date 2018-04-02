@@ -107,6 +107,9 @@ class ClCache {
         if (count($args) > 0) {
             $function .= self::createKeyByParams($args);
         }
+        if(strpos($function, 'ExamBatchOrgUserModelGetStudentCount') !== false){
+            log_info('cachecache getKey', $function);
+        }
         //处理无效缓存数据
         self::dealInvalidDataByKey($function);
         //添加
@@ -134,7 +137,7 @@ class ClCache {
         }
         foreach ([$function, $function . self::$seg_str . 'k'] as $key_each) {
             //如果缓存存在
-            if (cache('?' . $key_each)) {
+            if (cache($key_each) !== false) {
                 cache($key_each, null);
             }
         }
@@ -187,8 +190,11 @@ class ClCache {
      * @return bool
      */
     public static function dealInvalidDataByKey($key) {
+        if(strpos($function, 'ExamBatchOrgUserModelGetStudentCount') !== false){
+            log_info('cachecache getKey', $key);
+        }
         //没有子存储或者缓存不存在
-        if (strpos($key, self::$seg_str) === false || !cache('?' . $key)) {
+        if (strpos($key, self::$seg_str) === false || cache($key) === false) {
             return false;
         }
         $father_key       = explode(self::$seg_str, $key);

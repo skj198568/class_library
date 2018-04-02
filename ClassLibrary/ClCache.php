@@ -20,7 +20,7 @@ class ClCache {
      * key分隔符
      * @var string
      */
-    private static $seg_str = '_';
+    private static $seg_str = '/';
 
     /**
      * 获取删除keys
@@ -133,7 +133,10 @@ class ClCache {
             self::$get_remove_keys[] = $function;
         }
         foreach ([$function, $function . self::$seg_str . 'k'] as $key_each) {
-            cache($key_each, null);
+            //如果缓存存在
+            if (cache('?' . $key_each)) {
+                cache($key_each, null);
+            }
         }
         return true;
     }
@@ -185,7 +188,7 @@ class ClCache {
      */
     public static function dealInvalidDataByKey($key) {
         //没有子存储或者缓存不存在
-        if (strpos($key, self::$seg_str) === false || empty(cache($key))) {
+        if (strpos($key, self::$seg_str) === false || !cache('?' . $key)) {
             return false;
         }
         $father_key       = explode(self::$seg_str, $key);

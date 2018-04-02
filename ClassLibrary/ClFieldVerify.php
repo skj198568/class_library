@@ -648,9 +648,9 @@ class ClFieldVerify extends ClFieldBase {
             return $key_field;
         }
         if (isset($instance::$fields_names[$key_field]) && !empty($instance::$fields_names[$key_field])) {
-            return $instance::$fields_names[$key_field] . '(' . $key_field . ')';
+            return sprintf('%s.%s(%s)', $instance->getTable(), $key_field, $instance::$fields_names[$key_field]);
         } else {
-            return $key_field;
+            return sprintf('%s.%s', $instance->getTable(), $key_field);
         }
     }
 

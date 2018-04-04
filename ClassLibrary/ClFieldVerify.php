@@ -50,7 +50,7 @@ class ClFieldVerify extends ClFieldBase {
                         $filters_desc[] = sprintf('密码长度%s~%s', $v_verify[1], $v_verify[2]);
                         break;
                     case 'in_array':
-                        $filters_desc[] = sprintf('在%s范围内', json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
+                        $filters_desc[] = sprintf('在%s数组内', json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
                         break;
                     case 'in_scope':
                         $filters_desc[] = sprintf('在[%s, %s]区间内', $v_verify[1], $v_verify[2]);
@@ -194,13 +194,13 @@ class ClFieldVerify extends ClFieldBase {
                                 if (is_array($fields[$k_field])) {
                                     foreach ($fields[$k_field] as $each_value) {
                                         if (!in_array($each_value, $v_verify[1])) {
-                                            $error_msg = sprintf('%s:%s 不在%s范围内', self::getFieldDesc($k_field, $instance), json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
+                                            $error_msg = sprintf('%s:%s 不在%s数组内', self::getFieldDesc($k_field, $instance), json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
                                             break;
                                         }
                                     }
                                 } else {
                                     if (!in_array($fields[$k_field], $v_verify[1])) {
-                                        $error_msg = sprintf('%s:%s 不在%s范围内', self::getFieldDesc($k_field, $instance), $fields[$k_field], json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
+                                        $error_msg = sprintf('%s:%s 不在%s数组内', self::getFieldDesc($k_field, $instance), $fields[$k_field], json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
                                     }
                                 }
                             }

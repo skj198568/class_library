@@ -78,7 +78,7 @@ class ClMigrateTable {
 
     /**
      * 是否启用缓存
-     * @param int $duration
+     * @param int|null $duration 缓存时间：0/永久缓存，null/不缓存
      * @return $this
      */
     public function usingCache($duration = 3600) {

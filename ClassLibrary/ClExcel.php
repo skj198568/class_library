@@ -183,7 +183,7 @@ class ClExcel {
                     $content            .= trim(fgets($f_handle));
                     $temp_content_array = ClString::toArray($content);
                 }
-                $item = explode(',', $content);
+                $item = explode('","', $content);
                 //去除两端"
                 foreach ($item as $k => $v) {
                     $item[$k] = trim(trim($v, '"'));

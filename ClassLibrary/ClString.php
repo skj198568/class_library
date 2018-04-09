@@ -44,13 +44,13 @@ class ClString {
     const V_ENCODE_EUC_JP = 'EUC-JP';
 
     /**
-     * 自动检测内容是编码进行转换
+     * 自动检测内容并且进行转换编码
      * @param $string
-     * @param $to
+     * @param string $to
      * @return string
      */
-    public static function encoding($string, $to) {
-        $encode_arr = array('GB2312', 'UTF-8', 'ASCII', 'GBK', 'BIG5', 'JIS', 'eucjp-win', 'sjis-win', 'EUC-JP');
+    public static function encoding($string, $to = 'UTF-8') {
+        $encode_arr = ['GB2312', 'UTF-8', 'ASCII', 'GBK', 'BIG5', 'JIS', 'eucjp-win', 'sjis-win', 'EUC-JP'];
         $encoded    = mb_detect_encoding($string, $encode_arr);
         $string     = mb_convert_encoding($string, $to, $encoded);
         return $string;

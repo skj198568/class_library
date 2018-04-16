@@ -9,7 +9,6 @@
       "email": "597481334@qq.com"
     }
   ],
-  "minimum-stability": "dev",
   "require": {
     "php": ">=7.0.0",
     "phpoffice/phpexcel": "*",
@@ -22,13 +21,5 @@
     "psr-4": {
       "ClassLibrary\\": "ClassLibrary"
     }
-  },
-  "scripts": {
-    "post-install-cmd": [
-      "php create_files.php"
-    ],
-    "post-update-cmd": [
-      "php create_files.php"
-    ]
   }
 }

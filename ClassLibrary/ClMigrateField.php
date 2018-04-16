@@ -100,7 +100,7 @@ class ClMigrateField extends ClFieldBase {
 
     /**
      * 展现格式化
-     * @param string|array $format 两种方式，date('Y-m-d H:i:s', %s)这种会自动sprintf进行格式话，这种[["1","是"],["0","否"]]会自动按1和0进行格式话显示
+     * @param string|array $format 两种方式，date('Y-m-d H:i:s', %s)这种会自动sprintf进行格式化，这种[["1","是"],["0","否"]]会自动按1和0进行格式化显示
      * @param string $alias_append 别名，如果不为空，则自动拼接生成新字段，如果为空，则覆盖当前字段
      * @return $this
      */

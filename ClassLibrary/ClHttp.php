@@ -471,6 +471,112 @@ class ClHttp {
     }
 
     /**
+     * 使用 fsockopen 通过 HTTP 协议直接访问(采集)远程文件
+     * 如果主机或服务器没有开启 CURL 扩展可考虑使用
+     * fsockopen 比 CURL 稍慢,但性能稳定
+     * @static
+     * @access public
+     * @param string $url 远程URL
+     * @param array $conf 其他配置信息
+     *        int   limit 分段读取字符个数
+     *        string post  post的内容,字符串或数组,key=value&形式
+     *        string cookie 携带cookie访问,该参数是cookie内容
+     *        string ip    如果该参数传入,$url将不被使用,ip访问优先
+     *        int    timeout 采集超时时间
+     *        bool   block 是否阻塞访问,默认为true
+     * @return mixed
+     */
+    public static function fsockopenDownload($url, $conf = []) {
+        $return = '';
+        if (!is_array($conf)) {
+            return $return;
+        }
+        $matches = parse_url($url);
+        !isset($matches['host']) && $matches['host'] = '';
+        !isset($matches['path']) && $matches['path'] = '';
+        !isset($matches['query']) && $matches['query'] = '';
+        !isset($matches['port']) && $matches['port'] = '';
+        $host = $matches['host'];
+        $path = $matches['path'] ? $matches['path'] . ($matches['query'] ? '?' . $matches['query'] : '') : '/';
+        $port = !empty($matches['port']) ? $matches['port'] : 80;
+
+        $conf_arr   = [
+            'limit'        => 0,
+            'post'         => '',
+            'cookie'       => '',
+            'ip'           => '',
+            'timeout'      => 15,
+            'block'        => TRUE,
+            'content_type' => 'application/x-www-form-urlencoded'
+        ];
+        $conf_arr   = array_merge($conf_arr, $conf);
+        $user_agent = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36 Core/1.47.640.400 QQBrowser/9.4.8309.400';
+        if (isset($_SERVER['HTTP_USER_AGENT'])) {
+            $user_agent = $_SERVER['HTTP_USER_AGENT'];
+        }
+        $limit        = $conf_arr['limit'];
+        $post         = $conf_arr['post'];
+        $cookie       = $conf_arr['cookie'];
+        $ip           = $conf_arr['ip'];
+        $timeout      = $conf_arr['timeout'];
+        $block        = $conf_arr['block'];
+        $content_type = $conf_arr['content_type'];
+        if ($post) {
+            if (is_array($post)) {
+                $post = http_build_query($post);
+            }
+            $out = "POST $path HTTP/1.0\r\n";
+            $out .= "Accept: */*\r\n";
+            //$out .= "Referer: $boardurl\r\n";
+            $out .= "Accept-Language: zh-cn\r\n";
+            $out .= "Content-Type: $content_type\r\n";
+            $out .= "User-Agent: $user_agent\r\n";
+            $out .= "Host: $host\r\n";
+            $out .= 'Content-Length: ' . strlen($post) . "\r\n";
+            $out .= "Connection: Close\r\n";
+            $out .= "Cache-Control: no-cache\r\n";
+            $out .= "Cookie: $cookie\r\n\r\n";
+            $out .= $post;
+        } else {
+            $out = "GET $path HTTP/1.0\r\n";
+            $out .= "Accept: */*\r\n";
+            //$out .= "Referer: $boardurl\r\n";
+            $out .= "Accept-Language: zh-cn\r\n";
+            $out .= "User-Agent: $user_agent\r\n";
+            $out .= "Host: $host\r\n";
+            $out .= "Connection: Close\r\n";
+            $out .= "Cookie: $cookie\r\n\r\n";
+        }
+        $fp = @fsockopen(($ip ? $ip : $host), $port, $errno, $errstr, $timeout);
+        if (!$fp) {
+            return '';
+        } else {
+            stream_set_blocking($fp, $block);
+            stream_set_timeout($fp, $timeout);
+            @fwrite($fp, $out);
+            $status = stream_get_meta_data($fp);
+            if (!$status['timed_out']) {
+                while (!feof($fp)) {
+                    if (($header = @fgets($fp)) && ($header == "\r\n" || $header == "\n")) {
+                        break;
+                    }
+                }
+                $stop = false;
+                while (!feof($fp) && !$stop) {
+                    $data   = fread($fp, ($limit == 0 || $limit > 8192 ? 8192 : $limit));
+                    $return .= $data;
+                    if ($limit) {
+                        $limit -= strlen($data);
+                        $stop  = $limit <= 0;
+                    }
+                }
+            }
+            @fclose($fp);
+            return $return;
+        }
+    }
+
+    /**
      * 分析返回用户网页浏览器名称
      * @param string $user_agent
      * @return array 返回的数组第一个为浏览器名称，第二个是版本号。

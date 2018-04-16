@@ -8,6 +8,7 @@
  */
 
 namespace ClassLibrary;
+
 use think\Exception;
 use think\exception\ErrorException;
 
@@ -574,7 +575,7 @@ class ClString {
             $newline = "\n";
         }
         $json = self::toArray($json);
-        try{
+        try {
             foreach ($json as $k_char => $char) {
                 if ($ignore_next) {
                     $result      .= $char;
@@ -625,7 +626,7 @@ class ClString {
                     }
                 }
             }
-        }catch (ErrorException $e){
+        } catch (ErrorException $e) {
             return 'json格式错误';
         }
         if ($html) {

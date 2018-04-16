@@ -9,6 +9,21 @@
 
 namespace ClassLibrary;
 
+use PhpOffice\PhpSpreadsheet\Helper\Sample;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\RichText\RichText;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Font;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Style\Protection;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
+
 /**
  * 实现原理是以csv为中间格式，进行excel转换
  * Class ClExcel(class library Excel)
@@ -31,7 +46,7 @@ class ClExcel {
      * @param integer $max_count 最大列数
      * @return array
      */
-    public function getLetters($max_count) {
+    public static function getLetters($max_count) {
         $letter_str = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $m          = ceil($max_count / 26);
         $r          = array();
@@ -56,21 +71,12 @@ class ClExcel {
      * @param array $values
      * @return string
      */
-    public function exportToCsv($titles, $values = []) {
+    public static function exportToCsv($titles, $values = []) {
         $file = DOCUMENT_ROOT_PATH . '/temp.csv';
-        $f    = fopen($file, 'w+');
-        //先put titles
-        fputs($f, sprintf('"%s"' . "\n", implode('","', $titles)));
-        //填充数据
-        if (!empty($values)) {
-            $values_string = '';
-            foreach ($values as $k => $v) {
-                $values_string .= sprintf('"%s"' . "\n", implode('","', $v));
-            }
-            //去除最后一行换行符
-            $values_string = rtrim($values_string, "\n");
-            //填充
-            fputs($f, $values_string);
+        array_unshift($values, $titles);
+        $f = fopen($file, 'w+');
+        foreach ($values as $each_array) {
+            fputcsv($f, $each_array);
         }
         fclose($f);
         return $file;
@@ -83,43 +89,44 @@ class ClExcel {
      * @param string $suffix
      * @param bool $is_delete
      * @return array|bool|string
-     * @throws \PHPExcel_Reader_Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function exportToExcel($titles, $values = [], $suffix = 'xls', $is_delete = false) {
-        $csv_file = $this->exportToCsv($titles, $values);
+    public static function exportToExcel($titles, $values = [], $suffix = 'xls', $is_delete = false) {
+        $csv_file = self::exportToCsv($titles, $values);
         //转换为excel
-        return $this->csvToExcel($csv_file, $suffix, $is_delete);
+        return self::csvToExcel($csv_file, $suffix, $is_delete);
     }
 
     /**
      * csv to excel
-     * @param string $csv_file csv绝对地址
-     * @param string $suffix 格式2003或2007
-     * @param bool $is_delete 是否删除源文件
+     * @param $csv_file
+     * @param string $suffix
+     * @param bool $is_delete
      * @return array|bool|string
-     * @throws \PHPExcel_Reader_Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function csvToExcel($csv_file, $suffix = 'xls', $is_delete = false) {
+    public static function csvToExcel($csv_file, $suffix = 'xls', $is_delete = false) {
         if (!is_file($csv_file)) {
             le_info(sprintf('文件“%s”，不存在。', $csv_file));
             return false;
         }
-        $object_csv    = new \PHPExcel_Reader_CSV();
-        $csv           = $object_csv->load($csv_file);
-        $object_writer = null;
-        $suffix        = strtolower($suffix);
+        $reader               = IOFactory::createReader('Csv')->setDelimiter(',')->setEnclosure('"')->setSheetIndex(0);
+        $spreadsheet_from_csv = $reader->load($csv_file);
+        $suffix               = strtolower($suffix);
         if ($suffix == 'xlsx') {
-            $object_writer = new \PHPExcel_Writer_Excel2007($csv);
+            $writer = IOFactory::createWriter($spreadsheet_from_csv, 'xlsx');
         } else {
-            $object_writer = new \PHPExcel_Writer_Excel5($csv);
+            $writer = IOFactory::createWriter($spreadsheet_from_csv, 'Xls');
         }
         $excel_file                         = explode('.', $csv_file);
         $excel_file[count($excel_file) - 1] = $suffix;
         $excel_file                         = implode('.', $excel_file);
         //保存excel
-        $object_writer->save($excel_file);
-        unset($object_writer);
-        unset($object_csv);
+        $writer->save($excel_file);
         if ($is_delete) {
             //是否删除
             unlink($csv_file);
@@ -133,10 +140,10 @@ class ClExcel {
      * @param bool $is_delete_excel
      * @param bool $is_delete_csv
      * @param bool $auto_fixed
-     * @return array|bool|mixed
-     * @throws \PHPExcel_Writer_Exception
+     * @return array|mixed
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
-    public function excelToArray($excel_file, $is_delete_excel = false, $is_delete_csv = false, $auto_fixed = false) {
+    public static function excelToArray($excel_file, $is_delete_excel = false, $is_delete_csv = false, $auto_fixed = false) {
         if (!is_file($excel_file)) {
             if (is_file(DOCUMENT_ROOT_PATH . $excel_file)) {
                 $excel_file = DOCUMENT_ROOT_PATH . $excel_file;
@@ -145,23 +152,16 @@ class ClExcel {
                 return false;
             }
         }
-        $suffix     = ClFile::getSuffix($excel_file);
-        $obj_reader = null;
-        if ($suffix == 'xlsx') {
-            $obj_reader = new \PHPExcel_Reader_Excel2007();
-        } else {
-            $obj_reader = new \PHPExcel_Reader_Excel5();
-        }
-        $excel        = $obj_reader->load($excel_file);
-        $count        = $excel->getSheetCount();
-        $obj_writer   = new \PHPExcel_Writer_CSV($excel);
+        $spreadsheet  = IOFactory::load($excel_file);
+        $count        = $spreadsheet->getSheetCount();
         $return_array = [];
         //保存csv格式
         for ($sheet_index = 0; $sheet_index < $count; $sheet_index++) {
             $csv_file                       = explode('.', $excel_file);
             $csv_file[count($csv_file) - 1] = sprintf('_%s.csv', $sheet_index);
             $csv_file                       = implode('.', $csv_file);
-            $obj_writer->setSheetIndex($sheet_index);
+            $spreadsheet->setActiveSheetIndex($sheet_index);
+            $obj_writer = IOFactory::createWriter($spreadsheet, 'Csv');
             $obj_writer->save($csv_file);
             $return = [];
             //标题

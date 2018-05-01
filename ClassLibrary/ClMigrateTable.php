@@ -22,7 +22,6 @@ class ClMigrateTable {
      */
     private static $instance = null;
 
-    const V_CREATE_API_GET_LIST = 'getList';
     const V_CREATE_API_GET = 'get';
     const V_CREATE_API_CREATE = 'create';
     const V_CREATE_API_DELETE = 'delete';
@@ -34,7 +33,6 @@ class ClMigrateTable {
      */
     private $table_config = [
         'create_api' => [
-            self::V_CREATE_API_GET_LIST,
             self::V_CREATE_API_GET,
             self::V_CREATE_API_CREATE,
             self::V_CREATE_API_DELETE,
@@ -66,7 +64,6 @@ class ClMigrateTable {
             JSON_UNESCAPED_UNICODE);
         $this->table_config = [
             'create_api' => [
-                self::V_CREATE_API_GET_LIST,
                 self::V_CREATE_API_GET,
                 self::V_CREATE_API_CREATE,
                 self::V_CREATE_API_DELETE,
@@ -102,7 +99,6 @@ class ClMigrateTable {
      * @return $this
      */
     public function createApi($functions = [
-        ClMigrateTable::V_CREATE_API_GET_LIST,
         ClMigrateTable::V_CREATE_API_GET,
         ClMigrateTable::V_CREATE_API_CREATE,
         ClMigrateTable::V_CREATE_API_DELETE,
@@ -115,19 +111,19 @@ class ClMigrateTable {
     /**
      * 获取更新Comment SQL
      * @param $table
-     * @param $comment_name
+     * @param $table_desc
+     * @param string $engine
      * @return string
      */
-    public function getUpdateCommentSql($table, $comment_name) {
-        $sql                = sprintf("ALTER TABLE `%s` COMMENT='%s'", config('database.prefix') . $table, json_encode(
+    public function getUpdateCommentSql($table, $table_desc, $engine = 'InnoDB') {
+        $sql                = sprintf("ALTER TABLE `%s` ENGINE=%s COMMENT='%s'", config('database.prefix') . $table, $engine, json_encode(
                 array_merge([
-                    'name' => $comment_name
+                    'name' => $table_desc
                 ], $this->table_config),
                 JSON_UNESCAPED_UNICODE)
         );
         $this->table_config = [
             'create_api' => [
-                self::V_CREATE_API_GET_LIST,
                 self::V_CREATE_API_GET,
                 self::V_CREATE_API_CREATE,
                 self::V_CREATE_API_DELETE,

@@ -593,6 +593,9 @@ class ClHttp {
         } elseif (stripos($sys, "Opera") > 0 || stripos($sys, "OPR/") > 0) {
             $exp[0] = "Opera";
             $exp[1] = "";
+        } elseif (stripos($sys, 'Edge')) {
+            $exp[0] = "Edge";
+            $exp[1] = '';
         } else if (stripos($sys, "Safari/") > 0) {
             $exp[0] = "Safari";
             $exp[1] = "";
@@ -626,9 +629,6 @@ class ClHttp {
         } elseif (stripos($sys, "Netscape") > 0) {
             $exp[0] = "Netscape";
             $exp[1] = "";
-        } elseif (stripos($sys, 'Edge')) {
-            $exp[0] = "Edge";
-            $exp[1] = '';
         } elseif (stripos($sys, "Chrome") > 0) {
             $exp[0] = "Chrome";
             $exp[1] = "";

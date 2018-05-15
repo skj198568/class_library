@@ -562,24 +562,26 @@ class ClFieldVerify extends ClFieldBase {
                         case 'unique':
                             if (self::fieldNeedCheck($fields, $k_field) && !is_null($instance)) {
                                 $new_instance = $instance::instance(-2);
-                                if ($type == 'insert') {
-                                    //插入，则只需要判断是否存在
-                                    $count = $new_instance->where([
-                                        $k_field => $fields[$k_field]
-                                    ])->count();
-                                    if ($count > 0) {
-                                        $error_msg = sprintf('%s:%s 该值为unique，不可重复', self::getFieldDesc($k_field, $instance), $fields[$k_field]);
-                                    }
-                                } else {
-                                    //更新，则要判断where条件
-                                    $field_id = $new_instance->where([$k_field => $fields[$k_field]])->value($new_instance->getPk());
-                                    if (!empty($field_id)) {
-                                        //存在值的情况
-                                        $where    = $instance->getOptions('where');
-                                        $where_id = $new_instance->where($where['AND'])->value($new_instance->getPk());
-                                        if ($field_id != $where_id) {
-                                            //两个结果记录不同，则不可更新
-                                            $error_msg = sprintf('%s:%s 该值为unique，不可重复，已经存在记录id=%s', self::getFieldDesc($k_field, $instance), $fields[$k_field], $field_id);
+                                if ($new_instance->tableIsExist()) {
+                                    if ($type == 'insert') {
+                                        //插入，则只需要判断是否存在
+                                        $count = $new_instance->where([
+                                            $k_field => $fields[$k_field]
+                                        ])->count();
+                                        if ($count > 0) {
+                                            $error_msg = sprintf('%s:%s 该值为unique，不可重复', self::getFieldDesc($k_field, $instance), $fields[$k_field]);
+                                        }
+                                    } else {
+                                        //更新，则要判断where条件
+                                        $field_id = $new_instance->where([$k_field => $fields[$k_field]])->value($new_instance->getPk());
+                                        if (!empty($field_id)) {
+                                            //存在值的情况
+                                            $where    = $instance->getOptions('where');
+                                            $where_id = $new_instance->where($where['AND'])->value($new_instance->getPk());
+                                            if ($field_id != $where_id) {
+                                                //两个结果记录不同，则不可更新
+                                                $error_msg = sprintf('%s:%s 该值为unique，不可重复，已经存在记录id=%s', self::getFieldDesc($k_field, $instance), $fields[$k_field], $field_id);
+                                            }
                                         }
                                     }
                                 }

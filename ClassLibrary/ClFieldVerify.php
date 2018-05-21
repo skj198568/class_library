@@ -562,7 +562,7 @@ class ClFieldVerify extends ClFieldBase {
                         case 'unique':
                             if (self::fieldNeedCheck($fields, $k_field) && !is_null($instance)) {
                                 $new_instance = $instance::instance(999999);
-                                if ($new_instance->tableIsExist()) {
+                                if (!$new_instance->is_divide_table) {
                                     if ($type == 'insert') {
                                         //插入，则只需要判断是否存在
                                         $count = $new_instance->where([

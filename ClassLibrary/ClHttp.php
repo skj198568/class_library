@@ -140,13 +140,13 @@ class ClHttp {
      * @param string $result_type 结果格式
      * @return mixed
      */
-    public static function http($url, $params = [], $duration = 0, $is_debug = false, $result_type = 'json') {
+    public static function http($url, $params = [], $duration = null, $is_debug = false, $result_type = 'json') {
         $config = ['post' => $params];
         if ($result_type == 'json') {
             $config['content_type'] = 'application/json';
         }
-        $key = ClCache::getKey($duration, $url, $params);
-        if (!empty($key)) {
+        if ($duration !== null) {
+            $key    = ClCache::getKey($url, $params);
             $result = cache($key);
             if ($result === false) {
                 $result = self::fsockopenDownload($url, $config);
@@ -185,11 +185,18 @@ class ClHttp {
      * @param string $result_type
      * @return mixed|string
      */
-    public static function httpForm($url, $params = array(), $is_debug = false, $result_type = 'json') {
+    public static function httpForm($url, $params = [], $is_debug = false, $result_type = 'json') {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+        $headers = [
+            "Content-type: application/x-www-form-urlencoded",
+            "Accept: application/json",
+            "Cache-Control: no-cache",
+            "Pragma: no-cache"
+        ];
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         ob_start();
         curl_exec($ch);
         $result = ob_get_contents();

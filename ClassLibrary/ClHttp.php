@@ -178,37 +178,42 @@ class ClHttp {
     }
 
     /**
-     * http form方式提交
+     * https请求
      * @param $url
-     * @param array $params : array('a' => 1, 'img' => '@d:/1.jpg')
-     * @param bool|false $is_debug
+     * @param array $params
+     * @param bool $debug
      * @param string $result_type
-     * @return mixed|string
+     * @param array $header
+     * @param int $timeout
+     * @return mixed
      */
-    public static function httpForm($url, $params = [], $is_debug = false, $result_type = 'json') {
+    public static function request($url, $params = [], $debug = false, $result_type = 'json', $header = [], $timeout = 30) {
         $ch = curl_init();
+        if (strpos($url, 'https') !== false) {
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // 跳过证书检查
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);  // 从证书中检查SSL加密算法是否存在
+        }
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-        $headers = [
-            "Content-type: application/x-www-form-urlencoded",
-            "Accept: application/json",
-            "Cache-Control: no-cache",
-            "Pragma: no-cache"
-        ];
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        ob_start();
-        curl_exec($ch);
-        $result = ob_get_contents();
-        ob_end_clean();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+        $response = curl_exec($ch);
+        if ($error = curl_error($ch)) {
+            die($error);
+        }
+        // 打印错误信息
+        if ($debug) {
+            log_info('info', curl_getinfo($ch));
+            log_info('error', curl_error($ch));
+            log_info('response', $response);
+        }
         curl_close($ch);
-        if ($is_debug) {
-            log_info('HTTP:', $url, $params, $result);
-        }
         if (strtolower($result_type) == 'json') {
-            $result = json_decode($result, true);
+            $response = json_decode($response, true);
         }
-        return $result;
+        return $response;
     }
 
     /**

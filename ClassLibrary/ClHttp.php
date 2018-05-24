@@ -40,7 +40,13 @@ class ClHttp {
     public static function getServerDomain($with_protocol = true) {
         $protocol = '';
         if ($with_protocol) {
+            if (!isset($_SERVER['SERVER_PORT'])) {
+                $_SERVER['SERVER_PORT'] = 80;
+            }
             $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+        }
+        if (!isset($_SERVER['HTTP_HOST'])) {
+            $_SERVER['HTTP_HOST'] = '127.0.0.1';
         }
         return $protocol . $_SERVER['HTTP_HOST'];
     }

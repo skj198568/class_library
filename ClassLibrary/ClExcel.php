@@ -254,6 +254,7 @@ class ClExcel {
         $new_file_handle       = fopen($new_csv_absolute_file, 'w+');
         $titles                = [];
         $items                 = [];
+        $is_first_put          = true;
         while (!feof($file_handle)) {
             $content = trim(fgets($file_handle));
             if (empty($content)) {
@@ -283,8 +284,13 @@ class ClExcel {
             }
             if (!empty($temp_content_array)) {
                 $content = '"' . implode('","', $items) . '"';
+                if ($is_first_put) {
+                    $is_first_put = false;
+                } else {
+                    $content = "\n" . $content;
+                }
                 //写入新内容
-                fputs($new_file_handle, $content . "\n");
+                fputs($new_file_handle, $content);
             }
         }
         fclose($new_file_handle);

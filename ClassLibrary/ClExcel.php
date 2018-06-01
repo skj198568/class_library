@@ -163,7 +163,9 @@ class ClExcel {
             $spreadsheet->setActiveSheetIndex($sheet_index);
             $obj_writer = IOFactory::createWriter($spreadsheet, 'Csv');
             $obj_writer->save($csv_file);
-            $return = [];
+            //csv格式化
+            $csv_file = self::csvClear($csv_file);
+            $return   = [];
             //标题
             $titles = [];
             //内容
@@ -177,37 +179,7 @@ class ClExcel {
                 if (empty($content)) {
                     continue;
                 }
-                $temp_content_array = ClString::toArray($content);
-                while ($temp_content_array[count($temp_content_array) - 1] !== '"' && !feof($f_handle)) {
-                    //如果换行，则接着读取数据
-                    $content            .= trim(fgets($f_handle));
-                    $temp_content_array = ClString::toArray($content);
-                }
-                $item = explode('","', $content);
-                //去除两端"
-                foreach ($item as $k => $v) {
-                    $item[$k] = trim(trim($v, '"'));
-                }
-                //处理标题
-                if (empty($titles)) {
-                    $titles = $item;
-                }
-                //删除多余数据
-                foreach ($item as $k => $v) {
-                    if ($k + 1 > count($titles)) {
-                        unset($item[$k]);
-                    }
-                }
-                //判断空数据的行
-                $temp_content_array = $item;
-                for ($i = count($temp_content_array) - 1; $i >= 0; $i--) {
-                    if (empty(ClString::spaceTrim($temp_content_array[$i]))) {
-                        unset($temp_content_array[$i]);
-                    }
-                }
-                if (!empty($temp_content_array)) {
-                    $return[] = $item;
-                }
+                $return[] = self::csvLineToArray($content);
             }
             fclose($f_handle);
             if ($is_delete_csv) {
@@ -260,6 +232,93 @@ class ClExcel {
             }
         }
         return count($return_array) == 1 ? $return_array[0] : $return_array;
+    }
+
+    /**
+     * csv数据清理
+     * @param $csv_absolute_file
+     * @param bool $is_cover
+     * @return mixed|string
+     */
+    public static function csvClear($csv_absolute_file, $is_cover = true) {
+        if (!is_file($csv_absolute_file)) {
+            if (is_file(DOCUMENT_ROOT_PATH . $csv_absolute_file)) {
+                $csv_absolute_file = DOCUMENT_ROOT_PATH . $csv_absolute_file;
+            } else {
+                le_info(sprintf('文件“%s”，不存在。', $csv_absolute_file));
+                return false;
+            }
+        }
+        $new_csv_absolute_file = str_replace('.csv', '_temp.csv', $csv_absolute_file);
+        $file_handle           = fopen($csv_absolute_file, 'r');
+        $new_file_handle       = fopen($new_csv_absolute_file, 'w+');
+        $titles                = [];
+        $items                 = [];
+        while (!feof($file_handle)) {
+            $content = trim(fgets($file_handle));
+            if (empty($content)) {
+                continue;
+            }
+            while (strpos($content, ',"') !== false && substr_count($content, '"') % 2 != 0 && !feof($file_handle)) {
+                //如果换行，则接着读取数据
+                $content .= trim(fgets($file_handle));
+            }
+            $items = self::csvLineToArray($content);
+            //处理标题
+            if (empty($titles)) {
+                $titles = $items;
+            }
+            //删除多余数据
+            foreach ($items as $k => $v) {
+                if ($k + 1 > count($titles)) {
+                    unset($items[$k]);
+                }
+            }
+            //判断空数据的行
+            $temp_content_array = $items;
+            for ($i = count($temp_content_array) - 1; $i >= 0; $i--) {
+                if (empty(ClString::spaceTrim($temp_content_array[$i]))) {
+                    unset($temp_content_array[$i]);
+                }
+            }
+            if (!empty($temp_content_array)) {
+                $content = '"' . implode('","', $items) . '"';
+                //写入新内容
+                fputs($new_file_handle, $content . "\n");
+            }
+        }
+        fclose($new_file_handle);
+        fclose($file_handle);
+        if ($is_cover) {
+            //删除
+            unlink($csv_absolute_file);
+            //重命名
+            rename($new_csv_absolute_file, $csv_absolute_file);
+            return $csv_absolute_file;
+        } else {
+            return $new_csv_absolute_file;
+        }
+    }
+
+    /**
+     * csv行转数组
+     * @param $line_content
+     * @return array
+     */
+    public static function csvLineToArray($line_content) {
+        $line_content = trim($line_content);
+        //转码
+        $line_content = ClString::encoding($line_content);
+        $delimiter    = ',';
+        if (strpos($line_content, '","') !== false) {
+            $delimiter = '","';
+        }
+        $items = explode(',', $line_content);
+        //去除两端"
+        foreach ($items as $k => $v) {
+            $items[$k] = trim(trim($v, '"'));
+        }
+        return $items;
     }
 
 }

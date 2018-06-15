@@ -104,8 +104,8 @@ class ClVerify {
      * @return bool
      */
     public static function isJson($str) {
-        $str = json_decode($str);
-        return !empty($str);
+        $str = json_decode($str, true);
+        return is_array($str);
     }
 
     /**

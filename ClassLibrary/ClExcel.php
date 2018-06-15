@@ -283,7 +283,13 @@ class ClExcel {
                 }
             }
             if (!empty($temp_content_array)) {
-                $content = '"' . implode('","', $items) . '"';
+                //处理数据回写
+                array_walk($items, function (&$each_item) {
+                    if (strpos($each_item, ',') !== false) {
+                        $each_item = '"' . $each_item . '"';
+                    }
+                });
+                $content = implode(',', $items);
                 if ($is_first_put) {
                     $is_first_put = false;
                 } else {
@@ -316,15 +322,24 @@ class ClExcel {
         //转码
         $line_content = ClString::encoding($line_content);
         $delimiter    = ',';
-        if (strpos($line_content, '","') !== false) {
-            $delimiter = '","';
-        }
-        $items = explode(',', $line_content);
-        //去除两端"
+        $items        = explode(',', $line_content);
+        $items_temp   = [];
+        $item         = '';
         foreach ($items as $k => $v) {
-            $items[$k] = trim(trim($v, '"'));
+            if (empty($item)) {
+                $item = $v;
+            } else {
+                $item .= ',' . $v;
+            }
+            if (strpos($item, '"') === 0 && substr($item, -1, 1) !== '"') {
+                continue;
+            }
+            //去除两端"
+            $items_temp[] = trim(trim($item, '"'));
+            //置空
+            $item = '';
         }
-        return $items;
+        return $items_temp;
     }
 
 }

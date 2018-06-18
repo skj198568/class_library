@@ -43,8 +43,8 @@ class ClCrypt {
 
     /**
      * 解密字符串
-     * @param $string 字符串
-     * @param $key 加密key
+     * @param string $string 字符串
+     * @param string $key 加密key
      * @param bool $get_left_time 获取剩余时间
      * @return bool|int|string
      */

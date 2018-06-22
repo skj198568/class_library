@@ -133,4 +133,14 @@ class ClMigrateTable {
         return $sql;
     }
 
+    /**
+     * 分表规则
+     * @param array $partition
+     * @return $this
+     */
+    public function partition($partition) {
+        $this->table_config['partition'] = $partition;
+        return $this;
+    }
+
 }

@@ -139,7 +139,9 @@ class ClMigrateTable {
      * @return $this
      */
     public function partition($partition) {
-        $this->table_config['partition'] = $partition;
+        if (!empty($partition)) {
+            $this->table_config['partition'] = $partition;
+        }
         return $this;
     }
 

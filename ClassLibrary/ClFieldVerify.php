@@ -621,20 +621,14 @@ class ClFieldVerify extends ClFieldBase {
                 }
             }
             if (!empty($error_msg)) {
-                $msg   = json_encode([
+                $response = json_return([
                     'status'  => -1,
                     'message' => $error_msg,
                     'data'    => $fields
-                ], JSON_UNESCAPED_UNICODE);
-                $value = isset($_SERVER['HTTP_X_REQUESTED_WITH']) ? strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) : '';
-                if (strpos($value, 'xmlhttprequest') !== false) {
-                    //输出结果并退出
-                    header('Content-Type:application/json; charset=utf-8');
-                    echo($msg);
-                } else {
-                    echo($msg . PHP_EOL);
-                }
-                exit;
+                ]);
+                $response->send();
+                //退出
+                exit();
             }
         }
     }

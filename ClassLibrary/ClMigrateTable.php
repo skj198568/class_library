@@ -116,11 +116,11 @@ class ClMigrateTable {
      * @return string
      */
     public function getUpdateCommentSql($table, $table_desc, $engine = 'InnoDB') {
-        $sql                = sprintf("ALTER TABLE `%s` ENGINE=%s COMMENT='%s'", config('database.prefix') . $table, $engine, json_encode(
+        $sql                = sprintf("ALTER TABLE `%s` ENGINE=%s COMMENT='%s'", config('database.prefix') . $table, $engine, str_replace(["'"], ["\'"], json_encode(
                 array_merge([
                     'name' => $table_desc
                 ], $this->table_config),
-                JSON_UNESCAPED_UNICODE)
+                JSON_UNESCAPED_UNICODE))
         );
         $this->table_config = [
             'create_api' => [

@@ -142,7 +142,7 @@ class ClVerify {
         if (empty($str)) {
             $str = request()->ip();
         }
-        if (in_array(strtok($str, '.'), ['0', '10', '127', '168', '192'])) {
+        if (in_array(strtok($str, '.'), ['0', '10', '127', '168', '172', '192'])) {
             return true;
         }
         return false;

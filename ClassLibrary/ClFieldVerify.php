@@ -703,25 +703,27 @@ class ClFieldVerify extends ClFieldBase {
     private static function getErrorMsg($verify, $fields, $k_field, $instance = null) {
         if (!ClVerify::isJson(json_encode($fields[$k_field]))) {
             $fields[$k_field] = '';
+        } else {
+            $fields[$k_field] = is_string($fields[$k_field]) ? $fields[$k_field] : json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE);
         }
         switch ($verify) {
             case 'password':
-                $error_msg = sprintf('%s:%s 密码长度%s~%s，且只能包含字符、数字和下划线', self::getFieldDesc($k_field, $instance), is_string($fields[$k_field]) ? $fields[$k_field] : json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $verify[1], $verify[2]);
+                $error_msg = sprintf('%s:%s 密码长度%s~%s，且只能包含字符、数字和下划线', self::getFieldDesc($k_field, $instance), $fields[$k_field], $verify[1], $verify[2]);
                 break;
             case 'in_array':
-                $error_msg = sprintf('%s:%s 不在%s数组内', self::getFieldDesc($k_field, $instance), json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
+                $error_msg = sprintf('%s:%s 不在%s数组内', self::getFieldDesc($k_field, $instance), $fields[$k_field], json_encode($v_verify[1], JSON_UNESCAPED_UNICODE));
                 break;
             case 'in_scope':
-                $error_msg = sprintf('%s:%s 不在[%s, %s]区间内', self::getFieldDesc($k_field, $instance), json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1], $v_verify[2]);
+                $error_msg = sprintf('%s:%s 不在[%s, %s]区间内', self::getFieldDesc($k_field, $instance), $fields[$k_field], $v_verify[1], $v_verify[2]);
                 break;
             case 'max':
-                $error_msg = sprintf('%s:%s 最大值%s', self::getFieldDesc($k_field, $instance), json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
+                $error_msg = sprintf('%s:%s 最大值%s', self::getFieldDesc($k_field, $instance), $fields[$k_field], $v_verify[1]);
                 break;
             case 'min':
-                $error_msg = sprintf('%s:%s 最小值%s', self::getFieldDesc($k_field, $instance), json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
+                $error_msg = sprintf('%s:%s 最小值%s', self::getFieldDesc($k_field, $instance), $fields[$k_field], $v_verify[1]);
                 break;
             case 'length':
-                $error_msg = sprintf('%s:%s 长度为%s', self::getFieldDesc($k_field, $instance), json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE), $v_verify[1]);
+                $error_msg = sprintf('%s:%s 长度为%s', self::getFieldDesc($k_field, $instance), $fields[$k_field], $v_verify[1]);
                 break;
             case 'length_max':
                 $error_msg = sprintf('%s:%s 最大长度%s', self::getFieldDesc($k_field, $instance), $fields[$k_field], $v_verify[1]);

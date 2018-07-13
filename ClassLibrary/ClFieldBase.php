@@ -300,4 +300,13 @@ class ClFieldBase {
         return $this;
     }
 
+    /**
+     * 是否是json格式
+     * @return $this
+     */
+    public function verifyIsJson() {
+        $this->field_config['verifies'][] = 'is_json';
+        return $this;
+    }
+
 }

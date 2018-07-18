@@ -14,6 +14,7 @@ use ClassLibrary\ClCache;
 use ClassLibrary\ClFile;
 use ClassLibrary\ClHttp;
 use ClassLibrary\ClString;
+use think\App;
 use think\Exception;
 
 /**
@@ -109,7 +110,7 @@ class ClWX {
         if (intval($aStatus["http_code"]) == 200) {
             if ($result_type == 'json') {
                 $r = json_decode($output, true);
-                if (config('app_debug')) {
+                if (App::$debug) {
                     log_info([
                         'url'       => $url,
                         'params'    => $param,
@@ -273,8 +274,7 @@ class ClWX {
 
     /**
      * 获取内容
-     * @return array|string
-     * @throws \Exception
+     * @return array|bool|string
      */
     public static function getInput() {
         if (empty(self::$input)) {
@@ -310,7 +310,7 @@ class ClWX {
      * @return mixed
      */
     public static function getAccessToken($app_id, $app_secret) {
-        $key = ClCache::getKey(1, $app_id, $app_secret);
+        $key = ClCache::getKey($app_id, $app_secret);
         $r   = cache($key);
         if ($r !== false) {
             return $r;
@@ -330,7 +330,7 @@ class ClWX {
         self::$app_id       = $app_id;
         self::$app_secret   = $app_secret;
         self::$access_token = self::getAccessToken($app_id, $app_secret);
-        if (config('app_debug')) {
+        if (App::$debug) {
             log_info('access_token:', self::$access_token);
         }
     }
@@ -400,7 +400,7 @@ class ClWX {
      * @param $msg
      */
     private static function msgReply($msg) {
-        if (app_debug()) {
+        if (App::$debug) {
             log_info($msg);
         }
         exit($msg);
@@ -1831,7 +1831,7 @@ class ClWX {
      * @return mixed|string
      */
     public static function qrCodeGet($scene_id, $expire_seconds = 604800, $type = 1) {
-        $key     = ClCache::getKey(1, $scene_id, $expire_seconds);
+        $key     = ClCache::getKey($scene_id, $expire_seconds);
         $qr_info = cache($key);
         if (!empty($qr_info)) {
             if ($type == 1) {
@@ -2002,7 +2002,7 @@ class ClWX {
      * @return mixed
      */
     public static function getJsApiTicket() {
-        $key    = ClCache::getKey(1, self::$app_id, self::$app_secret);
+        $key    = ClCache::getKey(self::$app_id, self::$app_secret);
         $ticket = cache($key);
         if (!empty($ticket)) {
             return $ticket;

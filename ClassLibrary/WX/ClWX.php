@@ -78,12 +78,6 @@ class ClWX {
      * @throws Exception
      */
     public static function httpPost($url, $param = [], $post_file = false, $result_type = 'json') {
-        $function_name = ClCache::getFunctionHistory(2);
-        if (empty(self::$access_token)) {
-            if (ClCache::getFunctionHistory(2) != 'ClWXGetAccessToken') {
-                throw new Exception(sprintf('[function_name]: %s, %s', $function_name, '[请先调用]: ClWX::setAccessToken($app_id, $app_secret)'));
-            }
-        }
         $oCurl = curl_init();
         if (stripos($url, "https://") !== FALSE) {
             curl_setopt($oCurl, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -304,35 +298,36 @@ class ClWX {
     }
 
     /**
-     * 获取access_token
-     * @param $app_id
-     * @param $app_secret
-     * @return mixed
+     * 获取access token
+     * @return string
      */
-    public static function getAccessToken($app_id, $app_secret) {
-        $key = ClCache::getKey($app_id, $app_secret);
-        $r   = cache($key);
-        if ($r !== false) {
-            return $r;
+    public static function getAccessToken() {
+        if (empty(self::$app_id) || empty(self::$app_secret)) {
+            throw new Exception(sprintf('[function_name]: %s, %s', $function_name, '[请先调用]: ClWX::init($app_id, $app_secret)'));
         }
-        $r = self::httpPost(self::URL . "/token?grant_type=client_credential&appid=$app_id&secret=$app_secret");
-        //写入缓存
-        cache($key, $r['access_token'], $r['expires_in'] - self::V_CACHE_SAFE_SECOND);
-        return $r['access_token'];
+        if (empty(self::$access_token)) {
+            $key = ClCache::getKey(self::$app_id, self::$app_secret);
+            $r   = cache($key);
+            if ($r !== false) {
+                self::$access_token = $r;
+            } else {
+                $r = self::httpPost(self::URL . "/token?grant_type=client_credential&appid=" . self::$app_id . "&secret=" . self::$app_secret);
+                //写入缓存
+                cache($key, $r['access_token'], $r['expires_in'] - self::V_CACHE_SAFE_SECOND);
+                self::$access_token = $r['access_token'];
+            }
+        }
+        return self::$access_token;
     }
 
     /**
-     * 设置access_token
+     * 初始化
      * @param $app_id
      * @param $app_secret
      */
-    public static function setAccessToken($app_id, $app_secret) {
-        self::$app_id       = $app_id;
-        self::$app_secret   = $app_secret;
-        self::$access_token = self::getAccessToken($app_id, $app_secret);
-        if (App::$debug) {
-            log_info('access_token:', self::$access_token);
-        }
+    public static function init($app_id, $app_secret) {
+        self::$app_id     = $app_id;
+        self::$app_secret = $app_secret;
     }
 
     /**
@@ -340,7 +335,7 @@ class ClWX {
      * @return mixed
      */
     public static function getServerIps() {
-        $r = self::httpPost(self::URL . "/getcallbackip?access_token=" . self::$access_token);
+        $r = self::httpPost(self::URL . "/getcallbackip?access_token=" . self::getAccessToken());
         return $r['ip_list'];
     }
 
@@ -594,7 +589,7 @@ class ClWX {
      * @return bool
      */
     public static function customerAdd($kf_account, $nickname, $password) {
-        $r = self::httpPost(self::URL_CUSTOM . "/add?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL_CUSTOM . "/add?access_token=" . self::getAccessToken(), array(
             'kf_account' => $kf_account,
             'nickname'   => $nickname,
             'password'   => $password
@@ -610,7 +605,7 @@ class ClWX {
      * @return bool
      */
     public static function customerUpdate($kf_account, $nickname, $password) {
-        $r = self::httpPost(self::URL_CUSTOM . "/update?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL_CUSTOM . "/update?access_token=" . self::getAccessToken(), array(
             'kf_account' => $kf_account,
             'nickname'   => $nickname,
             'password'   => $password
@@ -626,7 +621,7 @@ class ClWX {
      * @return bool
      */
     public static function customerDelete($kf_account, $nickname, $password) {
-        $r = self::httpPost(self::URL_CUSTOM . "/del?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL_CUSTOM . "/del?access_token=" . self::getAccessToken(), array(
             'kf_account' => $kf_account,
             'nickname'   => $nickname,
             'password'   => $password
@@ -641,7 +636,7 @@ class ClWX {
      * @return mixed|string
      */
     public static function customerUploadHeadImg($kf_account, $head_img_absolute_url) {
-        $result = ClHttp::uploadFile(self::URL_CUSTOM . "/uploadheadimg?access_token=" . self::$access_token . "&kf_account=$kf_account", array(), ClFile::getName($head_img_absolute_url), 'media', $head_img_absolute_url);
+        $result = ClHttp::uploadFile(self::URL_CUSTOM . "/uploadheadimg?access_token=" . self::getAccessToken() . "&kf_account=$kf_account", array(), ClFile::getName($head_img_absolute_url), 'media', $head_img_absolute_url);
         return $result;
     }
 
@@ -651,7 +646,7 @@ class ClWX {
      * ))
      */
     public static function customerList() {
-        $r = self::httpPost(self::URL_CUSTOM . "/getkflist?access_token=" . self::$access_token);
+        $r = self::httpPost(self::URL_CUSTOM . "/getkflist?access_token=" . self::getAccessToken());
         return $r['kf_list'];
     }
 
@@ -673,7 +668,7 @@ class ClWX {
         if (!empty($kf_account)) {
             $params['customservice'] = array('kf_account' => $kf_account);
         }
-        $r = self::httpPost(self::URL . "/message/custom/send?access_token=" . self::$access_token, $params);
+        $r = self::httpPost(self::URL . "/message/custom/send?access_token=" . self::getAccessToken(), $params);
         return $r[self::F_RETURN_ERR_CODE] == 0 ? true : false;
     }
 
@@ -695,7 +690,7 @@ class ClWX {
         if (!empty($kf_account)) {
             $params['customservice'] = array('kf_account' => $kf_account);
         }
-        $r = self::httpPost(self::URL . "/message/custom/send?access_token=" . self::$access_token, $params);
+        $r = self::httpPost(self::URL . "/message/custom/send?access_token=" . self::getAccessToken(), $params);
         return $r[self::F_RETURN_ERR_CODE] == 0 ? true : false;
     }
 
@@ -717,7 +712,7 @@ class ClWX {
         if (!empty($kf_account)) {
             $params['customservice'] = array('kf_account' => $kf_account);
         }
-        $r = self::httpPost(self::URL . "/message/custom/send?access_token=" . self::$access_token, $params);
+        $r = self::httpPost(self::URL . "/message/custom/send?access_token=" . self::getAccessToken(), $params);
         return $r[self::F_RETURN_ERR_CODE] == 0 ? true : false;
     }
 
@@ -745,7 +740,7 @@ class ClWX {
         if (!empty($kf_account)) {
             $params['customservice'] = array('kf_account' => $kf_account);
         }
-        $r = self::httpPost(self::URL . "/message/custom/send?access_token=" . self::$access_token, $params);
+        $r = self::httpPost(self::URL . "/message/custom/send?access_token=" . self::getAccessToken(), $params);
         return $r[self::F_RETURN_ERR_CODE] == 0 ? true : false;
     }
 
@@ -775,7 +770,7 @@ class ClWX {
         if (!empty($kf_account)) {
             $params['customservice'] = array('kf_account' => $kf_account);
         }
-        $r = self::httpPost(self::URL . "/message/custom/send?access_token=" . self::$access_token, $params);
+        $r = self::httpPost(self::URL . "/message/custom/send?access_token=" . self::getAccessToken(), $params);
         return $r[self::F_RETURN_ERR_CODE] == 0 ? true : false;
     }
 
@@ -797,7 +792,7 @@ class ClWX {
         if (!empty($kf_account)) {
             $params['customservice'] = array('kf_account' => $kf_account);
         }
-        $r = self::httpPost(self::URL . "/message/custom/send?access_token=" . self::$access_token, $params);
+        $r = self::httpPost(self::URL . "/message/custom/send?access_token=" . self::getAccessToken(), $params);
         return $r[self::F_RETURN_ERR_CODE] == 0 ? true : false;
     }
 
@@ -821,7 +816,7 @@ class ClWX {
         if (!empty($kf_account)) {
             $params['customservice'] = array('kf_account' => $kf_account);
         }
-        $r = self::httpPost(self::URL . "/message/custom/send?access_token=" . self::$access_token, $params);
+        $r = self::httpPost(self::URL . "/message/custom/send?access_token=" . self::getAccessToken(), $params);
         return $r[self::F_RETURN_ERR_CODE] == 0 ? true : false;
     }
 
@@ -831,7 +826,7 @@ class ClWX {
      * @return mixed
      */
     public static function massMediaUploadImg($img_absolute_url) {
-        $r = ClHttp::uploadFile(self::URL . "/media/uploadimg?access_token=" . self::$access_token, array(), 'media', ClFile::getName($img_absolute_url), $img_absolute_url);
+        $r = ClHttp::uploadFile(self::URL . "/media/uploadimg?access_token=" . self::getAccessToken(), array(), 'media', ClFile::getName($img_absolute_url), $img_absolute_url);
         return $r['url'];
     }
 
@@ -849,7 +844,7 @@ class ClWX {
      * @return mixed
      */
     public static function massMediaUploadArticles(array $articles) {
-        $r = self::httpPost(self::URL . "/media/uploadnews?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/media/uploadnews?access_token=" . self::getAccessToken(), array(
             'articles' => $articles
         ));
         return $r['media_id'];
@@ -880,7 +875,7 @@ class ClWX {
      * @return mixed
      */
     public static function massSendArticles($article_media_id, $group_id = 0) {
-        return self::httpPost(self::URL . "/message/mass/sendall?access_token=" . self::$access_token, array(
+        return self::httpPost(self::URL . "/message/mass/sendall?access_token=" . self::getAccessToken(), array(
             'filter'  => self::massSendGetFilter($group_id),
             'mpnews'  => array(
                 'media_id' => $article_media_id
@@ -896,7 +891,7 @@ class ClWX {
      * @return mixed
      */
     public static function massSendText($text_content, $group_id = 0) {
-        return self::httpPost(self::URL . "/message/mass/sendall?access_token=" . self::$access_token, array(
+        return self::httpPost(self::URL . "/message/mass/sendall?access_token=" . self::getAccessToken(), array(
             'filter'  => self::massSendGetFilter($group_id),
             'text'    => array(
                 'content' => $text_content
@@ -912,7 +907,7 @@ class ClWX {
      * @return mixed
      */
     public static function massSendVoice($voice_media_id, $group_id = 0) {
-        return self::httpPost(self::URL . "/message/mass/sendall?access_token=" . self::$access_token, array(
+        return self::httpPost(self::URL . "/message/mass/sendall?access_token=" . self::getAccessToken(), array(
             'filter'  => self::massSendGetFilter($group_id),
             'voice'   => array(
                 'media_id' => $voice_media_id
@@ -928,7 +923,7 @@ class ClWX {
      * @return mixed
      */
     public static function massSendImg($img_media_id, $group_id = 0) {
-        return self::httpPost(self::URL . "/message/mass/sendall?access_token=" . self::$access_token, array(
+        return self::httpPost(self::URL . "/message/mass/sendall?access_token=" . self::getAccessToken(), array(
             'filter'  => self::massSendGetFilter($group_id),
             'image'   => array(
                 'media_id' => $img_media_id
@@ -947,12 +942,12 @@ class ClWX {
      */
     public static function massSendVideo($video_media_id, $title, $desc, $group_id = 0) {
         //置换media_id
-        $r = self::httpPost("https://file.api.weixin.qq.com/cgi-bin/media/uploadvideo?access_token=" . self::$access_token, array(
+        $r = self::httpPost("https://file.api.weixin.qq.com/cgi-bin/media/uploadvideo?access_token=" . self::getAccessToken(), array(
             'media_id'    => $video_media_id,
             'title'       => $title,
             'description' => $desc
         ));
-        return self::httpPost(self::URL . "/message/mass/sendall?access_token=" . self::$access_token, array(
+        return self::httpPost(self::URL . "/message/mass/sendall?access_token=" . self::getAccessToken(), array(
             'filter'  => self::massSendGetFilter($group_id),
             'mpvideo' => array(
                 'media_id' => $r['media_id']
@@ -968,7 +963,7 @@ class ClWX {
      * @return mixed
      */
     public static function massSendCard($card_media_id, $group_id = 0) {
-        return self::httpPost(self::URL . "/message/mass/sendall?access_token=" . self::$access_token, array(
+        return self::httpPost(self::URL . "/message/mass/sendall?access_token=" . self::getAccessToken(), array(
             'filter'  => self::massSendGetFilter($group_id),
             'wxcard'  => array(
                 'media_id' => $card_media_id
@@ -984,7 +979,7 @@ class ClWX {
      * @return mixed
      */
     public static function massSendArticlesToUsers($article_media_id, array $to_users) {
-        return self::httpPost(self::URL . "/message/mass/send?access_token=" . self::$access_token, array(
+        return self::httpPost(self::URL . "/message/mass/send?access_token=" . self::getAccessToken(), array(
             'touser'  => $to_users,
             'mpnews'  => array(
                 'media_id' => $article_media_id
@@ -1000,7 +995,7 @@ class ClWX {
      * @return mixed
      */
     public static function massSendTextToUsers($text_content, array $to_users) {
-        return self::httpPost(self::URL . "/message/mass/send?access_token=" . self::$access_token, array(
+        return self::httpPost(self::URL . "/message/mass/send?access_token=" . self::getAccessToken(), array(
             'touser'  => $to_users,
             'text'    => array(
                 'content' => $text_content
@@ -1016,7 +1011,7 @@ class ClWX {
      * @return mixed
      */
     public static function massSendVoiceToUsers($voice_media_id, array $to_users) {
-        return self::httpPost(self::URL . "/message/mass/send?access_token=" . self::$access_token, array(
+        return self::httpPost(self::URL . "/message/mass/send?access_token=" . self::getAccessToken(), array(
             'touser'  => $to_users,
             'voice'   => array(
                 'media_id' => $voice_media_id
@@ -1032,7 +1027,7 @@ class ClWX {
      * @return mixed
      */
     public static function massSendImgToUsers($img_media_id, array $to_users) {
-        return self::httpPost(self::URL . "/message/mass/send?access_token=" . self::$access_token, array(
+        return self::httpPost(self::URL . "/message/mass/send?access_token=" . self::getAccessToken(), array(
             'touser'  => $to_users,
             'image'   => array(
                 'media_id' => $img_media_id
@@ -1051,12 +1046,12 @@ class ClWX {
      */
     public static function massSendVideoToUsers($video_media_id, $title, $desc, array $to_users) {
         //置换media_id
-        $r = self::httpPost("https://file.api.weixin.qq.com/cgi-bin/media/uploadvideo?access_token=" . self::$access_token, array(
+        $r = self::httpPost("https://file.api.weixin.qq.com/cgi-bin/media/uploadvideo?access_token=" . self::getAccessToken(), array(
             'media_id'    => $video_media_id,
             'title'       => $title,
             'description' => $desc
         ));
-        return self::httpPost(self::URL . "/message/mass/send?access_token=" . self::$access_token, array(
+        return self::httpPost(self::URL . "/message/mass/send?access_token=" . self::getAccessToken(), array(
             'touser'  => $to_users,
             'mpvideo' => array(
                 'media_id' => $r['media_id']
@@ -1072,7 +1067,7 @@ class ClWX {
      * @return mixed
      */
     public static function massSendCardToUsers($card_media_id, array $to_users) {
-        return self::httpPost(self::URL . "/message/mass/send?access_token=" . self::$access_token, array(
+        return self::httpPost(self::URL . "/message/mass/send?access_token=" . self::getAccessToken(), array(
             'touser'  => $to_users,
             'wxcard'  => array(
                 'media_id' => $card_media_id
@@ -1088,7 +1083,7 @@ class ClWX {
      * @return mixed
      */
     public static function massPreviewText($to_user, $content) {
-        $r = self::httpPost(self::URL . "/message/mass/preview?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/message/mass/preview?access_token=" . self::getAccessToken(), array(
             'touser'  => $to_user,
             'text'    => array(
                 'content' => $content
@@ -1105,7 +1100,7 @@ class ClWX {
      * @return mixed
      */
     public static function massPreviewArticles($to_user, $media_id) {
-        $r = self::httpPost(self::URL . "/message/mass/preview?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/message/mass/preview?access_token=" . self::getAccessToken(), array(
             'touser'  => $to_user,
             'mpnews'  => array(
                 'media_id' => $media_id
@@ -1122,7 +1117,7 @@ class ClWX {
      * @return mixed
      */
     public static function massPreviewVoice($to_user, $media_id) {
-        $r = self::httpPost(self::URL . "/message/mass/preview?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/message/mass/preview?access_token=" . self::getAccessToken(), array(
             'touser'  => $to_user,
             'voice'   => array(
                 'media_id' => $media_id
@@ -1139,7 +1134,7 @@ class ClWX {
      * @return mixed
      */
     public static function massPreviewImg($to_user, $media_id) {
-        $r = self::httpPost(self::URL . "/message/mass/preview?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/message/mass/preview?access_token=" . self::getAccessToken(), array(
             'touser'  => $to_user,
             'image'   => array(
                 'media_id' => $media_id
@@ -1156,7 +1151,7 @@ class ClWX {
      * @return mixed
      */
     public static function massPreviewVideo($to_user, $media_id) {
-        $r = self::httpPost(self::URL . "/message/mass/preview?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/message/mass/preview?access_token=" . self::getAccessToken(), array(
             'touser'  => $to_user,
             'mpvideo' => array(
                 'media_id' => $media_id
@@ -1174,7 +1169,7 @@ class ClWX {
      * @return mixed
      */
     public static function massPreviewCard($to_user, $card_id, $card_ext) {
-        $r = self::httpPost(self::URL . "/message/mass/preview?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/message/mass/preview?access_token=" . self::getAccessToken(), array(
             'touser'  => $to_user,
             'wxcard'  => array(
                 'card_id'  => $card_id,
@@ -1350,7 +1345,7 @@ class ClWX {
      * @return mixed
      */
     public static function businessSet($business_type_1, $business_type_2) {
-        $r = self::httpPost(self::URL . "/template/api_set_industry?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/template/api_set_industry?access_token=" . self::getAccessToken(), array(
             'industry_id1' => $business_type_1,
             'industry_id2' => $business_type_2
         ));
@@ -1363,7 +1358,7 @@ class ClWX {
      * @return mixed
      */
     private static function templateGet($template_id_short) {
-        $r = self::httpPost(self::URL . "/template/api_add_template?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/template/api_add_template?access_token=" . self::getAccessToken(), array(
             'template_id_short' => $template_id_short
         ));
         return $r['template_id'];
@@ -1378,7 +1373,7 @@ class ClWX {
      * @return bool
      */
     public static function templateSend($template_id, $to_user, $url, $data) {
-        $r = self::httpPost(self::URL . "/message/template/send?access_token=" . self::$access_token, json_encode([
+        $r = self::httpPost(self::URL . "/message/template/send?access_token=" . self::getAccessToken(), json_encode([
             'touser'      => $to_user,
             'template_id' => $template_id,
             'url'         => $url,
@@ -1412,7 +1407,7 @@ class ClWX {
      * @return mixed
      */
     public static function getCurrentAutoReplyInfo() {
-        return self::httpPost(self::URL . "/get_current_autoreply_info?access_token=" . self::$access_token);
+        return self::httpPost(self::URL . "/get_current_autoreply_info?access_token=" . self::getAccessToken());
     }
 
     /**
@@ -1446,7 +1441,7 @@ class ClWX {
      * @return mixed
      */
     public static function mediaUpload($media_type, $media_absolute_url) {
-        $r = ClHttp::uploadFile("/media/upload?access_token=" . self::$access_token . "&type=$media_type", array(), $media_type, ClFile::getName($media_absolute_url), $media_absolute_url);
+        $r = ClHttp::uploadFile("/media/upload?access_token=" . self::getAccessToken() . "&type=$media_type", array(), $media_type, ClFile::getName($media_absolute_url), $media_absolute_url);
         return $r['media_id'];
     }
 
@@ -1457,7 +1452,7 @@ class ClWX {
      * @param bool|false $is_video :视频文件不支持https下载，调用该接口需http协议。
      */
     public static function mediaDown($media_id, $file_absolute_url, $is_video = false) {
-        $url = self::URL . "/cgi-bin/media/get?access_token=" . self::$access_token . "&media_id=$media_id";
+        $url = self::URL . "/cgi-bin/media/get?access_token=" . self::getAccessToken() . "&media_id=$media_id";
         if ($is_video) {
             $url = str_replace('https', 'http', $url);
         }
@@ -1471,7 +1466,7 @@ class ClWX {
      * @return string
      */
     public static function materialUpload($media_type, $media_absolute_file) {
-        $r = ClHttp::uploadFile(self::URL . "/material/add_material?access_token=" . self::$access_token . "&type=$media_type", array(), ClFile::getName($media_absolute_file), $media_absolute_file);
+        $r = ClHttp::uploadFile(self::URL . "/material/add_material?access_token=" . self::getAccessToken() . "&type=$media_type", array(), ClFile::getName($media_absolute_file), $media_absolute_file);
         return $r;
     }
 
@@ -1483,7 +1478,7 @@ class ClWX {
      * @return string
      */
     public static function materialUploadVideo($media_absolute_file, $title, $desc) {
-        $r = ClHttp::uploadFile(self::URL . "/material/add_material?access_token=" . self::$access_token . "&type=" . self::MEDIA_TYPE_VIDEO, array(
+        $r = ClHttp::uploadFile(self::URL . "/material/add_material?access_token=" . self::getAccessToken() . "&type=" . self::MEDIA_TYPE_VIDEO, array(
             'description' => array(
                 'title'        => $title,
                 'introduction' => $desc
@@ -1506,7 +1501,7 @@ class ClWX {
      * @return mixed
      */
     public static function materialUploadArticles($articles) {
-        $r = self::httpPost(self::URL . "/material/add_news?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/material/add_news?access_token=" . self::getAccessToken(), array(
             'articles' => $articles
         ));
         return $r['media_id'];
@@ -1528,7 +1523,7 @@ class ClWX {
      * @return bool|int
      */
     public static function materialUpdateArticles($media_id, $index, $articles) {
-        $r = self::httpPost(self::URL . "/material/update_news?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/material/update_news?access_token=" . self::getAccessToken(), array(
             'media_id' => $media_id,
             'index'    => $index,
             'articles' => $articles
@@ -1542,7 +1537,7 @@ class ClWX {
      * @return mixed
      */
     public static function materialGet($media_id) {
-        $r = self::httpPost(self::URL . "/material/get_material?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/material/get_material?access_token=" . self::getAccessToken(), array(
             'media_id' => $media_id
         ));
         return $r;
@@ -1554,7 +1549,7 @@ class ClWX {
      * @return bool|int
      */
     public static function materialDelete($media_id) {
-        $r = self::httpPost(self::URL . "/material/del_material?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/material/del_material?access_token=" . self::getAccessToken(), array(
             'media_id' => $media_id
         ));
         return $r[self::F_RETURN_ERR_CODE] == 0 ? true : 0;
@@ -1570,7 +1565,7 @@ class ClWX {
      * )
      */
     public static function materialGetCount() {
-        $r = self::httpPost(self::URL . "/material/get_materialcount?access_token=" . self::$access_token);
+        $r = self::httpPost(self::URL . "/material/get_materialcount?access_token=" . self::getAccessToken());
         return $r;
     }
 
@@ -1581,7 +1576,7 @@ class ClWX {
      * @return mixed
      */
     public static function materialList($type, $offset) {
-        $r = self::httpPost(self::URL . "/material/batchget_material?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/material/batchget_material?access_token=" . self::getAccessToken(), array(
             'type'   => $type,
             'offset' => $offset,
             'count'  => 20
@@ -1595,7 +1590,7 @@ class ClWX {
      * @return mixed:分组id，由微信分配
      */
     public static function userGroupsCreate($name) {
-        $r = self::httpPost(self::URL . "/groups/create?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/groups/create?access_token=" . self::getAccessToken(), array(
             'group' => array(
                 'name' => $name
             )
@@ -1608,7 +1603,7 @@ class ClWX {
      * @return mixed
      */
     public static function userGroupsList() {
-        $r = self::httpPost(self::URL . "/groups/get?access_token=" . self::$access_token);
+        $r = self::httpPost(self::URL . "/groups/get?access_token=" . self::getAccessToken());
         return $r['groups'];
     }
 
@@ -1618,7 +1613,7 @@ class ClWX {
      * @return mixed
      */
     public static function userGroupsSearchByOpenId($open_id) {
-        $r = self::httpPost(self::URL . "/groups/getid?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/groups/getid?access_token=" . self::getAccessToken(), array(
             'openid' => $open_id
         ));
         return $r['groupid'];
@@ -1631,7 +1626,7 @@ class ClWX {
      * @return bool
      */
     public static function userGroupUpdateName($group_id, $group_name) {
-        $r = self::httpPost(self::URL . "/groups/update?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/groups/update?access_token=" . self::getAccessToken(), array(
             'group' => array(
                 'id'   => $group_id,
                 'name' => $group_name
@@ -1647,7 +1642,7 @@ class ClWX {
      * @return bool
      */
     public static function userGroupMoveUser($to_group_id, $open_id) {
-        $r = self::httpPost(self::URL . "/groups/members/update?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/groups/members/update?access_token=" . self::getAccessToken(), array(
             'openid'     => $open_id,
             'to_groupid' => $to_group_id
         ));
@@ -1661,7 +1656,7 @@ class ClWX {
      * @return bool
      */
     public static function userGroupMoveUsers($to_group_id, $open_ids) {
-        $r = self::httpPost(self::URL . "/groups/members/batchupdate?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/groups/members/batchupdate?access_token=" . self::getAccessToken(), array(
             'openid_list' => $open_ids,
             'to_groupid'  => $to_group_id
         ));
@@ -1674,7 +1669,7 @@ class ClWX {
      * @return bool
      */
     public static function userGroupDelete($group_id) {
-        $r = self::httpPost(self::URL . "/groups/delete?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/groups/delete?access_token=" . self::getAccessToken(), array(
             'group' => array(
                 'id' => $group_id
             )
@@ -1689,7 +1684,7 @@ class ClWX {
      * @return bool
      */
     public static function userInfoUpdateRemark($open_id, $remark) {
-        $r = self::httpPost(self::URL . "/user/info/updateremark?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/user/info/updateremark?access_token=" . self::getAccessToken(), array(
             'openid' => $open_id,
             'remark' => $remark
         ));
@@ -1716,7 +1711,7 @@ class ClWX {
      * )
      */
     public static function userInfoGet($open_id) {
-        return self::httpPost(self::URL . "/user/info?access_token=" . self::$access_token . "&openid=$open_id&lang=zh_CN");
+        return self::httpPost(self::URL . "/user/info?access_token=" . self::getAccessToken() . "&openid=$open_id&lang=zh_CN");
     }
 
     /**
@@ -1734,7 +1729,7 @@ class ClWX {
             );
         }
         unset($open_ids);
-        $r = self::httpPost(self::URL . "/user/info/batchget?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/user/info/batchget?access_token=" . self::getAccessToken(), array(
             'user_list' => $user_list
         ));
         return $r['user_info_list'];
@@ -1751,32 +1746,29 @@ class ClWX {
      * )
      */
     public static function userListGet($next_open_id = '') {
-        $url = empty($next_open_id) ? "/user/get?access_token=" . self::$access_token : "/user/get?access_token=" . self::$access_token . "&next_openid=$next_open_id";
+        $url = empty($next_open_id) ? "/user/get?access_token=" . self::getAccessToken() : "/user/get?access_token=" . self::getAccessToken() . "&next_openid=$next_open_id";
         return self::httpPost(self::URL . $url);
     }
 
     /**
      * 网页获取获取code链接地址
-     * @param $app_id :公众号的唯一标识
      * @param $redirect_url :授权后重定向的回调链接地址
      * @param $state :重定向后会带上state参数，开发者可以填写a-zA-Z0-9的参数值，最多128字节
      * @param string $scope :应用授权作用域，snsapi_base （不弹出授权页面，直接跳转，只能获取用户openid），snsapi_userinfo （弹出授权页面，可通过openid拿到昵称、性别、所在地。并且，即使在未关注的情况下，只要用户授权，也能获取其信息）
      * @return string
      */
-    public static function webConnectGetCodeUrl($app_id, $redirect_url, $state, $scope = 'snsapi_base') {
+    public static function webConnectGetCodeUrl($redirect_url, $state, $scope = 'snsapi_base') {
         $redirect_url = urlencode($redirect_url);
-        return "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$app_id&redirect_uri=$redirect_url&response_type=code&scope=$scope&state=$state#wechat_redirect";
+        return "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" . self::$app_id . "&redirect_uri=$redirect_url&response_type=code&scope=$scope&state=$state#wechat_redirect";
     }
 
     /**
      * web获取用户open_id
-     * @param $app_id
-     * @param $app_secret
      * @param $code
      * @return string: open_id
      */
-    public static function webGetOpenId($app_id, $app_secret, $code) {
-        $r = self::httpPost("https://api.weixin.qq.com/sns/oauth2/access_token?appid=$app_id&secret=$app_secret&code=$code&grant_type=authorization_code");
+    public static function webGetOpenId($code) {
+        $r = self::httpPost("https://api.weixin.qq.com/sns/oauth2/access_token?appid=" . self::$app_id . "&secret=" . self::$app_secret . "&code=$code&grant_type=authorization_code");
         return $r['openid'];
     }
 
@@ -1786,7 +1778,7 @@ class ClWX {
      * @return bool
      */
     public static function menuCreate($buttons) {
-        $r = self::httpPost(self::URL . "/menu/create?access_token=" . self::$access_token, ClArray::jsonUnicode([
+        $r = self::httpPost(self::URL . "/menu/create?access_token=" . self::getAccessToken(), ClArray::jsonUnicode([
             'button' => $buttons
         ]));
         return $r[self::F_RETURN_ERR_CODE] == 0 ? true : false;
@@ -1797,7 +1789,7 @@ class ClWX {
      * @return mixed
      */
     public static function menuGet() {
-        $r = self::httpPost(self::URL . "/menu/get?access_token=" . self::$access_token);
+        $r = self::httpPost(self::URL . "/menu/get?access_token=" . self::getAccessToken());
         return $r['menu']['button'];
     }
 
@@ -1806,7 +1798,7 @@ class ClWX {
      * @return bool
      */
     public static function menuDelete() {
-        $r = self::httpPost(self::URL . "/menu/delete?access_token=" . self::$access_token);
+        $r = self::httpPost(self::URL . "/menu/delete?access_token=" . self::getAccessToken());
         return $r[self::F_RETURN_ERR_CODE] == 0 ? true : false;
     }
 
@@ -1820,7 +1812,7 @@ class ClWX {
      * @return mixed
      */
     public static function menuGetConfig() {
-        return self::httpPost(self::URL . "/get_current_selfmenu_info?access_token=" . self::$access_token);
+        return self::httpPost(self::URL . "/get_current_selfmenu_info?access_token=" . self::getAccessToken());
     }
 
     /**
@@ -1856,7 +1848,7 @@ class ClWX {
                 ]
             ];
         }
-        $qr_info = self::httpPost(self::URL . "/qrcode/create?access_token=" . self::$access_token, ClArray::jsonUnicode($post));
+        $qr_info = self::httpPost(self::URL . "/qrcode/create?access_token=" . self::getAccessToken(), ClArray::jsonUnicode($post));
         if (empty($expire_seconds)) {
             cache($key, $qr_info);
         } else {
@@ -1875,7 +1867,7 @@ class ClWX {
      * @return mixed
      */
     public static function urlToShort($url) {
-        $r = self::httpPost(self::URL . "/shorturl?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/shorturl?access_token=" . self::getAccessToken(), array(
             'action'   => 'long2short',
             'long_url' => $url
         ));
@@ -1903,7 +1895,7 @@ class ClWX {
      * @param $recommend :推荐品，餐厅可为推荐菜；酒店为推荐套房；景点为推荐游玩景点等，针对自己行业的推荐内容
      */
     public static function storeAdd($sid, $business_name, $branch_name, $province, $city, $district, $address, $telephone, $categories, $longitude, $latitude, $photo_list, $special, $introduction, $open_time, $avg_price, $recommend) {
-        $r = self::httpPost(self::URL . "/poi/addpoi?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/poi/addpoi?access_token=" . self::getAccessToken(), array(
             'business' => array(
                 'base_info' => array(
                     "sid"           => $sid,
@@ -1935,7 +1927,7 @@ class ClWX {
      * @return mixed
      */
     public static function storeGet($poi_id) {
-        $r = self::httpPost(self::URL . "/poi/getpoi?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/poi/getpoi?access_token=" . self::getAccessToken(), array(
             'poi_id' => $poi_id
         ));
         return $r['business']['base_info'];
@@ -1948,7 +1940,7 @@ class ClWX {
      * @return mixed
      */
     public static function storeList($begin = 0, $limit = 50) {
-        $r = self::httpPost(self::URL . "/poi/getpoilist?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/poi/getpoilist?access_token=" . self::getAccessToken(), array(
             'begin' => $begin,
             'limit' => $limit
         ));
@@ -1968,7 +1960,7 @@ class ClWX {
      * @return bool
      */
     public static function storeUpdate($poi_id, $telephone, $photo_list, $recommend, $special, $introduction, $open_time, $avg_price) {
-        $r = self::httpPost(self::URL . "/poi/updatepoi?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/poi/updatepoi?access_token=" . self::getAccessToken(), array(
             'business' => array(
                 'base_info' => array(
                     'poi_id'       => $poi_id,
@@ -1991,7 +1983,7 @@ class ClWX {
      * @return bool
      */
     public static function storeDelete($poi_id) {
-        $r = self::httpPost(self::URL . "/poi/delpoi?access_token=" . self::$access_token, array(
+        $r = self::httpPost(self::URL . "/poi/delpoi?access_token=" . self::getAccessToken(), array(
             'poi_id' => $poi_id
         ));
         return $r[self::F_RETURN_ERR_CODE] == 0 ? true : false;
@@ -2004,13 +1996,13 @@ class ClWX {
     public static function getJsApiTicket() {
         $key    = ClCache::getKey(self::$app_id, self::$app_secret);
         $ticket = cache($key);
-        if (!empty($ticket)) {
-            return $ticket;
+        if ($ticket === false) {
+            $r = self::httpPost(sprintf(self::URL . "/ticket/getticket?access_token=%s&type=jsapi", self::getAccessToken()));
+            //存储
+            cache($key, $r['ticket'], $r['expires_in'] - self::V_CACHE_SAFE_SECOND);
+            $ticket = $r['ticket'];
         }
-        $r = self::httpPost(sprintf(self::URL . "/ticket/getticket?access_token=%s&type=jsapi", self::$access_token));
-        //存储
-        cache($key, $r['ticket'], $r['expires_in'] - self::V_CACHE_SAFE_SECOND);
-        return $r['ticket'];
+        return $ticket;
     }
 
     /**

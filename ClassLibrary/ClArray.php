@@ -220,4 +220,14 @@ class ClArray {
         }
     }
 
+    /**
+     * 判断是否在数组内，不区分大小写
+     * @param $search
+     * @param $array
+     * @return bool
+     */
+    public static function inArrayIgnoreCase($search, $array) {
+        return in_array(strtolower($search), array_map('strtolower', $array));
+    }
+
 }

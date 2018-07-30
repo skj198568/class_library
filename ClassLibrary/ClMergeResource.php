@@ -38,14 +38,14 @@ class ClMergeResource {
             return $content;
         }
         //临时修改缓存配置
-        $config           = config('cache');
-        $config['type']   = 'File';
+        $config = config('cache');
+        $config['type'] = 'File';
         $config['prefix'] = 'merge_resource';
         Config::set('cache', $config);
         //缓存key
         $key = ClCache::getKey(ClString::toCrc32($content));;
         //非本地局域网请求
-        if (!self::isLocalRequest()) {
+        if (!ClVerify::isLocalIp()) {
             $merge_content  = Cache::get($key);
             $resource_items = ClString::parseToArray($merge_content, '/resource/', '"');
             $not_exist      = false;
@@ -85,7 +85,7 @@ class ClMergeResource {
         }
         $js_files = array_values($js_files);
         if (count($js_files) > 0) {
-            if (!self::isLocalRequest()) {
+            if (!ClVerify::isLocalIp()) {
                 //非局域网请求
                 //合并js
                 $merge_js_file = self::mergeJs($js_files);
@@ -123,7 +123,7 @@ class ClMergeResource {
         }
         $css_files = array_values($css_files);
         if (count($css_files) > 0) {
-            if (!self::isLocalRequest()) {
+            if (!ClVerify::isLocalIp()) {
                 //合并css文件
                 $merge_css_file = sprintf('<link rel="stylesheet" href="%s"/>', self::mergeCss($css_files));
                 //替换css文件
@@ -149,19 +149,11 @@ class ClMergeResource {
         }
         //处理资源的images base64处理
         $content = self::dealBase64Images($content);
-        if (!self::isLocalRequest()) {
+        if (!ClVerify::isLocalIp()) {
             //写入缓存
             Cache::set($key, $content);
         }
         return $content;
-    }
-
-    /**
-     * 是否是局域网请求
-     * @return bool
-     */
-    private static function isLocalRequest() {
-        return in_array(strtok(request()->ip(), '.'), ['0', '10', '127', '168', '192']);
     }
 
     /**

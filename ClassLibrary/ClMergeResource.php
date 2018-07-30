@@ -38,14 +38,14 @@ class ClMergeResource {
             return $content;
         }
         //临时修改缓存配置
-        $config = config('cache');
-        $config['type'] = 'File';
+        $config           = config('cache');
+        $config['type']   = 'File';
         $config['prefix'] = 'merge_resource';
         Config::set('cache', $config);
         //缓存key
         $key = ClCache::getKey(ClString::toCrc32($content));;
         //非本地局域网请求
-        if (!self::isLocalRequest() || 1==1) {
+        if (!self::isLocalRequest()) {
             $merge_content  = Cache::get($key);
             $resource_items = ClString::parseToArray($merge_content, '/resource/', '"');
             $not_exist      = false;

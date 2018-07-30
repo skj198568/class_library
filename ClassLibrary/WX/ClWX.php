@@ -115,9 +115,9 @@ class ClWX {
                 if (isset($r['errcode']) && $r['errcode'] != 0) {
                     $msg = self::getErrorMsgByCode($r['errcode']);
                     if (empty($msg)) {
-                        return sprintf('[function_name]: %s, [error_code]: %s, [error_msg]: %s', $function_name, $r['errcode'], $r['errmsg']);
+                        return sprintf('[error_code]: %s, [error_msg]: %s', $r['errcode'], $r['errmsg']);
                     } else {
-                        return sprintf('[function_name]: %s, [error_code]: %s, [error_msg]: %s, [msg]: %s', $function_name, $r['errcode'], $r['errmsg'], $msg);
+                        return sprintf('[error_code]: %s, [error_msg]: %s, [msg]: %s', $r['errcode'], $r['errmsg'], $msg);
                     }
                 } else {
                     return $r;

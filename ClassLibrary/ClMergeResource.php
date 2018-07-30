@@ -39,9 +39,18 @@ class ClMergeResource {
         $key = '';
         //非本地局域网请求
         if (!self::isLocalRequest()) {
-            $key           = ClCache::getKey(ClString::toCrc32($content));
-            $merge_content = Cache::get($key);
-            if ($merge_content !== false) {
+            $key            = ClCache::getKey(ClString::toCrc32($content));
+            $merge_content  = Cache::get($key);
+            $resource_items = ClString::parseToArray($merge_content, '/resource/', '"');
+            $not_exist      = false;
+            foreach ($resource_items as $each_item) {
+                $each_item = DOCUMENT_ROOT_PATH . trim($each_item, '"');
+                if (!is_file($each_item)) {
+                    $not_exist = true;
+                    break;
+                }
+            }
+            if ($merge_content !== false && $not_exist === false) {
                 return $merge_content;
             }
         }

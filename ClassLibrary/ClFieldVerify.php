@@ -706,7 +706,7 @@ class ClFieldVerify extends ClFieldBase {
         } else {
             $fields[$k_field] = is_string($fields[$k_field]) ? $fields[$k_field] : json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE);
         }
-        switch ($verify) {
+        switch ((is_array($verify) ? $verify[0] : $verify)) {
             case 'password':
                 $error_msg = sprintf('%s:%s 密码长度%s~%s，且只能包含字符、数字和下划线', self::getFieldDesc($k_field, $instance), $fields[$k_field], $verify[1], $verify[2]);
                 break;

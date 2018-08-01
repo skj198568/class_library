@@ -157,11 +157,11 @@ class ClExcel {
         $return_array = [];
         //保存csv格式
         for ($sheet_index = 0; $sheet_index < $count; $sheet_index++) {
-            $csv_file                       = explode('.', $excel_file);
-            $csv_file[count($csv_file) - 1] = sprintf('_%s.csv', $sheet_index);
-            $csv_file                       = implode('.', $csv_file);
-            $spreadsheet->setActiveSheetIndex($sheet_index);
+            $csv_file = str_replace(ClFile::getSuffix($excel_file, true), sprintf('_%s.csv', $sheet_index), $excel_file);
             $obj_writer = IOFactory::createWriter($spreadsheet, 'Csv');
+            //设置sheet
+            $obj_writer->setSheetIndex($sheet_index);
+            //保存sheet
             $obj_writer->save($csv_file);
             //csv格式化
             $csv_file = self::csvClear($csv_file);

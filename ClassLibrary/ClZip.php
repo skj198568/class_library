@@ -70,7 +70,7 @@ class ClZip {
             //删除源文件
             if ($is_delete) {
                 foreach ($files as $file) {
-                    unlink($file);
+                    unlink($file[0]);
                 }
             }
             return $zip_file;

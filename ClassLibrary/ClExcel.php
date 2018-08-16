@@ -118,7 +118,7 @@ class ClExcel {
         $spreadsheet_from_csv = $reader->load($csv_file);
         $suffix               = strtolower($suffix);
         if ($suffix == 'xlsx') {
-            $writer = IOFactory::createWriter($spreadsheet_from_csv, 'xlsx');
+            $writer = IOFactory::createWriter($spreadsheet_from_csv, 'Xlsx');
         } else {
             $writer = IOFactory::createWriter($spreadsheet_from_csv, 'Xls');
         }

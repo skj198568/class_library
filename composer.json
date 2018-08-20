@@ -1,26 +1,28 @@
 {
-  "name": "skj198568/class_library",
-  "description": "tp5框架常用类库",
-  "type": "library",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "宋可敬",
-      "email": "597481334@qq.com"
+    "name": "skj198568/class_library",
+    "description": "tp5框架常用类库",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "宋可敬",
+            "email": "597481334@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "phpoffice/phpspreadsheet": "^1.2",
+        "phpmailer/phpmailer": "^6.0",
+        "michelf/php-markdown": "^1.8",
+        "endroid/qr-code": "^3.2",
+        "mpdf/mpdf": "^7.0"
+    },
+    "autoload": {
+        "files": [
+            "ClassLibrary/common.php"
+        ],
+        "psr-4": {
+            "ClassLibrary\\": "ClassLibrary"
+        }
     }
-  ],
-  "require": {
-    "php": ">=7.0.0",
-    "phpoffice/phpspreadsheet": "^1.2",
-    "phpmailer/phpmailer": "^6.0",
-    "michelf/php-markdown": "^1.8",
-    "endroid/qr-code": "^3.2",
-    "mpdf/mpdf": "^7.0"
-  },
-  "autoload": {
-    "files": ["ClassLibrary/common.php"],
-    "psr-4": {
-      "ClassLibrary\\": "ClassLibrary"
-    }
-  }
 }

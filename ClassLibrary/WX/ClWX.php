@@ -14,7 +14,7 @@ use ClassLibrary\ClCache;
 use ClassLibrary\ClFile;
 use ClassLibrary\ClHttp;
 use ClassLibrary\ClString;
-use think\App;
+use think\facade\App;
 use think\Exception;
 
 /**
@@ -104,7 +104,7 @@ class ClWX {
         if (intval($aStatus["http_code"]) == 200) {
             if ($result_type == 'json') {
                 $r = json_decode($output, true);
-                if (App::$debug) {
+                if (App::isDebug()) {
                     log_info([
                         'url'       => $url,
                         'params'    => $param,
@@ -395,7 +395,7 @@ class ClWX {
      * @param $msg
      */
     private static function msgReply($msg) {
-        if (App::$debug) {
+        if (App::isDebug()) {
             log_info($msg);
         }
         exit($msg);

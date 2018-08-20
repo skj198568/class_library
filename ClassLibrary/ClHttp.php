@@ -72,7 +72,7 @@ class ClHttp {
      * @return bool
      */
     public static function noBlockingRequest($ip, $url, $params = array(), $timeout = 15) {
-        if (config('app_debug')) {
+        if (App::isDebug()) {
             log_info($ip, $url, $params);
         }
         $matches = parse_url($url);

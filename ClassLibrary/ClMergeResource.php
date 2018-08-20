@@ -10,7 +10,7 @@ namespace ClassLibrary;
 
 
 use think\Cache;
-use think\Config;
+use think\facade\Config;
 use think\Request;
 
 class ClMergeResource {

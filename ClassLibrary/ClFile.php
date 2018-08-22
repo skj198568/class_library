@@ -119,13 +119,13 @@ class ClFile {
      * @param array $ignore_dir_or_file : 忽略的文件或文件夹
      * @return array
      */
-    public static function dirGetFiles($dir, $file_types = array(), $ignore_dir_or_file = []) {
+    public static function dirGetFiles($dir, $file_types = [], $ignore_dir_or_file = []) {
         foreach (['.', '..'] as $each) {
             if (!in_array($each, $ignore_dir_or_file)) {
                 $ignore_dir_or_file[] = $each;
             }
         }
-        $data = array();
+        $data = [];
         if (is_dir($dir)) {
             $files = scandir($dir);
             foreach ($files as $file) {
@@ -136,11 +136,11 @@ class ClFile {
                     $data = array_merge($data, self::dirGetFiles($dir . DIRECTORY_SEPARATOR . $file, $file_types, $ignore_dir_or_file));
                 } else {
                     if (empty($file_types)) {
-                        $data[] = $dir . DIRECTORY_SEPARATOR . $file;
+                        $data[] = self::pathClear($dir . DIRECTORY_SEPARATOR . $file);
                     } else {
                         //判断类型
                         if (in_array(self::getSuffix($file), $file_types)) {
-                            $data[] = $dir . DIRECTORY_SEPARATOR . $file;
+                            $data[] = self::pathClear($dir . DIRECTORY_SEPARATOR . $file);
                         }
                     }
                 }
@@ -148,16 +148,30 @@ class ClFile {
         } else if (is_file($dir)) {
             if (empty($file_types)) {
                 if (!in_array($dir, $ignore_dir_or_file)) {
-                    $data[] = $dir;
+                    $data[] = self::pathClear($dir);
                 }
             } else {
                 //判断类型
                 if (in_array(self::getSuffix($dir), $file_types) && !in_array($dir, $ignore_dir_or_file)) {
-                    $data[] = $dir;
+                    $data[] = self::pathClear($dir);
                 }
             }
         }
         return $data;
+    }
+
+    /**
+     * 路径整理
+     * @param $path
+     * @return mixed
+     */
+    public static function pathClear($path) {
+        $path          = str_replace(['\\', '/'], [DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR], $path);
+        $separator_str = DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR;
+        while (strpos($path, $separator_str)) {
+            $path = str_replace($separator_str, DIRECTORY_SEPARATOR, $path);
+        }
+        return $path;
     }
 
     /**

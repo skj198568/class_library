@@ -263,7 +263,7 @@ class ClFile {
         if (strpos($url, 'http') === false) {
             return $url;
         }
-        if (ClString::hasChinese($url)) {
+        if (ClVerify::hasChinese($url)) {
             return DOCUMENT_ROOT_PATH . '/upload' . str_replace(basename($url), ClString::toCrc32(basename($url)), parse_url($url)['path']) . '.' . (pathinfo($url)['extension']);
         } else {
             return DOCUMENT_ROOT_PATH . '/upload' . parse_url($url)['path'];
@@ -291,7 +291,7 @@ class ClFile {
         $path = preg_replace('/\/+/', '/', $path);
         if (strpos($path, '/') === false) {
             $suffix = self::getSuffix($path);
-            if (ClString::hasChinese($path)) {
+            if (ClVerify::hasChinese($path)) {
                 if (!empty($suffix)) {
                     return ClString::toCrc32($path) . $suffix;
                 } else {

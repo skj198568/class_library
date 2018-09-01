@@ -593,7 +593,7 @@ class ClPinYin {
             if (!empty($length) && $k + 1 > $length) {
                 break;
             }
-            if (ClString::hasChinese($v)) {
+            if (ClVerify::hasChinese($v)) {
                 //过滤标点符号
                 if (strpos($mark, $v) === false) {
                     $py[$k] = self::str2py($v, $is_cut);

@@ -327,4 +327,22 @@ class ClVerify {
         return preg_match('/(http(s?):\/\/)?([a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,6}/u', $str) === 1;
     }
 
+    /**
+     * 是否包含中文
+     * @param $str
+     * @return bool
+     */
+    public static function hasChinese($str) {
+        return preg_match('/[\x7f-\xff]/', $str) === 1;
+    }
+
+    /**
+     * 是否包含html标签
+     * @param $str
+     * @return bool
+     */
+    public static function hasHtmlTag($str) {
+        return ClString::stripTags($str) !== $str;
+    }
+
 }

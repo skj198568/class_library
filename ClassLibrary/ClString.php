@@ -58,15 +58,6 @@ class ClString {
     }
 
     /**
-     * 判断字符串是否包含中文
-     * @param $str
-     * @return bool
-     */
-    public static function hasChinese($str) {
-        return preg_match('/[\x7f-\xff]/', $str) === 1;
-    }
-
-    /**
      * 获取crc32字符串结果的正整数
      * @param $str
      * @return string 正整数
@@ -278,12 +269,22 @@ class ClString {
         $preg_quote_begin_tag = preg_quote($begin_tag);
         $preg_quote_end_tag   = preg_quote($end_tag);
         preg_match_all("($preg_quote_begin_tag(.*)$preg_quote_end_tag)siU", $string, $matching_data);
-        if ($is_include_tag == false) {
-            foreach ($matching_data[0] as $k => $v) {
-                $v                    = str_replace($begin_tag, '', $v);
-                $v                    = str_replace($end_tag, '', $v);
-                $matching_data[0][$k] = $v;
+        //循环处理，获取最小结果值
+        foreach ($matching_data[0] as $k => $each) {
+            while (substr_count($each, $begin_tag) > 1 || substr_count($each, $end_tag) > 1) {
+                if (substr_count($each, $begin_tag) > 1) {
+                    $each = trim($each, $begin_tag);
+                }
+                if (substr_count($each, $end_tag) > 1) {
+                    $each = trim($each, $end_tag);
+                }
+                $each = ClString::getBetween($each, $begin_tag, $end_tag, $is_include_tag);
             }
+            if ($is_include_tag == false) {
+                $each = str_replace($begin_tag, '', $each);
+                $each = str_replace($end_tag, '', $each);
+            }
+            $matching_data[0][$k] = $each;
         }
         return $matching_data[0];
     }

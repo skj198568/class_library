@@ -14,7 +14,6 @@
     "phpoffice/phpspreadsheet": "^1.2",
     "phpmailer/phpmailer": "^6.0",
     "michelf/php-markdown": "^1.8",
-    "endroid/qr-code": "^3.2",
     "mpdf/mpdf": "^7.0"
   },
   "autoload": {

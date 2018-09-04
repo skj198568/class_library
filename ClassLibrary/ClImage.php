@@ -8,8 +8,6 @@
 
 namespace ClassLibrary;
 
-use Endroid\QrCode\ErrorCorrectionLevel;
-use Endroid\QrCode\QrCode;
 use think\Image;
 
 /**
@@ -138,42 +136,34 @@ class ClImage {
 
     /**
      * 生成二维码图片
-     * @param string $str 二维码内容
-     * @param int $qr_width 二维码图片像素宽度
+     * @param $str 二维码内容
      * @param string $logo_absolute_file 二维码logo绝对路径
-     * @param bool $force 是否强制生成
-     * @param array $background_color 背景颜色
-     * @param array $foreground_color 前景颜色
-     * @return string
-     * @throws \Endroid\QrCode\Exception\InvalidPathException
+     * @param int $width 图片宽度，
+     * @param int $margin 二维码margin
+     * @param bool $cover 是否覆盖原图片
+     * @return string 返回二维码图片地址
      */
-    public static function qrCode($str, $qr_width = 100, $logo_absolute_file = '', $force = false, $background_color = ['r' => 255, 'g' => 255, 'b' => 255], $foreground_color = ['r' => 0, 'g' => 0, 'b' => 0]) {
-        $file_dir  = '/QrCode';
-        $file_name = md5($str . $logo_absolute_file . $qr_width) . '.png';
+    public static function qrCode($str, $logo_absolute_file = '', $width = 200, $margin = 1, $cover = false) {
+        if (!empty($logo_absolute_file)) {
+            if (!in_array(strtolower(ClFile::getSuffix($logo_absolute_file)), ['.png', '.jpg'])) {
+                echo_info('logo_absolute_file support png or jpg');
+                exit;
+            }
+        }
+        include_once "phpqrcode/phpqrcode.php";
+        $file_dir  = '/qr_code';
+        $file_name = md5($str . $logo_absolute_file . $width . $margin) . '.png';
         //三级目录存储
-        $file = $file_dir . '/' . implode('/', ClString::toArray(substr($file_name, 0, 32))) . '/' . $file_name;
-        if ($force == false && is_file(DOCUMENT_ROOT_PATH . $file)) {
+        $file = $file_dir . '/' . implode('/', ClString::toArray(substr($file_name, 0, 3))) . '/' . $file_name;
+        if ($cover == false && is_file(DOCUMENT_ROOT_PATH . $file)) {
             return $file;
         }
+        //创建文件夹
         ClFile::dirCreate(DOCUMENT_ROOT_PATH . $file);
-        $qrCode = new QrCode($str);
-        $qrCode->setSize($qr_width);
-        // Set advanced options
-        $qrCode
-            ->setWriterByName('png')
-            ->setMargin(10)
-            ->setEncoding('UTF-8')
-            ->setErrorCorrectionLevel(ErrorCorrectionLevel::HIGH)
-            ->setForegroundColor($foreground_color)
-            ->setBackgroundColor($background_color)
-            ->setValidateResult(false);
+        \QRcode::png($str, DOCUMENT_ROOT_PATH . $file, QR_ECLEVEL_M, $width, $margin);
         if (!empty($logo_absolute_file)) {
-            $qrCode
-                ->setLogoPath($logo_absolute_file)
-                ->setLogoWidth(ceil($qr_width / 5));
+            self::qrCodeAddLogo(DOCUMENT_ROOT_PATH . $file, $logo_absolute_file);
         }
-        //保存
-        $qrCode->writeFile(DOCUMENT_ROOT_PATH . $file);
         return $file;
     }
 
@@ -184,14 +174,17 @@ class ClImage {
      * @return mixed
      */
     public static function qrCodeAddLogo($qr_absolute_file, $logo_absolute_file) {
-        $QR        = imagecreatefromstring(file_get_contents($qr_absolute_file));
-        $QR_width  = imagesx($QR);//二维码图片宽度
-        $QR_height = imagesy($QR);//二维码图片高度
+        $qr        = imagecreatefromstring(file_get_contents($qr_absolute_file));
+        $qr_width  = imagesx($qr);//二维码图片宽度
+        $qr_height = imagesy($qr);//二维码图片高度
         //重新裁剪图片
-        $temp_logo = DOCUMENT_ROOT_PATH . '/temp.png';
-        self::centerCut($logo_absolute_file, ceil($QR_width / 5), ceil($QR_width / 5), $temp_logo);
+        $temp_logo = DOCUMENT_ROOT_PATH . '/temp' . ClFile::getSuffix($logo_absolute_file);
+        self::centerCut($logo_absolute_file, ceil($qr_width / 5), ceil($qr_width / 5), $temp_logo);
         //拼接图片
-        $x = $y = ceil(($QR_width - $QR_width / 5) / 2);
+        $x = $y = ceil(($qr_width - $qr_width / 5) / 2);
+        //转换为圆角图
+        $temp_logo = self::radius($temp_logo);
+        //合并图片
         return self::mergeImages($qr_absolute_file, $temp_logo, $x, $y);
     }
 
@@ -733,6 +726,79 @@ class ClImage {
         } else {
             return $file_absolute_url;
         }
+    }
+
+    /**
+     * 圆角图
+     * @param $absolute_file_url
+     * @param string $save_absulute_file_url
+     * @param int $radius
+     * @return mixed|string
+     */
+    public static function radius($absolute_file_url, $save_absulute_file_url = '', $radius = 30) {
+        $suffix = strtolower(ClFile::getSuffix($absolute_file_url));
+        if (!in_array($suffix, ['.png', '.jpg'])) {
+            echo_info('ClImage::radius.$absolute_file_url support png or jpg');
+            exit;
+        }
+        if ($suffix == '.png') {
+            $src_img = imagecreatefrompng($absolute_file_url);
+        } else {
+            $src_img = imagecreatefromjpeg($absolute_file_url);
+        }
+        $wh = getimagesize($absolute_file_url);
+        $w  = $wh[0];
+        $h  = $wh[1];
+        // $radius = $radius == 0 ? (min($w, $h) / 2) : $radius;
+        $img = imagecreatetruecolor($w, $h);
+        //这一句一定要有
+        imagesavealpha($img, true);
+        //拾取一个完全透明的颜色,最后一个参数127为全透明
+        $bg = imagecolorallocatealpha($img, 255, 255, 255, 127);
+        imagefill($img, 0, 0, $bg);
+        $r = $radius; //圆 角半径
+        for ($x = 0; $x < $w; $x++) {
+            for ($y = 0; $y < $h; $y++) {
+                $rgbColor = imagecolorat($src_img, $x, $y);
+                if (($x >= $radius && $x <= ($w - $radius)) || ($y >= $radius && $y <= ($h - $radius))) {
+                    //不在四角的范围内,直接画
+                    imagesetpixel($img, $x, $y, $rgbColor);
+                } else {
+                    //在四角的范围内选择画
+                    //上左
+                    $y_x = $r; //圆心X坐标
+                    $y_y = $r; //圆心Y坐标
+                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($r * $r))) {
+                        imagesetpixel($img, $x, $y, $rgbColor);
+                    }
+                    //上右
+                    $y_x = $w - $r; //圆心X坐标
+                    $y_y = $r; //圆心Y坐标
+                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($r * $r))) {
+                        imagesetpixel($img, $x, $y, $rgbColor);
+                    }
+                    //下左
+                    $y_x = $r; //圆心X坐标
+                    $y_y = $h - $r; //圆心Y坐标
+                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($r * $r))) {
+                        imagesetpixel($img, $x, $y, $rgbColor);
+                    }
+                    //下右
+                    $y_x = $w - $r; //圆心X坐标
+                    $y_y = $h - $r; //圆心Y坐标
+                    if (((($x - $y_x) * ($x - $y_x) + ($y - $y_y) * ($y - $y_y)) <= ($r * $r))) {
+                        imagesetpixel($img, $x, $y, $rgbColor);
+                    }
+                }
+            }
+        }
+        if (empty($save_absulute_file_url)) {
+            $save_absulute_file_url = $absolute_file_url;
+        }
+        $save_absulute_file_url = str_replace('.jpg', '.png', strtolower($save_absulute_file_url));
+        //存储为png
+        imagepng($img, $save_absulute_file_url);
+        return $save_absulute_file_url;
     }
 
 }

@@ -177,28 +177,27 @@ class ClFile {
     /**
      * 获取文件名
      * @param $file
-     * @param bool|false $has_suffix 是否带有后缀
+     * @param bool|false $with_suffix 是否带有后缀
      * @return array|string
      */
-    public static function getName($file, $has_suffix = false) {
-        $file = trim($file);
-        $file = basename($file);
-        if ($has_suffix) {
-            //兼容url处理
-            if (strpos($file, '?')) {
-                $file = ClString::getBetween($file, '', '?', false);
+    public static function getName($file, $with_suffix = false) {
+        $file   = trim($file);
+        $file   = basename($file);
+        $suffix = self::getSuffix($file);
+        //兼容url处理
+        foreach (['?', '#', '='] as $tag) {
+            if (strpos($file, $tag) !== false) {
+                if (strpos($file, $tag) > strpos($file, $suffix)) {
+                    $file = ClString::getBetween($file, '', $tag, false);
+                } else {
+                    $file = ClString::getBetween($file, $tag, '', false);
+                }
             }
-            //兼容url处理
-            if (strpos($file, '#')) {
-                $file = ClString::getBetween($file, '', '#', false);
-            }
-            return $file;
+        }
+        if (!$with_suffix) {
+            return str_replace($suffix, '', $file);
         } else {
-            if (strpos($file, '.') === false) {
-                return $file;
-            } else {
-                return str_replace(self::getSuffix($file), '', $file);
-            }
+            return $file;
         }
     }
 
@@ -457,6 +456,9 @@ class ClFile {
      * @return int
      */
     public static function getRemoteFileSize($remote_file_url) {
+        if (strpos($remote_file_url, '//') === 0) {
+            $remote_file_url = 'http:' . $remote_file_url;
+        }
         try {
             $header = get_headers($remote_file_url, true);
         } catch (ErrorException $e) {
@@ -475,7 +477,10 @@ class ClFile {
      * @param string $local_absolute_file 本地文件绝对地址
      * @return bool|string 下载的文件绝对地址
      */
-    public static function catchRemote($remote_file_url, $local_absolute_file = '', $is_file = true) {
+    public static function catchRemote($remote_file_url, $local_absolute_file = '') {
+        if (strpos($remote_file_url, '//') === 0) {
+            $remote_file_url = 'http:' . $remote_file_url;
+        }
         if (empty($local_absolute_file)) {
             //本地存储地址
             $local_absolute_file = ClFile::getLocalAbsoluteUrlByRemoteUrl($remote_file_url);
@@ -484,7 +489,7 @@ class ClFile {
         self::dirCreate($local_absolute_file);
         $remote_file_size = self::getRemoteFileSize($remote_file_url);
         if (is_file($local_absolute_file)) {
-            if ($is_file && ($remote_file_size > 0 && filesize($local_absolute_file) == $remote_file_size)) {
+            if (($remote_file_size > 0 && filesize($local_absolute_file) == $remote_file_size)) {
                 return $local_absolute_file;
             } else {
                 unlink($local_absolute_file);
@@ -503,12 +508,6 @@ class ClFile {
             //设置id
             return false;
         }
-//        if (empty($f_remote)) {
-//            log_info('fopen error:', $remote_file_url);
-//            fclose($f_remote);
-//            //设置id
-//            return false;
-//        }
         $file_size  = 0;
         $local_temp = dirname($local_absolute_file) . '/temp';
         $f_local    = fopen($local_temp, 'w+');
@@ -528,7 +527,7 @@ class ClFile {
         fclose($f_local);
         fclose($f_remote);
         $file_size = filesize($local_temp);
-        if ($is_file && ($remote_file_size > 0 && $file_size != $remote_file_size)) {
+        if (($remote_file_size > 0 && $file_size != $remote_file_size)) {
             //文件大小不一致
             unlink($local_temp);
             //设置id

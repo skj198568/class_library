@@ -39,7 +39,7 @@ class ClVerify {
      * @return bool
      */
     public static function isUrl($str) {
-        return preg_match('/^http(s?):\/\/(?:[A-za-z0-9-]+\.)+[A-za-z]{2,4}(:\d+)?(?:[\/\?#][\/=\?%\-&~`@[\]\':+!\.#\w]*)?$/', $str) === 1;
+        return preg_match('/^(http(s?))?(:)?\/\/(?:[A-za-z0-9-]+\.)+[A-za-z]{2,4}(:\d+)?(?:[\/\?#][\/=\?%\-&~`@[\]\':+!\.#\w]*)?$/', $str) === 1;
     }
 
     /**

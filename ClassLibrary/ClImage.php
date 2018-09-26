@@ -154,7 +154,7 @@ class ClImage {
         $file_dir  = '/qr_code';
         $file_name = md5($str . $logo_absolute_file . $width . $margin) . '.png';
         //三级目录存储
-        $file = $file_dir . '/' . implode('/', ClString::toArray(substr($file_name, 0, 3))) . '/' . $file_name;
+        $file = $file_dir . '/' . date('Y/m/d') . '/' . $file_name;
         if ($cover == false && is_file(DOCUMENT_ROOT_PATH . $file)) {
             return $file;
         }

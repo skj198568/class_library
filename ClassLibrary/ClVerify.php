@@ -62,11 +62,11 @@ class ClVerify {
 
     /**
      * 是否是手机
-     * @param $str
+     * @param $mobile
      * @return bool
      */
-    public static function isMobile($str) {
-        return preg_match('/^1(3|4|5|7|8)\d{9}$/', $str) === 1;
+    public static function isMobile($mobile) {
+        return preg_match('/^1(3|4|5|6|7|8|9)\d{9}$/', $mobile) === 1;
     }
 
     /**
@@ -135,14 +135,14 @@ class ClVerify {
 
     /**
      * 是否是局域网ip
-     * @param string $str
+     * @param string $ip
      * @return bool
      */
-    public static function isLocalIp($str = '') {
-        if (empty($str)) {
-            $str = request()->ip();
+    public static function isLocalIp($ip = '') {
+        if (empty($ip)) {
+            $ip = request()->ip();
         }
-        if (in_array(strtok($str, '.'), ['0', '10', '127', '168', '172', '192'])) {
+        if (in_array(strtok($ip, '.'), ['0', '10', '127', '168', '172', '192'])) {
             return true;
         }
         return false;

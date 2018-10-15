@@ -88,8 +88,8 @@ class ClVerify {
         if (strlen($id_card) != 18) {
             return false;
         }
-        $id_cardBase = substr($id_card, 0, 17);
-        return (self::isIdCardGetVerifyNum($id_cardBase) == strtoupper(substr($id_card, 17, 1)));
+        $id_card_base = substr($id_card, 0, 17);
+        return (self::isIdCardGetVerifyNum($id_card_base) == strtoupper(substr($id_card, 17, 1)));
     }
 
     /**
@@ -106,7 +106,7 @@ class ClVerify {
             return false;
         }
         // 如果身份证顺序码是996 997 998 999,这些是为百岁以上老人的特殊编码
-        if (array_search(substr($id_card, 12, 3), array('996', '997', '998', '999')) !== false) {
+        if (array_search(substr($id_card, 12, 3), ['996', '997', '998', '999']) !== false) {
             $id_card = substr($id_card, 0, 6) . '18' . substr($id_card, 6, 9);
         } else {
             $id_card = substr($id_card, 0, 6) . '19' . substr($id_card, 6, 9);
@@ -117,20 +117,20 @@ class ClVerify {
 
     /**
      * 计算身份证校验码,根据国家标准gb 11643-1999
-     * @param $id_cardBase
+     * @param $id_card_base
      * @return bool|mixed
      */
-    private static function isIdCardGetVerifyNum($id_cardBase) {
-        if (strlen($id_cardBase) != 17) {
+    private static function isIdCardGetVerifyNum($id_card_base) {
+        if (strlen($id_card_base) != 17) {
             return false;
         }
         // 加权因子
-        $factor = array(7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2);
+        $factor = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
         // 校验码对应值
-        $verify_number_list = array('1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2');
+        $verify_number_list = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'];
         $checksum           = 0;
-        for ($i = 0; $i < strlen($id_cardBase); $i++) {
-            $checksum += substr($id_cardBase, $i, 1) * $factor[$i];
+        for ($i = 0; $i < strlen($id_card_base); $i++) {
+            $checksum += substr($id_card_base, $i, 1) * $factor[$i];
         }
         $mod           = $checksum % 11;
         $verify_number = $verify_number_list[$mod];

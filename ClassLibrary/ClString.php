@@ -24,7 +24,7 @@ class ClString {
      * @return int
      */
     public static function getLength($string) {
-        if (is_string($string)) {
+        if (is_string($string) || is_numeric($string)) {
             // 将字符串分解为单元
             preg_match_all('/./us', $string, $match);
             // 返回单元个数

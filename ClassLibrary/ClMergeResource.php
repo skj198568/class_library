@@ -38,8 +38,8 @@ class ClMergeResource {
             return $content;
         }
         //临时修改缓存配置
-        $config = config('cache');
-        $config['type'] = 'File';
+        $config           = config('cache');
+        $config['type']   = 'File';
         $config['prefix'] = 'merge_resource';
         Config::set('cache', $config);
         //缓存key
@@ -364,4 +364,17 @@ class ClMergeResource {
         }
         return $content;
     }
+
+    /**
+     * 清空缓存
+     */
+    public static function clearCache() {
+        $temp_dir = DOCUMENT_ROOT_PATH . '/../runtime/cache/merge_resource';
+        if (is_dir($temp_dir)) {
+            //清空文件夹
+            $cmd = sprintf('rm %s/* -rf', $temp_dir);
+            exec($cmd);
+        }
+    }
+
 }

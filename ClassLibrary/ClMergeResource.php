@@ -9,7 +9,7 @@
 namespace ClassLibrary;
 
 
-use think\Cache;
+use think\facade\Cache;
 use think\facade\Config;
 use think\Request;
 
@@ -37,16 +37,15 @@ class ClMergeResource {
         if (!empty($un_merge_module) && in_array(request()->controller(), $un_merge_module)) {
             return $content;
         }
-        //临时修改缓存配置
-        $config           = config('cache');
-        $config['type']   = 'File';
-        $config['prefix'] = 'merge_resource';
-        Config::set('cache', $config);
+        $cache_config = [
+            'type'   => 'File',
+            'prefix' => 'merge_resource',
+        ];
         //缓存key
-        $key = ClCache::getKey(ClString::toCrc32($content));;
+        $key = ClCache::getKey(ClString::toCrc32($content));
         //非本地局域网请求
         if (!ClVerify::isLocalIp()) {
-            $merge_content  = Cache::get($key);
+            $merge_content  = Cache::connect($cache_config)->get($key);
             $resource_items = ClString::parseToArray($merge_content, '/resource/', '"');
             $not_exist      = false;
             foreach ($resource_items as $each_item) {
@@ -151,7 +150,7 @@ class ClMergeResource {
         $content = self::dealBase64Images($content);
         if (!ClVerify::isLocalIp()) {
             //写入缓存
-            Cache::set($key, $content);
+            Cache::connect($cache_config)->set($key, $content);
         }
         return $content;
     }

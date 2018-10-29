@@ -377,6 +377,14 @@ class ClFile {
             if (!is_dir($save_file)) {
                 ClFile::dirCreate($save_file);
             }
+            //判断上传文件是否存在
+            if (!isset($_FILES['file'])) {
+                $response = json_return([
+                    'message' => '上传文件不存在'
+                ]);
+                $response->send();
+                exit;
+            }
             move_uploaded_file($_FILES['file']['tmp_name'], $save_file);
             if (!empty($_FILES['file']['error'])) {
                 $return = array(

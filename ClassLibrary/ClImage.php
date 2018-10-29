@@ -731,11 +731,11 @@ class ClImage {
     /**
      * 圆角图
      * @param $absolute_file_url
-     * @param string $save_absulute_file_url
+     * @param string $save_absolute_file_url
      * @param int $radius
      * @return mixed|string
      */
-    public static function radius($absolute_file_url, $save_absulute_file_url = '', $radius = 30) {
+    public static function radius($absolute_file_url, $save_absolute_file_url = '', $radius = 30) {
         $suffix = strtolower(ClFile::getSuffix($absolute_file_url));
         if (!in_array($suffix, ['.png', '.jpg'])) {
             echo_info('ClImage::radius.$absolute_file_url support png or jpg');
@@ -792,13 +792,13 @@ class ClImage {
                 }
             }
         }
-        if (empty($save_absulute_file_url)) {
-            $save_absulute_file_url = $absolute_file_url;
+        if (empty($save_absolute_file_url)) {
+            $save_absolute_file_url = $absolute_file_url;
         }
-        $save_absulute_file_url = str_replace('.jpg', '.png', strtolower($save_absulute_file_url));
+        $save_absolute_file_url = str_replace('.jpg', '.png', strtolower($save_absolute_file_url));
         //存储为png
-        imagepng($img, $save_absulute_file_url);
-        return $save_absulute_file_url;
+        imagepng($img, $save_absolute_file_url);
+        return $save_absolute_file_url;
     }
 
 }

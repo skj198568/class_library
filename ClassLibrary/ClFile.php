@@ -362,11 +362,19 @@ class ClFile {
      * @return array
      */
     public static function uploadDealClient($file_save_dir = '') {
+        //判断上传文件是否存在
+        if (!isset($_FILES['file'])) {
+            $response = json_return([
+                'message' => '上传文件不存在'
+            ]);
+            $response->send();
+            exit;
+        }
         if (!empty($file_save_dir) && strpos($file_save_dir, DOCUMENT_ROOT_PATH) === false) {
             $file_save_dir = DOCUMENT_ROOT_PATH . '/' . ltrim($file_save_dir, '/');
         }
-        $file_size = input('post.file_size', '', 'trim');
-        $file_name = input('post.name', '', 'trim,strval');
+        $file_size = input('post.file_size', $_FILES['file']['size'], 'trim');
+        $file_name = input('post.name', $_FILES['file']['name'], 'trim,strval');
         $chunk     = input('post.chunk', 'no', 'trim');
         $root_path = sprintf(DOCUMENT_ROOT_PATH . '/upload/%s/', date('Y/m/d'));
         if (!is_dir($root_path)) {
@@ -376,14 +384,6 @@ class ClFile {
             $save_file = ($file_save_dir == '' ? $root_path : $file_save_dir) . date('His') . '_' . (ClString::toCrc32($file_size . $file_name)) . self::getSuffix($file_name);
             if (!is_dir($save_file)) {
                 ClFile::dirCreate($save_file);
-            }
-            //判断上传文件是否存在
-            if (!isset($_FILES['file'])) {
-                $response = json_return([
-                    'message' => '上传文件不存在'
-                ]);
-                $response->send();
-                exit;
             }
             move_uploaded_file($_FILES['file']['tmp_name'], $save_file);
             if (!empty($_FILES['file']['error'])) {

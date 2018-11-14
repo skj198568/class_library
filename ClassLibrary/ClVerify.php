@@ -366,7 +366,11 @@ class ClVerify {
      * @return bool
      */
     public static function isBoolean($str) {
-        return in_array($str, [true, false, 0, 1, '0', '1'], true);
+        if (empty(filter_var($str, FILTER_VALIDATE_BOOLEAN))) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**

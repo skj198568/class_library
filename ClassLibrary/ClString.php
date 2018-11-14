@@ -76,15 +76,15 @@ class ClString {
     }
 
     /**
-     * bool格式转换为数字0,1
+     * boolean格式转换为数字0,1
      * @param $boolean
      * @return int
      */
-    public static function bool2int($boolean) {
-        if (empty(filter_var($boolean, FILTER_VALIDATE_BOOLEAN))) {
-            return 0;
-        } else {
+    public static function boolean2int($boolean) {
+        if (ClVerify::isBoolean($boolean)) {
             return 1;
+        } else {
+            return 0;
         }
     }
 

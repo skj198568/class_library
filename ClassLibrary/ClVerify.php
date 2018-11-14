@@ -19,18 +19,12 @@ use Think\Verify;
 class ClVerify {
 
     /**
-     * model实例
-     * @var null
-     */
-    private static $model_instance = null;
-
-    /**
      * 是否是邮件
      * @param $str
      * @return bool
      */
     public static function isEmail($str) {
-        return preg_match('/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/', $str) === 1;
+        return filter_var($str, FILTER_VALIDATE_EMAIL) !== false;
     }
 
     /**
@@ -39,7 +33,19 @@ class ClVerify {
      * @return bool
      */
     public static function isUrl($str) {
-        return preg_match('/^(http(s?))?(:)?\/\/((?:[A-za-z0-9-]+\.)+[A-za-z]{2,4}|((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d)(\.((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d)){3})(:\d+)?(?:[\/\?#][\/=\?%\-&~`@[\]\':+!\.#\w]*)?$/', $str) === 1;
+        if (empty(filter_var($str, FILTER_VALIDATE_URL))) {
+            if (strpos($str, '//') === 0) {
+                if (empty(filter_var('http:' . $str, FILTER_VALIDATE_URL))) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -180,7 +186,11 @@ class ClVerify {
         if (self::isLocalIp($str)) {
             return true;
         }
-        return preg_match('/^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$/', $v);
+        if (filter_var($str, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false || filter_var($str, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

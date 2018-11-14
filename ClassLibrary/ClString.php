@@ -76,6 +76,19 @@ class ClString {
     }
 
     /**
+     * bool格式转换为数字0,1
+     * @param $boolean
+     * @return int
+     */
+    public static function bool2int($boolean) {
+        if (empty(filter_var($boolean, FILTER_VALIDATE_BOOLEAN))) {
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
+    /**
      * 格式化金钱为万分单位分割
      * @param $money
      * @return string

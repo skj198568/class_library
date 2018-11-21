@@ -193,7 +193,9 @@ class ClCache {
         }
         $father_key       = explode(self::$seg_str, $key);
         $key_father_temp  = '';
-        $father_key_count = count($father_key) - 1;
+        $father_key_count = count($father_key) - 2;
+        $is_valid         = true;
+        $del_keys         = [];
         for ($i = 0; $i < $father_key_count; $i++) {
             if ($key_father_temp == '') {
                 $key_father_temp = $father_key[$i];
@@ -204,11 +206,20 @@ class ClCache {
             $map      = cache($key_father_temp . self::$seg_str . 'k');
             //map不存在，或者是不在map里，均认为该key对应的value，不是最新的值
             if (!(is_array($map) && in_array($key_temp, $map))) {
-                //该key对应的value为无效数据，进行删除操作
-                cache($key, null);
-                break;
+                $is_valid = false;
+            }
+            if (!$is_valid) {
+                $del_keys[] = $key_temp . self::$seg_str . 'k';
+            }
+        }
+        if (!$is_valid) {
+            $del_keys[] = $key;
+            //批量删除
+            foreach ($del_keys as $each_del_key) {
+                cache($each_del_key, null);
             }
         }
         return true;
     }
+
 }

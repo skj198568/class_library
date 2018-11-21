@@ -133,10 +133,7 @@ class ClCache {
             self::$get_remove_keys[] = $function;
         }
         foreach ([$function, $function . self::$seg_str . 'k'] as $key_each) {
-            //如果缓存存在
-            if (cache($key_each) !== false) {
-                cache($key_each, null);
-            }
+            cache($key_each, null);
         }
         return true;
     }
@@ -193,7 +190,7 @@ class ClCache {
         }
         $father_key       = explode(self::$seg_str, $key);
         $key_father_temp  = '';
-        $father_key_count = count($father_key) - 2;
+        $father_key_count = count($father_key) - 1;
         $is_valid         = true;
         $del_keys         = [];
         for ($i = 0; $i < $father_key_count; $i++) {

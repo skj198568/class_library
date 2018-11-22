@@ -107,8 +107,6 @@ class ClCache {
         if (count($args) > 0) {
             $function .= self::createKeyByParams($args);
         }
-        //处理无效缓存数据
-        self::dealInvalidDataByKey($function);
         //添加
         self::addToKeysList($function);
         return $function;
@@ -132,7 +130,7 @@ class ClCache {
         } else {
             self::$get_remove_keys[] = $function;
         }
-        foreach ([$function, $function . self::$seg_str . 'k'] as $key_each) {
+        foreach ([$function, $function . self::$seg_str . 'valid'] as $key_each) {
             cache($key_each, null);
         }
         return true;
@@ -158,65 +156,90 @@ class ClCache {
         $father_key       = explode(self::$seg_str, $key);
         $key_father_temp  = '';
         $father_key_count = count($father_key) - 1;
+        $is_valid         = true;
         for ($i = 0; $i < $father_key_count; $i++) {
             if ($key_father_temp == '') {
                 $key_father_temp = $father_key[$i];
             } else {
                 $key_father_temp = $key_father_temp . self::$seg_str . $father_key[$i];
             }
-            $key_temp = $key_father_temp . self::$seg_str . $father_key[$i + 1];
-            $map      = cache($key_father_temp . self::$seg_str . 'k');
+            $key_temp       = $key_father_temp . self::$seg_str . $father_key[$i + 1];
+            $map_key        = $key_father_temp . self::$seg_str . self::getMapKey($father_key[$i + 1]);
+            $key_valids_key = $key_father_temp . self::$seg_str . 'valid';
+            if ($is_valid) {
+                $key_valids = cache($key_valids_key);
+                if (!(is_array($key_valids) && in_array($map_key, $key_valids))) {
+                    $is_valid = false;
+                } else {
+                    $map = cache($map_key);
+                    //map不存在，或者是不在map里，均认为该key对应的value，不是最新的值
+                    if (!(is_array($map) && in_array($key_temp, $map))) {
+                        $is_valid = false;
+                    }
+                }
+            }
+            if (!$is_valid) {
+                //删除
+                cache($key_temp . self::$seg_str . 'valid', null);
+            }
+            $key_valids = cache($key_valids_key);
+            if (empty($key_valids)) {
+                cache($key_valids_key, [$map_key]);
+            } else {
+                if (!in_array($map_key, $key_valids)) {
+                    $key_valids[] = $map_key;
+                    cache($key_valids_key, $key_valids);
+                }
+            }
+            $map = cache($map_key);
             if (empty($map)) {
-                cache($key_father_temp . self::$seg_str . 'k', [$key_temp]);
+                cache($map_key, [$key_temp]);
             } else {
                 if (!in_array($key_temp, $map)) {
                     $map[] = $key_temp;
-                    cache($key_father_temp . self::$seg_str . 'k', $map);
+                    cache($map_key, $map);
                 }
             }
+        }
+        if (!$is_valid) {
+            cache($key, null);
         }
         return true;
     }
 
     /**
-     * 处理无效数据
-     * @param $key
-     * @return bool
+     * 获取map key
+     * @param $value
+     * @return string
      */
-    public static function dealInvalidDataByKey($key) {
-        //没有子存储或者缓存不存在
-        if (strpos($key, self::$seg_str) === false || cache($key) === false) {
-            return false;
+    private static function getMapKey($value) {
+        //将非数字类型转换成数字
+        if (!is_numeric($value)) {
+            $value = [$value];
+            $value = json_encode($value);
+            $value = ClString::toCrc32($value);
         }
-        $father_key       = explode(self::$seg_str, $key);
-        $key_father_temp  = '';
-        $father_key_count = count($father_key) - 1;
-        $is_valid         = true;
-        $del_keys         = [];
-        for ($i = 0; $i < $father_key_count; $i++) {
-            if ($key_father_temp == '') {
-                $key_father_temp = $father_key[$i];
-            } else {
-                $key_father_temp = $key_father_temp . self::$seg_str . $father_key[$i];
-            }
-            $key_temp = $key_father_temp . self::$seg_str . $father_key[$i + 1];
-            $map      = cache($key_father_temp . self::$seg_str . 'k');
-            //map不存在，或者是不在map里，均认为该key对应的value，不是最新的值
-            if (!(is_array($map) && in_array($key_temp, $map))) {
-                $is_valid = false;
-            }
-            if (!$is_valid) {
-                $del_keys[] = $key_temp . self::$seg_str . 'k';
-            }
-        }
-        if (!$is_valid) {
-            $del_keys[] = $key;
-            //批量删除
-            foreach ($del_keys as $each_del_key) {
-                cache($each_del_key, null);
+        //5000取整，每个数组里面含有5000个数据
+        $value   = ceil($value / 5000);
+        $key     = [
+            0  => 0, 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7, 8 => 8, 9 => 9,
+            10 => 'a', 11 => 'b', 12 => 'c', 13 => 'd', 14 => 'e', 15 => 'f', 16 => 'g', 17 => 'h', 17 => 'i', 19 => 'j', 20 => 'k', 21 => 'l', 22 => 'm', 23 => 'n', 24 => 'o', 25 => 'p', 26 => 'q', 27 => 'r', 28 => 's', 29 => 't', 30 => 'u', 31 => 'v', 32 => 'w', 33 => 'x', 34 => 'y', 35 => 'z',
+            36 => 'A', 37 => 'B', 38 => 'C', 39 => 'D', 40 => 'E', 41 => 'F', 42 => 'G', 43 => 'H', 44 => 'I', 45 => 'J', 46 => 'K', 47 => 'L', 48 => 'M', 48 => 'N', 55 => 'O', 51 => 'P', 52 => 'Q', 53 => 'R', 54 => 'S', 55 => 'T', 56 => 'U', 57 => 'V', 58 => 'W', 59 => 'X', 60 => 'Y', 61 => 'Z',
+        ];
+        $map_key = 'mk';
+        if ($value < 62) {
+            $map_key .= $key[0];
+        } else {
+            $cut_value_array = [62 * 62 * 62, 62 * 62, 62];
+            foreach ($cut_value_array as $cut_value) {
+                if ($value > $cut_value) {
+                    $index   = floor($value / $cut_value);
+                    $map_key .= $key[$index];
+                    $value   -= $index * $cut_value;
+                }
             }
         }
-        return true;
+        return $map_key;
     }
 
 }

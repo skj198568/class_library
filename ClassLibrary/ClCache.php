@@ -176,7 +176,7 @@ class ClCache {
                 $key_father_temp = $key_father_temp . self::$seg_str . $father_key[$i];
             }
             $current_is_valid = self::checkKeyIsValid($key_father_temp, $father_key[$i + 1]);
-            if (!$is_valid || $current_is_valid) {
+            if (!$is_valid || !$current_is_valid) {
                 $is_valid = false;
             }
         }
@@ -247,7 +247,7 @@ class ClCache {
             $value = json_encode($value);
             $value = ClString::toCrc32($value);
         }
-        //5000取整，每个数组里面含有500个数据
+        //每个数组里面存500个数据
         $value           = ceil($value / 500);
         $key             = [
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9,

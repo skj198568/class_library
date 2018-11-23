@@ -29,6 +29,12 @@ class ClCache {
     private static $get_remove_keys = [];
 
     /**
+     * 检查时删除的key
+     * @var array
+     */
+    private static $check_key_is_valid_del_keys = [];
+
+    /**
      * 获取历史调用函数的函数名，主要用于生成缓存
      * @param int $index 函数调用逆序 -1/获取所有调用
      * @return string
@@ -77,7 +83,13 @@ class ClCache {
             }
             if (is_numeric($each)) {
                 $key .= self::$seg_str . $each;
-            } else if (is_array($each)) {
+            } else if (is_string($each)) {
+                if (strlen($each) < 10) {
+                    $key .= self::$seg_str . $each;
+                } else {
+                    $key .= self::$seg_str . ClString::toCrc32($each);
+                }
+            } else if (is_array($each) || is_object($each)) {
                 $key .= self::$seg_str . ClString::toCrc32(json_encode($each, JSON_UNESCAPED_UNICODE));
             } else if (is_bool($each)) {
                 if ($each) {
@@ -130,7 +142,7 @@ class ClCache {
         } else {
             self::$get_remove_keys[] = $function;
         }
-        foreach ([$function, $function . self::$seg_str . 'valid'] as $key_each) {
+        foreach ([$function, $function . self::$seg_str . 'mkl0'] as $key_each) {
             cache($key_each, null);
         }
         return true;
@@ -149,7 +161,7 @@ class ClCache {
      * @param $key
      * @return bool|mixed
      */
-    public static function addToKeysList($key) {
+    private static function addToKeysList($key) {
         if (strpos($key, self::$seg_str) === false) {
             return false;
         }
@@ -163,42 +175,9 @@ class ClCache {
             } else {
                 $key_father_temp = $key_father_temp . self::$seg_str . $father_key[$i];
             }
-            $key_temp       = $key_father_temp . self::$seg_str . $father_key[$i + 1];
-            $map_key        = $key_father_temp . self::$seg_str . self::getMapKey($father_key[$i + 1]);
-            $key_valids_key = $key_father_temp . self::$seg_str . 'valid';
-            if ($is_valid) {
-                $key_valids = cache($key_valids_key);
-                if (!(is_array($key_valids) && in_array($map_key, $key_valids))) {
-                    $is_valid = false;
-                } else {
-                    $map = cache($map_key);
-                    //map不存在，或者是不在map里，均认为该key对应的value，不是最新的值
-                    if (!(is_array($map) && in_array($key_temp, $map))) {
-                        $is_valid = false;
-                    }
-                }
-            }
-            if (!$is_valid) {
-                //删除
-                cache($key_temp . self::$seg_str . 'valid', null);
-            }
-            $key_valids = cache($key_valids_key);
-            if (empty($key_valids)) {
-                cache($key_valids_key, [$map_key]);
-            } else {
-                if (!in_array($map_key, $key_valids)) {
-                    $key_valids[] = $map_key;
-                    cache($key_valids_key, $key_valids);
-                }
-            }
-            $map = cache($map_key);
-            if (empty($map)) {
-                cache($map_key, [$key_temp]);
-            } else {
-                if (!in_array($key_temp, $map)) {
-                    $map[] = $key_temp;
-                    cache($map_key, $map);
-                }
+            $current_is_valid = self::checkKeyIsValid($key_father_temp, $father_key[$i + 1]);
+            if (!$is_valid || $current_is_valid) {
+                $is_valid = false;
             }
         }
         if (!$is_valid) {
@@ -208,35 +187,80 @@ class ClCache {
     }
 
     /**
+     * 校验key是否有效
+     * @param string $key_father_temp
+     * @param string $value
+     * @param int $i 递减计数
+     * @return bool
+     */
+    private static function checkKeyIsValid($key_father_temp, $value, $i = 3, $son_map_key_level = '') {
+        if (empty($son_map_key_level)) {
+            $son_map_key_level = $key_father_temp . self::$seg_str . $value;
+        }
+        $is_valid = true;
+        if ($i == 0) {
+            $map_key_level = $key_father_temp . self::$seg_str . 'mkl' . $i;
+        } else {
+            $map_key_level = $key_father_temp . self::$seg_str . self::getMapKey($son_map_key_level, 'mkl' . $i . '_');
+        }
+        $map_values_level = cache($map_key_level);
+        if ($map_values_level === false) {
+            $is_valid = false;
+            cache($map_key_level, [$son_map_key_level]);
+        } else {
+            if (!in_array($son_map_key_level, $map_values_level)) {
+                $is_valid           = false;
+                $map_values_level[] = $son_map_key_level;
+                cache($map_key_level, $map_values_level);
+            }
+        }
+        if (!$is_valid) {
+            $delete_key = $key_father_temp . self::$seg_str . $value . self::$seg_str . 'mkl0';
+            if (!in_array($delete_key, self::$check_key_is_valid_del_keys)) {
+                self::$check_key_is_valid_del_keys[] = $delete_key;
+                //删除
+                cache($delete_key, null);
+            }
+        }
+        if ($i > 0) {
+            $i--;
+            $son_is_valid = self::checkKeyIsValid($key_father_temp, $value, $i, $map_key_level);
+            $is_valid     = (!$is_valid || !$son_is_valid) ? false : true;
+        }
+        if ($i == 0) {
+            //清空
+            self::$check_key_is_valid_del_keys = [];
+        }
+        return $is_valid;
+    }
+
+    /**
      * 获取map key
      * @param $value
+     * @param string $pre_suffix 前缀
      * @return string
      */
-    private static function getMapKey($value) {
+    private static function getMapKey($value, $pre_suffix = 'cache_mk_') {
         //将非数字类型转换成数字
         if (!is_numeric($value)) {
             $value = [$value];
             $value = json_encode($value);
             $value = ClString::toCrc32($value);
         }
-        //5000取整，每个数组里面含有5000个数据
-        $value   = ceil($value / 5000);
-        $key     = [
-            0  => 0, 1 => 1, 2 => 2, 3 => 3, 4 => 4, 5 => 5, 6 => 6, 7 => 7, 8 => 8, 9 => 9,
-            10 => 'a', 11 => 'b', 12 => 'c', 13 => 'd', 14 => 'e', 15 => 'f', 16 => 'g', 17 => 'h', 17 => 'i', 19 => 'j', 20 => 'k', 21 => 'l', 22 => 'm', 23 => 'n', 24 => 'o', 25 => 'p', 26 => 'q', 27 => 'r', 28 => 's', 29 => 't', 30 => 'u', 31 => 'v', 32 => 'w', 33 => 'x', 34 => 'y', 35 => 'z',
-            36 => 'A', 37 => 'B', 38 => 'C', 39 => 'D', 40 => 'E', 41 => 'F', 42 => 'G', 43 => 'H', 44 => 'I', 45 => 'J', 46 => 'K', 47 => 'L', 48 => 'M', 48 => 'N', 55 => 'O', 51 => 'P', 52 => 'Q', 53 => 'R', 54 => 'S', 55 => 'T', 56 => 'U', 57 => 'V', 58 => 'W', 59 => 'X', 60 => 'Y', 61 => 'Z',
+        //5000取整，每个数组里面含有500个数据
+        $value           = ceil($value / 500);
+        $key             = [
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
         ];
-        $map_key = 'mk';
-        if ($value < 62) {
-            $map_key .= $key[0];
-        } else {
-            $cut_value_array = [62 * 62 * 62, 62 * 62, 62];
-            foreach ($cut_value_array as $cut_value) {
-                if ($value > $cut_value) {
-                    $index   = floor($value / $cut_value);
-                    $map_key .= $key[$index];
-                    $value   -= $index * $cut_value;
-                }
+        $map_key         = $pre_suffix;
+        $cut_value_array = [62 * 62 * 62 * 62, 62 * 62 * 62, 62 * 62, 62, 0];
+        foreach ($cut_value_array as $cut_value) {
+            if ($value >= $cut_value) {
+                $index   = empty($cut_value) ? 0 : floor($value / $cut_value);
+                $map_key .= $key[$index];
+                $value   -= $index * $cut_value;
             }
         }
         return $map_key;

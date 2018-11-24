@@ -193,7 +193,7 @@ class ClCache {
      * @param int $i 递减计数
      * @return bool
      */
-    private static function checkKeyIsValid($key_father_temp, $value, $i = 3, $son_map_key_level = '') {
+    private static function checkKeyIsValid($key_father_temp, $value, $i = 2, $son_map_key_level = '') {
         if (empty($son_map_key_level)) {
             $son_map_key_level = $key_father_temp . self::$seg_str . $value;
         }
@@ -238,17 +238,18 @@ class ClCache {
      * 获取map key
      * @param $value
      * @param string $pre_suffix 前缀
+     * @param int $array_count 每个数组存储的数量
      * @return string
      */
-    private static function getMapKey($value, $pre_suffix = 'cache_mk_') {
+    private static function getMapKey($value, $pre_suffix = 'cache_mk_', $array_count = 500) {
         //将非数字类型转换成数字
         if (!is_numeric($value)) {
             $value = [$value];
             $value = json_encode($value);
             $value = ClString::toCrc32($value);
         }
-        //每个数组里面存500个数据
-        $value           = ceil($value / 500);
+        //根据每个数组里面储存数量进行计算
+        $value           = ceil($value / $array_count);
         $key             = [
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',

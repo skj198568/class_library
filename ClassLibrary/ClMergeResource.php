@@ -8,11 +8,13 @@
 
 namespace ClassLibrary;
 
-
-use think\Cache;
-use think\Config;
 use think\Request;
 
+/**
+ * 压缩资源文件
+ * Class ClMergeResource
+ * @package ClassLibrary
+ */
 class ClMergeResource {
 
     /**
@@ -28,6 +30,21 @@ class ClMergeResource {
     private static $image_base64_max_size = 0;
 
     /**
+     * 所有资源映射创建时间，用于判断文件是否修改
+     * @var array
+     */
+    private static $all_resource_file_map_create_time = [];
+
+    /**
+     * 获取存储key
+     * @param $content_key
+     * @return string
+     */
+    private static function getAllResourceFileCacheKey($content_key) {
+        return $content_key . '_file_map';
+    }
+
+    /**
      * 执行
      * @param $content
      * @param array $un_merge_module 忽略的模块
@@ -37,27 +54,38 @@ class ClMergeResource {
         if (!empty($un_merge_module) && in_array(request()->controller(), $un_merge_module)) {
             return $content;
         }
-        //临时修改缓存配置
-        $config           = config('cache');
-        $config['type']   = 'File';
-        $config['prefix'] = 'merge_resource';
-        Config::set('cache', $config);
         //缓存key
-        $key = ClCache::getKey(ClString::toCrc32($content));;
+        $key = ClCache::getKey(ClString::toCrc32($content));
         //非本地局域网请求
         if (!ClVerify::isLocalIp()) {
-            $merge_content  = Cache::get($key);
-            $resource_items = ClString::parseToArray($merge_content, '/resource/', '"');
-            $not_exist      = false;
-            foreach ($resource_items as $each_item) {
-                $each_item = DOCUMENT_ROOT_PATH . trim($each_item, '"');
-                if (!is_file($each_item)) {
-                    $not_exist = true;
-                    break;
+            $merge_content = cache($key);
+            if ($merge_content !== false) {
+                $resource_items  = ClString::parseToArray($merge_content, '/resource/', '"');
+                $all_files_is_ok = true;
+                foreach ($resource_items as $each_item) {
+                    $each_item = DOCUMENT_ROOT_PATH . trim($each_item, '"');
+                    if (!is_file($each_item)) {
+                        $all_files_is_ok = false;
+                        break;
+                    }
                 }
-            }
-            if ($merge_content !== false && $not_exist === false) {
-                return $merge_content;
+                if ($all_files_is_ok) {
+                    //判断文件创建时间是否一致
+                    $all_file_time_map = cache(self::getAllResourceFileCacheKey($key));
+                    if ($all_file_time_map === false) {
+                        $all_files_is_ok = false;
+                    } else {
+                        foreach ($all_file_time_map as $each_file => $file_create_time) {
+                            if (filectime($each_file) != $file_create_time) {
+                                $all_files_is_ok = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if ($all_files_is_ok) {
+                    return $merge_content;
+                }
             }
         }
         //替换掉所有的版本控制
@@ -151,7 +179,9 @@ class ClMergeResource {
         $content = self::dealBase64Images($content);
         if (!ClVerify::isLocalIp()) {
             //写入缓存
-            Cache::set($key, $content);
+            cache($key, $content);
+            //写入文件映射缓存
+            cache(self::getAllResourceFileCacheKey($key), self::$all_resource_file_map_create_time);
         }
         return $content;
     }
@@ -187,7 +217,18 @@ class ClMergeResource {
      * @return string
      */
     private static function getJsAbsolutePath($js) {
-        return DOCUMENT_ROOT_PATH . ClString::getBetween($js, 'src="', '.js', false) . '.js';
+        $js_file = ClString::getBetween($js, 'src="', '.js', false) . '.js';
+        if (ClVerify::isUrl($js_file)) {
+            if (strpos($js_file, 'http') === 0 || strpos($js_file, '//') === 0) {
+                return $js_file;
+            }
+        }
+        $js_file = DOCUMENT_ROOT_PATH . $js_file;
+        //添加至时间映射
+        if (is_file($js_file)) {
+            self::$all_resource_file_map_create_time[$js_file] = filectime($js_file);
+        }
+        return $js_file;
     }
 
     /**
@@ -265,7 +306,18 @@ class ClMergeResource {
      * @return string
      */
     private static function getCssAbsolutePath($file) {
-        return DOCUMENT_ROOT_PATH . ClString::getBetween($file, 'href="', '"', false);
+        $css_file = ClString::getBetween($file, 'href="', '"', false);
+        if (ClVerify::isUrl($css_file)) {
+            if (strpos($css_file, 'http') === 0 || strpos($css_file, '//') === 0) {
+                return $css_file;
+            }
+        }
+        $css_file = DOCUMENT_ROOT_PATH . $css_file;
+        if (is_file($css_file)) {
+            //添加至时间映射
+            self::$all_resource_file_map_create_time[$css_file] = filectime($css_file);
+        }
+        return $css_file;
     }
 
     /**
@@ -363,18 +415,6 @@ class ClMergeResource {
             }
         }
         return $content;
-    }
-
-    /**
-     * 清空缓存
-     */
-    public static function clearCache() {
-        $temp_dir = DOCUMENT_ROOT_PATH . '/../runtime/cache/merge_resource';
-        if (is_dir($temp_dir)) {
-            //清空文件夹
-            $cmd = sprintf('rm %s/* -rf', $temp_dir);
-            exec($cmd);
-        }
     }
 
 }

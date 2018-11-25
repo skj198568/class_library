@@ -76,6 +76,10 @@ class ClMergeResource {
                         $all_files_is_ok = false;
                     } else {
                         foreach ($all_file_time_map as $each_file => $file_create_time) {
+                            if (!is_file($each_file)) {
+                                $all_files_is_ok = false;
+                                break;
+                            }
                             if (filectime($each_file) != $file_create_time) {
                                 $all_files_is_ok = false;
                                 break;

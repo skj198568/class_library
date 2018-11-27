@@ -196,13 +196,15 @@ class ClHttp {
     public static function request($url, $params = [], $debug = false, $result_type = 'json', $header = [], $timeout = 30) {
         $ch = curl_init();
         //处理包含文件的参数
+        $is_post_file = false;
         if (is_array($params)) {
             foreach ($params as $param_index => $param_value) {
                 if (!is_string($param_value)) {
                     continue;
                 }
                 if (strpos($param_value, '@') === 0) {
-                    $param_value = substr($param_value, 1);
+                    $is_post_file = true;
+                    $param_value  = substr($param_value, 1);
                     //如果存在文件
                     if (is_file($param_value)) {
                         //兼容5.0-5.6版本的curl
@@ -225,7 +227,8 @@ class ClHttp {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+        //文件上传不可build
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $is_post_file ? $params : (is_array($params) ? http_build_query($params) : $params));
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
         $response = curl_exec($ch);
         if ($error = curl_error($ch)) {

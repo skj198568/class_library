@@ -186,7 +186,7 @@ class ClHttp {
     /**
      * https请求
      * @param $url
-     * @param array $params
+     * @param array $params 上传文件采用 @文件绝对地址 方式
      * @param bool $debug
      * @param string $result_type
      * @param array $header
@@ -195,15 +195,37 @@ class ClHttp {
      */
     public static function request($url, $params = [], $debug = false, $result_type = 'json', $header = [], $timeout = 30) {
         $ch = curl_init();
-        if (strpos($url, 'https') !== false) {
+        //处理包含文件的参数
+        if (is_array($params)) {
+            foreach ($params as $param_index => $param_value) {
+                if (!is_string($param_value)) {
+                    continue;
+                }
+                if (strpos($param_value, '@') === 0) {
+                    $param_value = substr($param_value, 1);
+                    //如果存在文件
+                    if (is_file($param_value)) {
+                        //兼容5.0-5.6版本的curl
+                        if (class_exists('\CURLFile')) {
+                            $params[$param_index] = new \CURLFile(realpath($param_value), mime_content_type($param_value), ClFile::getName($param_value, true));
+                        } else {
+                            if (defined('CURLOPT_SAFE_UPLOAD')) {
+                                curl_setopt($ch, CURLOPT_SAFE_UPLOAD, FALSE);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (strpos($url, 'https') === 0) {
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // 跳过证书检查
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);  // 从证书中检查SSL加密算法是否存在
         }
         curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, is_array($params) ? http_build_query($params) : $params);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
         $response = curl_exec($ch);
         if ($error = curl_error($ch)) {
@@ -392,77 +414,6 @@ class ClHttp {
         }
         $codes = self::getHttpStatusAllCodes();
         return isset($codes[$code]) ? $codes[$code] : '';
-    }
-
-    /**
-     * 上传文件
-     * @param $url :上传地址
-     * @param $params :上传参数array('id'=>1, 'sex'=>1)
-     * @param $name :上传文件的文件名
-     * @param $filename :存储文件在临时目录中使用的文件名
-     * @param $file_absolute_url :文件绝对地址
-     * @param bool $is_debug :是否debug
-     * @return string:返回上传结果
-     */
-    public static function uploadFile($url, $params, $name, $filename, $file_absolute_url, $is_debug = false) {
-        // 设置分割标识
-        $boundary = '---------------------------' . ClString::toCrc32($file_absolute_url);
-        $data     = '--' . $boundary . "\r\n";
-        // form data
-        $form_data = '';
-        foreach ($params as $key => $val) {
-            $form_data .= "content-disposition: form-data; name=\"" . $key . "\"\r\n";
-            $form_data .= "content-type: text/plain\r\n\r\n";
-            if (is_array($val)) {
-                $form_data .= json_encode($val) . "\r\n"; // 数组使用json encode后方便处理
-            } else {
-                $form_data .= rawurlencode($val) . "\r\n";
-            }
-            $form_data .= '--' . $boundary . "\r\n";
-        }
-        // file data
-        $file_data = '';
-        $files     = array(
-            array(
-                'name'     => $name,
-                'filename' => $filename,
-                'path'     => $file_absolute_url
-            )
-        );
-        foreach ($files as $val) {
-            if (file_exists($val['path'])) {
-                $file_data .= "content-disposition: form-data; name=\"" . $val['name'] . "\"; filename=\"" . $val['filename'] . "\"\r\n";
-                $file_data .= "content-type: " . mime_content_type($val['path']) . "\r\n\r\n";
-                $file_data .= implode('', file($val['path'])) . "\r\n";
-                $file_data .= '--' . $boundary . "\r\n";
-            }
-        }
-        if (!$form_data && !$file_data) {
-            return false;
-        }
-        $data .= $form_data . $file_data . "--\r\n\r\n";
-        $out  = "POST " . $url . " http/1.1\r\n";
-        $out  .= "host: " . $url . "\r\n";
-        $out  .= "content-type: multipart/form-data; boundary=" . $boundary . "\r\n";
-        $out  .= "content-length: " . strlen($data) . "\r\n";
-        $out  .= "connection: close\r\n\r\n";
-        $out  .= $data;
-        if ($is_debug) {
-            log_info($out);
-        }
-        $fs = fsockopen($url);
-        // 发送数据
-        fputs($fs, $out);
-        // 读取返回数据
-        $response = '';
-        while ($row = fread($fs, 4096)) {
-            $response .= $row;
-        }
-        // 断开连接
-        fclose($fs);
-        $pos      = strpos($response, "\r\n\r\n");
-        $response = substr($response, $pos + 4);
-        return $response;
     }
 
     /**

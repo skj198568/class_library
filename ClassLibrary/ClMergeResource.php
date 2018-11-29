@@ -228,6 +228,7 @@ class ClMergeResource {
             }
         }
         $js_file = DOCUMENT_ROOT_PATH . $js_file;
+        $js_file = ClString::getBetween($js_file, '', '.js');
         //添加至时间映射
         if (is_file($js_file)) {
             self::$all_resource_file_map_create_time[$js_file] = filectime($js_file);
@@ -317,6 +318,7 @@ class ClMergeResource {
             }
         }
         $css_file = DOCUMENT_ROOT_PATH . $css_file;
+        $css_file = ClString::getBetween($css_file, '', '.css');
         if (is_file($css_file)) {
             //添加至时间映射
             self::$all_resource_file_map_create_time[$css_file] = filectime($css_file);

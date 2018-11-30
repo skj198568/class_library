@@ -20,7 +20,7 @@ class ClString {
 
     /**
      * 计算中文字符串长度，支持中文
-     * @param $string
+     * @param string $string
      * @return int
      */
     public static function getLength($string) {
@@ -46,7 +46,7 @@ class ClString {
 
     /**
      * 自动检测内容并且进行转换编码
-     * @param $string
+     * @param string $string
      * @param string $to
      * @return string
      */
@@ -59,7 +59,7 @@ class ClString {
 
     /**
      * 获取crc32字符串结果的正整数
-     * @param $str
+     * @param string $str
      * @return string 正整数
      */
     public static function toCrc32($str) {
@@ -68,7 +68,7 @@ class ClString {
 
     /**
      * 转换为浮点型
-     * @param $str
+     * @param string $str
      * @return float
      */
     public static function toFloat($str) {
@@ -77,7 +77,7 @@ class ClString {
 
     /**
      * boolean格式转换为数字0,1
-     * @param $boolean
+     * @param string $boolean
      * @return int
      */
     public static function boolean2int($boolean) {
@@ -90,7 +90,7 @@ class ClString {
 
     /**
      * 格式化金钱为万分单位分割
-     * @param $money
+     * @param string $money
      * @return string
      */
     public static function moneyFormat($money) {
@@ -120,7 +120,7 @@ class ClString {
 
     /**
      * 将字符串打散为数组
-     * @param $str
+     * @param string $str
      * @return mixed
      */
     public static function toArray($str) {
@@ -131,7 +131,7 @@ class ClString {
 
     /**
      * 去除空格，包括中英文
-     * @param $string
+     * @param string $string
      * @return string
      */
     public static function spaceTrim($string) {
@@ -149,7 +149,7 @@ class ClString {
 
     /**
      * 多个空格转换为一个空格
-     * @param $string
+     * @param string $string
      * @param string $separator
      * @return string
      */
@@ -168,7 +168,7 @@ class ClString {
 
     /**
      * 获取数字字符串
-     * @param $s
+     * @param string $s
      * @return string
      */
     public static function getInt($s) {
@@ -182,7 +182,7 @@ class ClString {
 
     /**
      * 获取所有的中文
-     * @param $s
+     * @param string $s
      * @return string
      */
     public static function getChinese($s) {
@@ -198,20 +198,20 @@ class ClString {
 
     /**
      * 把格式化的字符串写入变量中，支持数组参数
-     * @param $str
+     * @param string $str
      * @param array $value_array
      * @return mixed
      */
-    public static function sprintf($str, array $value_array) {
+    public static function sprintf($str, $value_array) {
         array_unshift($value_array, $str);
         return call_user_func_array('sprintf', $value_array);
     }
 
     /**
      * 仅替换一次
-     * @param $search
-     * @param $replace
-     * @param $string
+     * @param string $search
+     * @param string $replace
+     * @param string $string
      * @return mixed
      */
     public static function replaceOnce($search, $replace, $string) {
@@ -227,8 +227,8 @@ class ClString {
 
     /**
      * 分割字符串，会默认转为小写
-     * @param $string :待分割的字符
-     * @param $separator_tag :分割标签
+     * @param string $string :待分割的字符
+     * @param string $separator_tag :分割标签
      * @param bool $get_before :分割标签之前
      * @param bool $is_include_tag :是否包含分割标签
      * @return string 返回分割后的结果
@@ -259,8 +259,8 @@ class ClString {
 
     /**
      * 获取字符串标签中间的值
-     * @param $string
-     * @param $begin_tag :开始标签
+     * @param string $string
+     * @param string $begin_tag :开始标签
      * @param string $end_tag :结束标签，如果为空，则直接获取到最后
      * @param bool|true $is_include_tag :是否包含标签
      * @return string 结果
@@ -272,9 +272,9 @@ class ClString {
 
     /**
      * 解析为数组
-     * @param $string
-     * @param $begin_tag
-     * @param $end_tag
+     * @param string $string
+     * @param string $begin_tag
+     * @param string $end_tag
      * @param bool|true $is_include_tag 是否包含标签
      * @return mixed
      */
@@ -304,8 +304,8 @@ class ClString {
 
     /**
      * 获取Xml结构类型的标签属性
-     * @param $string
-     * @param $attribute :属性
+     * @param string $string
+     * @param string $attribute :属性
      * @return string
      */
     public static function getAttribute($string, $attribute) {
@@ -320,9 +320,9 @@ class ClString {
 
     /**
      * 删除标签之间的数据
-     * @param $string
-     * @param $begin_tag :开始标签
-     * @param $end_tag :结束标签
+     * @param string $string
+     * @param string $begin_tag :开始标签
+     * @param string $end_tag :结束标签
      * @param bool|false $is_remove_tag :是否删除标签
      * @return mixed
      */
@@ -337,7 +337,7 @@ class ClString {
 
     /**
      * 格式化html，注意开启php的tidy扩展
-     * @param $input_string
+     * @param string $input_string
      * @return string
      */
     public static function tidyHtml($input_string) {
@@ -371,7 +371,7 @@ class ClString {
 
     /**
      * 去除html标签
-     * @param $str
+     * @param string $str
      * @return mixed
      */
     public static function stripTags($str) {
@@ -476,7 +476,7 @@ class ClString {
 
     /**
      * 格式化url字符串
-     * @param $str
+     * @param string $str
      * @return mixed|string
      */
     public static function urlEncode($str) {
@@ -494,7 +494,7 @@ class ClString {
 
     /**
      * 去除html多次转码问题
-     * @param $html
+     * @param string $html
      * @return mixed
      */
     public static function stripAmp($html) {
@@ -513,7 +513,7 @@ class ClString {
 
     /**
      * html格式化
-     * @param $html
+     * @param string $html
      * @return mixed
      */
     public static function htmlFormat($html) {
@@ -692,6 +692,34 @@ class ClString {
             $result = str_replace(['\/', '\"'], ['/', '"'], $result);
         }
         return $result;
+    }
+
+    /**
+     * 拼接字符串
+     * @param string $source_str 原字符串
+     * @param int $append_char 拼接字符
+     * @param int $total_length 拼接至X长度
+     * @param bool $at_before 拼接位置
+     * @return string
+     */
+    public static function append($source_str, $append_char = 0, $total_length = 2, $at_before = true) {
+        if (self::getLength($append_char) > 1) {
+            return $source_str;
+        }
+        $source_str_length = self::getLength($source_str);
+        if ($source_str_length >= $total_length) {
+            return $source_str;
+        }
+        $join_str = '';
+        for ($i = 0; $i < $total_length - $source_str_length; $i++) {
+            $join_str .= $append_char;
+        }
+        if ($at_before) {
+            $source_str = $join_str . $source_str;
+        } else {
+            $source_str .= $join_str;
+        }
+        return $source_str;
     }
 
 }

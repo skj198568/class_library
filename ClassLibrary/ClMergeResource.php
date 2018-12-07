@@ -212,15 +212,16 @@ class ClMergeResource {
      * @return string
      */
     private static function getJsAbsolutePath($js) {
-        $js_file = ClString::getBetween($js, 'src="', '.js', false) . '.js';
+        $js_file = ClString::getBetween($js, 'src="', '.js', false);
+        if (empty($js_file)) {
+            //可能是js代码块
+            return '';
+        }
+        $js_file .= '.js';
         if (ClVerify::isUrl($js_file)) {
             if (strpos($js_file, 'http') === 0 || strpos($js_file, '//') === 0) {
                 return $js_file;
             }
-        }
-        $js_file = DOCUMENT_ROOT_PATH . $js_file;
-        if (strpos($js_file, '.js') === false) {
-            return '';
         }
         $js_file = ClString::getBetween($js_file, '', '.js');
         //添加至时间映射

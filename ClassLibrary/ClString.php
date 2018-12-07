@@ -227,10 +227,10 @@ class ClString {
 
     /**
      * 分割字符串，会默认转为小写
-     * @param string $string :待分割的字符
-     * @param string $separator_tag :分割标签
-     * @param bool $get_before :分割标签之前
-     * @param bool $is_include_tag :是否包含分割标签
+     * @param string $string 待分割的字符
+     * @param string $separator_tag 分割标签
+     * @param bool $get_before 分割标签之前
+     * @param bool $is_include_tag 是否包含分割标签
      * @return string 返回分割后的结果
      */
     public static function split($string, $separator_tag, $get_before = true, $is_include_tag = true) {
@@ -241,7 +241,7 @@ class ClString {
         $marker     = strtolower($separator_tag);
         $split_here = strpos($lc_str, $marker);
         if ($split_here === false) {
-            return $string;
+            return '';
         }
         if ($get_before) {
             if ($is_include_tag != false) {

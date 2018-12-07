@@ -223,7 +223,7 @@ class ClMergeResource {
                 return $js_file;
             }
         }
-        $js_file = ClString::getBetween($js_file, '', '.js');
+        $js_file = DOCUMENT_ROOT_PATH . $js_file;
         //添加至时间映射
         if (is_file($js_file)) {
             self::$all_resource_file_map_create_time[$js_file] = self::getFileVersion($js_file);
@@ -276,6 +276,9 @@ class ClMergeResource {
      */
     private static function getCssAbsolutePath($file) {
         $css_file = ClString::getBetween($file, 'href="', '"', false);
+        if (empty($css_file)) {
+            return '';
+        }
         if (ClVerify::isUrl($css_file)) {
             if (strpos($css_file, 'http') === 0 || strpos($css_file, '//') === 0) {
                 return $css_file;

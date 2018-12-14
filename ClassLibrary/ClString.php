@@ -601,16 +601,20 @@ class ClString {
                             $result .= $char . $newline . str_repeat($tab, $tab_count);
                             break;
                         case '}':
-                            $tab_count--;
+                            if ($tab_count > 0) {
+                                $tab_count--;
+                            }
                             $result = trim($result) . $newline . str_repeat($tab, $tab_count) . $char;
                             break;
                         case '[':
-                            if (isset($json[$k_char + 1]) && $json[$k_char + 1] != '{' && $json[$k_char + 1] != ']' && $json[$k_char + 1] != '[' && (isset($json[$k_char - 1]) && $json[$k_char - 1] != '[')) {
-                                $tab_count++;
-                                $result .= $char . $newline . str_repeat($tab, $tab_count);
-                            } else {
-                                $result .= $char;
+                            $tab_count++;
+                            $result .= $char . $newline . str_repeat($tab, $tab_count);
+                            break;
+                        case ']':
+                            if ($tab_count > 0) {
+                                $tab_count--;
                             }
+                            $result = trim($result) . $newline . str_repeat($tab, $tab_count) . $char;
                             break;
                         case ',':
                             //判断+1字符串为"时，才换行
@@ -655,31 +659,25 @@ class ClString {
                 if (strpos($v, ':') !== false) {
                     $pre  = ClString::getBetween($v, '', ':', false);
                     $left = trim(str_replace($pre, '', $v), ':');
-                    if ($left == '[{') {
-                        $left = '<span style="color:red;">[</span><span style="color: blue;">{</span>';
-                    } elseif ($left == '{') {
-                        $left = '<span style="color: blue;">{</span>';
+                    if ($left == '{') {
+                        $left = '<span style="color: #FF3300;">{</span>';
                     } elseif ($left == '[') {
-                        $left = '<span style="color: red;">[</span>';
+                        $left = '<span style="color: #3ab54a;">[</span>';
                     } elseif ($left == '[]') {
-                        $left = '<span style="color: red;">[]</span>';
+                        $left = '<span style="color: #3ab54a;">[]</span>';
                     }
                     $v = sprintf('%s:%s', sprintf('<span style="color: blue;">%s</span>', $pre), $left);
                 } else if (str_replace('&nbsp;', '', $v) == '{') {
-                    $v = str_replace('{', '<span style="color: blue;">{</span>', $v);
-                } else if (str_replace('&nbsp;', '', $v) == '[{') {
-                    $v = str_replace(['[', '{'], ['<span style="color: blue;">[</span>', '<span style="color: red;">{</span>'], $v);
-                } else if (str_replace('&nbsp;', '', $v) == '}]') {
-                    $v = str_replace(['}', ']'], ['<span style="color: blue;">}</span>', '<span style="color: red;">]</span>'], $v);
+                    $v = str_replace('{', '<span style="color: #FF3300;">{</span>', $v);
                 } else if (str_replace('&nbsp;', '', $v) == '}') {
-                    $v = str_replace('}', '<span style="color: blue;">}</span>', $v);
+                    $v = str_replace('}', '<span style="color: #FF3300;">}</span>', $v);
                 } else if (str_replace('&nbsp;', '', $v) == ']') {
-                    $v = str_replace(']', '<span style="color: red;">]</span>', $v);
+                    $v = str_replace(']', '<span style="color: #3ab54a;">]</span>', $v);
                 } else if (str_replace('&nbsp;', '', $v) == '[') {
-                    $v = str_replace('[', '<span style="color: red;">[</span>', $v);
+                    $v = str_replace('[', '<span style="color: #3ab54a;">[</span>', $v);
                 }
                 if ($has_comma) {
-                    $v .= '<i style="color: red;">,</i>';
+                    $v .= '<i style="color: blue;">,</i>';
                 }
                 $result[$k] = $v;
             }
@@ -687,7 +685,7 @@ class ClString {
         }
         //替换转义字符
         if ($html) {
-            $result = str_replace(['\/', '\"'], ['<span style="color: red;">/</span>', '"'], $result);
+            $result = str_replace(['\/', '\"'], ['<span style="color: #3ab54a;">/</span>', '"'], $result);
         } else {
             $result = str_replace(['\/', '\"'], ['/', '"'], $result);
         }

@@ -119,6 +119,15 @@ class ClMigrateField extends ClFieldBase {
     }
 
     /**
+     * 存储格式为base64
+     * @return $this
+     */
+    public function storageFormatBase64() {
+        $this->field_config['store_format'] = 'base64';
+        return $this;
+    }
+
+    /**
      * 存储格式为密码
      * @param string $salt
      * @return $this

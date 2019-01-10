@@ -48,20 +48,35 @@ class ClGeo {
      * @param string $qq_developer_key qq开发者key
      * @return bool|mixed
      */
-    public static function getByAddressWithQQMap($address, $qq_developer_key = '') {
-        $r = ClHttp::http(sprintf('http://apis.map.qq.com/ws/geocoder/v1/?address=%s&key=%s', urlencode($address), $qq_developer_key));
+    public static function getByAddressWithQQMap($address, $qq_developer_key) {
+        $r = ClHttp::request(sprintf('http://apis.map.qq.com/ws/geocoder/v1/?address=%s&key=%s', urlencode($address), $qq_developer_key));
         return $r['status'] == 0 ? $r['result'] : false;
     }
 
     /**
      * 依据地址获取经纬度，建议缓存查询结果
-     * @param $address
+     * @param string $address
      * @param string $bai_du_developer_key 百度开发者key
      * @return bool|mixed
      */
-    public static function getByAddressWithBaiDu($address, $bai_du_developer_key = '') {
-        $r = ClHttp::http(sprintf('http://api.map.baidu.com/geocoder/v2/?address=%s&output=json&ak=%s', urlencode($address), $bai_du_developer_key));
+    public static function getByAddressWithBaiDu($address, $bai_du_developer_key) {
+        $r = ClHttp::request(sprintf('http://api.map.baidu.com/geocoder/v2/?address=%s&output=json&ak=%s', urlencode($address), $bai_du_developer_key));
         return $r['status'] == 0 ? $r['result'] : false;
+    }
+
+    /**
+     * 依据经纬度获取地址
+     * @param $latitude
+     * @param $longitude
+     * @param $bai_du_developer_key
+     * @return mixed
+     */
+    public static function getAddressByLocationWithBaiDu($latitude, $longitude, $bai_du_developer_key) {
+        $r = ClHttp::request(sprintf('http://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location=%s,%s&output=json&pois=0&ak=%s', $latitude, $longitude, $bai_du_developer_key), [], false, true);
+        $r = str_replace('renderReverse&&renderReverse(', '', $r);
+        $r = substr($r, 0, -1);
+        $r = json_decode($r, true);
+        return $r['result']['formatted_address'] . $r['result']['sematic_description'];
     }
 
 }

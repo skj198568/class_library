@@ -188,7 +188,7 @@ class ClHttp {
      * @param $url
      * @param array $params 上传文件采用 @文件绝对地址 方式
      * @param bool $debug
-     * @param string $result_type
+     * @param string $result_type json/xml
      * @param array $header
      * @param int $timeout
      * @return mixed
@@ -243,6 +243,8 @@ class ClHttp {
         curl_close($ch);
         if (strtolower($result_type) == 'json') {
             $response = json_decode($response, true);
+        } else if (strtolower($result_type) == 'xml') {
+            $response = ClXml::toArray($response);
         }
         return $response;
     }

@@ -362,7 +362,7 @@ class ClWXQY {
         if ($result !== false) {
             return $result;
         }
-        $result = ClHttp::http(self::URL . "/gettoken?corpid=$corp_id&corpsecret=$secret");
+        $result = ClHttp::request(self::URL . "/gettoken?corpid=$corp_id&corpsecret=$secret");
         if (isset($result['errcode'])) {
             throw new Exception(ClArray::toString($result));
         }
@@ -499,7 +499,7 @@ class ClWXQY {
      * @return mixed
      */
     public static function getServerIps($access_token) {
-        $ips = ClHttp::http(self::URL . '/getcallbackip?access_token=' . $access_token, array(), 3600);
+        $ips = ClHttp::request(self::URL . '/getcallbackip?access_token=' . $access_token, array(), 3600);
         return $ips['ip_list'];
     }
 
@@ -514,7 +514,7 @@ class ClWXQY {
      * @return bool|int 成功返回部门id，失败返回false
      */
     public static function departmentCreate($access_token, $id, $name, $parent_id, $order) {
-        $r = ClHttp::http(self::URL . '/department/create?access_token=' . $access_token, array(
+        $r = ClHttp::request(self::URL . '/department/create?access_token=' . $access_token, array(
             'name'     => $name,
             'parentid' => $parent_id,
             'order'    => $order,
@@ -548,7 +548,7 @@ class ClWXQY {
         if (!empty($order)) {
             $post['order'] = $order;
         }
-        $r = ClHttp::http(self::URL . '/department/update?access_token=' . $access_token, $post);
+        $r = ClHttp::request(self::URL . '/department/update?access_token=' . $access_token, $post);
         return $r['errcode'] == 0 ? true : false;
     }
 
@@ -559,7 +559,7 @@ class ClWXQY {
      * @return boolean
      */
     public static function departmentDelete($access_token, $id) {
-        $r = ClHttp::http(self::URL . '/department/delete?access_token=' . $access_token, array('id' => $id));
+        $r = ClHttp::request(self::URL . '/department/delete?access_token=' . $access_token, array('id' => $id));
         return $r['errcode'] == 0 ? true : false;
     }
 
@@ -570,7 +570,7 @@ class ClWXQY {
      * @return bool/array
      */
     public static function departmentGet($access_token, $id) {
-        $r = ClHttp::http(self::URL . '/department/list?access_token=' . $access_token, array('id' => $id));
+        $r = ClHttp::request(self::URL . '/department/list?access_token=' . $access_token, array('id' => $id));
         return $r['errcode'] == 0 ? $r['department'] : false;
     }
 
@@ -619,7 +619,7 @@ class ClWXQY {
             'avatar_mediaid' => $avatar_media_id,
             'extattr'        => array('attrs' => $ext_attr)
         );
-        $r    = ClHttp::http(self::URL . '/user/create?access_token=' . $access_token, $post);
+        $r    = ClHttp::request(self::URL . '/user/create?access_token=' . $access_token, $post);
         return $r['errcode'] == 0 ? true : false;
     }
 
@@ -650,7 +650,7 @@ class ClWXQY {
             'avatar_mediaid' => $avatar_media_id,
             'extattr'        => array('attrs' => $ext_attr)
         );
-        $r    = ClHttp::http(self::URL . '/user/update?access_token=' . $access_token, $post);
+        $r    = ClHttp::request(self::URL . '/user/update?access_token=' . $access_token, $post);
         return $r['errcode'] == 0 ? true : false;
     }
 
@@ -661,7 +661,7 @@ class ClWXQY {
      * @return bool
      */
     public static function userDelete($access_token, $user_id) {
-        $r = ClHttp::http(self::URL . '/user/delete?access_token=' . $access_token, array(
+        $r = ClHttp::request(self::URL . '/user/delete?access_token=' . $access_token, array(
             'userid' => $user_id
         ));
         return $r['errcode'] == 0 ? true : false;
@@ -674,7 +674,7 @@ class ClWXQY {
      * @return bool
      */
     public static function userDeleteList($access_token, $user_ids) {
-        $r = ClHttp::http(self::URL . '/user/batchdelete?access_token=' . $access_token, array(
+        $r = ClHttp::request(self::URL . '/user/batchdelete?access_token=' . $access_token, array(
             'useridlist' => $user_ids
         ));
         return $r['errcode'] == 0 ? true : false;
@@ -687,7 +687,7 @@ class ClWXQY {
      * @return bool|array()
      */
     public static function userGet($access_token, $user_id) {
-        $r = ClHttp::http(self::URL . '/user/get?access_token=' . $access_token . '&userid=' . $user_id);
+        $r = ClHttp::request(self::URL . '/user/get?access_token=' . $access_token . '&userid=' . $user_id);
         return $r['errcode'] == 0 ? $r : false;
     }
 
@@ -702,7 +702,7 @@ class ClWXQY {
      */
     public static function userGetByDepartment($access_token, $department_id, $fetch_child = 1, $status = 0, $is_simple = true) {
         $action = $is_simple ? 'simplelist' : 'list';
-        $r      = ClHttp::http(self::URL . "/user/$action?access_token=$access_token&department_id=$department_id&fetch_child=$fetch_child&status=$status");
+        $r      = ClHttp::request(self::URL . "/user/$action?access_token=$access_token&department_id=$department_id&fetch_child=$fetch_child&status=$status");
         return $r['errcode'] == 0 ? $r['userlist'] : false;
     }
 
@@ -713,7 +713,7 @@ class ClWXQY {
      * @return bool|int 1:微信邀请 2.邮件邀请
      */
     public static function userInvite($access_token, $user_id) {
-        $r = ClHttp::http(self::URL . "/invite/send?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/invite/send?access_token=$access_token", array(
             'userid' => $user_id
         ));
         return $r['errcode'] == 0 ? $r['type'] : false;
@@ -727,7 +727,7 @@ class ClWXQY {
      * @return bool|int
      */
     public static function tagCreate($access_token, $tag_id, $tag_name) {
-        $r = ClHttp::http(self::URL . "/tag/create?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/tag/create?access_token=$access_token", array(
             'tagname' => $tag_name,
             'tagid'   => $tag_id
         ));
@@ -742,7 +742,7 @@ class ClWXQY {
      * @return bool
      */
     public static function tagUpdate($access_token, $tag_id, $tag_name) {
-        $r = ClHttp::http(self::URL . "/tag/update?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/tag/update?access_token=$access_token", array(
             'tagname' => $tag_name,
             'tagid'   => $tag_id
         ));
@@ -756,7 +756,7 @@ class ClWXQY {
      * @return bool
      */
     public static function tagDelete($access_token, $tag_id) {
-        $r = ClHttp::http(self::URL . "/tag/delete?access_token=$access_token&tagid=$tag_id");
+        $r = ClHttp::request(self::URL . "/tag/delete?access_token=$access_token&tagid=$tag_id");
         return $r['errcode'] == 0 ? true : false;
     }
 
@@ -767,7 +767,7 @@ class ClWXQY {
      * @return bool|array:array('partylist' => '部门列表')
      */
     public static function tagGet($access_token, $tag_id) {
-        $r = ClHttp::http(self::URL . "/tag/get?access_token=$access_token&tagid=$tag_id");
+        $r = ClHttp::request(self::URL . "/tag/get?access_token=$access_token&tagid=$tag_id");
         return $r['errcode'] == 0 ? $r : false;
     }
 
@@ -780,7 +780,7 @@ class ClWXQY {
      * @return bool
      */
     public static function tagUsersAdd($access_token, $tag_id, array $user_list, array $party_list) {
-        $r = ClHttp::http(self::URL . "/tag/addtagusers?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/tag/addtagusers?access_token=$access_token", array(
             'tagid'     => $tag_id,
             'userlist'  => $user_list,
             'partylist' => $party_list
@@ -797,7 +797,7 @@ class ClWXQY {
      * @return bool
      */
     public static function tagUsersDelete($access_token, $tag_id, array $user_list, array $party_list) {
-        $r = ClHttp::http(self::URL . "/tag/deltagusers?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/tag/deltagusers?access_token=$access_token", array(
             'tagid'     => $tag_id,
             'userlist'  => $user_list,
             'partylist' => $party_list
@@ -811,7 +811,7 @@ class ClWXQY {
      * @return bool|array
      */
     public static function tagList($access_token) {
-        $r = ClHttp::http(self::URL . "/tag/list?access_token=$access_token");
+        $r = ClHttp::request(self::URL . "/tag/list?access_token=$access_token");
         return $r['errcode'] == 0 ? $r['taglist'] : false;
     }
 
@@ -827,7 +827,7 @@ class ClWXQY {
      * @return bool
      */
     public static function batchInvite($access_token, array $to_users, array $to_parties, array $to_tags, $call_back_url, $call_back_token, $call_back_encoding_aes_key) {
-        $r = ClHttp::http(self::URL . "/batch/inviteuser?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/batch/inviteuser?access_token=$access_token", array(
             'touser'   => implode('|', $to_users),
             'toparty'  => implode('|', $to_parties),
             'totag'    => implode('|', $to_tags),
@@ -905,7 +905,7 @@ class ClWXQY {
      * )
      */
     public static function agentGet($access_token, $agent_id) {
-        $r = ClHttp::http(self::URL . "/agent/get?access_token=$access_token&agentid=$agent_id");
+        $r = ClHttp::request(self::URL . "/agent/get?access_token=$access_token&agentid=$agent_id");
         return $r['errcode'] == 0 ? $r : false;
     }
 
@@ -923,7 +923,7 @@ class ClWXQY {
      * @return bool
      */
     public static function agentSet($access_token, $agent_id, $report_location_flag, $logo_media_id, $name, $description, $redirect_domain, $is_report_user, $is_report_enter) {
-        $r = ClHttp::http(self::URL . "/agent/set?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/agent/set?access_token=$access_token", array(
             'agentid'              => $agent_id,
             'report_location_flag' => $report_location_flag,
             'logo_mediaid'         => $logo_media_id,
@@ -967,7 +967,7 @@ class ClWXQY {
      * ))
      */
     public static function agentList($access_token) {
-        $r = ClHttp::http(self::URL . "/agent/list?access_token=$access_token");
+        $r = ClHttp::request(self::URL . "/agent/list?access_token=$access_token");
         return $r['errcode'] == 0 ? $r['agentlist'] : false;
     }
 
@@ -983,7 +983,7 @@ class ClWXQY {
      * @return bool
      */
     public static function msgSendText($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $content, $is_safe = 0) {
-        $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/message/send?access_token=$access_token", array(
             "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
             "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
@@ -1009,7 +1009,7 @@ class ClWXQY {
      * @return bool
      */
     public static function msgSendImage($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $is_safe = 0) {
-        $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/message/send?access_token=$access_token", array(
             "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
             "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
@@ -1035,7 +1035,7 @@ class ClWXQY {
      * @return bool
      */
     public static function msgSendVoice($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $is_safe = 0) {
-        $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/message/send?access_token=$access_token", array(
             "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
             "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
@@ -1063,7 +1063,7 @@ class ClWXQY {
      * @return bool
      */
     public static function msgSendVideo($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $title = '', $desc = '', $is_safe = 0) {
-        $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/message/send?access_token=$access_token", array(
             "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
             "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
@@ -1091,7 +1091,7 @@ class ClWXQY {
      * @return bool
      */
     public static function msgSendFile($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $is_safe = 0) {
-        $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/message/send?access_token=$access_token", array(
             "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
             "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
@@ -1117,7 +1117,7 @@ class ClWXQY {
      * @return bool
      */
     public static function msgSendNews($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, array $news, $is_safe = 0) {
-        $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/message/send?access_token=$access_token", array(
             "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
             "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
@@ -1143,7 +1143,7 @@ class ClWXQY {
      * @return bool
      */
     public static function msgSendMpNews($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, array $news, $is_safe = 0) {
-        $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/message/send?access_token=$access_token", array(
             "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
             "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
@@ -1169,7 +1169,7 @@ class ClWXQY {
      * @return bool
      */
     public static function msgSendMpNewsUseMedia($access_token, array $to_users, array $to_parties, array $to_tags, $agent_id, $media_id, $is_safe = 0) {
-        $r = ClHttp::http(self::URL . "/message/send?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/message/send?access_token=$access_token", array(
             "touser"  => is_array($to_users) ? implode('|', $to_users) : '@all',
             "toparty" => is_array($to_parties) ? implode('|', $to_parties) : '',
             "totag"   => is_array($to_tags) ? implode('|', $to_tags) : '',
@@ -1247,7 +1247,7 @@ class ClWXQY {
      * @return bool
      */
     public static function menuCreate($access_token, $agent_id, array $buttons) {
-        $r = ClHttp::http(self::URL . "/menu/create?access_token=$access_token&agentid=$agent_id", array(
+        $r = ClHttp::request(self::URL . "/menu/create?access_token=$access_token&agentid=$agent_id", array(
             'button' => array(
                 $buttons
             )
@@ -1262,7 +1262,7 @@ class ClWXQY {
      * @return bool
      */
     public static function menuDelete($access_token, $agent_id) {
-        $r = ClHttp::http(self::URL . "/menu/delete?access_token=$access_token&agentid=$agent_id");
+        $r = ClHttp::request(self::URL . "/menu/delete?access_token=$access_token&agentid=$agent_id");
         return $r['errcode'] == 0 ? true : false;
     }
 
@@ -1273,7 +1273,7 @@ class ClWXQY {
      * @return mixed
      */
     public static function menuGet($access_token, $agent_id) {
-        $r = ClHttp::http(self::URL . "/menu/get?access_token=$access_token&agentid=$agent_id");
+        $r = ClHttp::request(self::URL . "/menu/get?access_token=$access_token&agentid=$agent_id");
         return $r;
     }
 
@@ -1290,7 +1290,7 @@ class ClWXQY {
     }
 
     public static function oauthGetUserInfo($access_token, $code) {
-        $r = ClHttp::http(self::URL . "/user/getuserinfo?access_token=$access_token&code=$code");
+        $r = ClHttp::request(self::URL . "/user/getuserinfo?access_token=$access_token&code=$code");
         return isset($r['errcode']) ? false : $r;
     }
 
@@ -1308,7 +1308,7 @@ class ClWXQY {
         if (!empty($agent_id)) {
             $post['agentid'] = $agent_id;
         }
-        $r = ClHttp::http(self::URL . "/user/convert_to_openid?access_token=$access_token", $post);
+        $r = ClHttp::request(self::URL . "/user/convert_to_openid?access_token=$access_token", $post);
         return $r['errcode'] == 0 ? $r['openid'] : false;
     }
 
@@ -1319,7 +1319,7 @@ class ClWXQY {
      * @return bool|string
      */
     public static function convertOpenIdToUserId($access_token, $open_id) {
-        $r = ClHttp::http(self::URL . "/user/convert_to_userid?access_token=$access_token", array(
+        $r = ClHttp::request(self::URL . "/user/convert_to_userid?access_token=$access_token", array(
             'openid' => $open_id
         ));
         return $r['errcode'] == 0 ? $r['userid'] : false;
@@ -1337,7 +1337,7 @@ class ClWXQY {
         if ($r !== false) {
             return $r;
         }
-        $r = ClHttp::http(self::URL . "/get_jsapi_ticket?access_token=$access_token");
+        $r = ClHttp::request(self::URL . "/get_jsapi_ticket?access_token=$access_token");
         if ($r['errcode'] != 0) {
             throw new Exception(ClArray::toString($r));
         }

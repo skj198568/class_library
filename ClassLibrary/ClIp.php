@@ -57,7 +57,28 @@ class ClIp {
         if (!ClVerify::isIp($ip)) {
             return 'ip地址错误：' . $ip;
         }
-        $r = ClHttp::http(sprintf('http://api.map.baidu.com/location/ip?ip=%s&ak=%s&coor=bd09ll', $ip, $bai_du_developer_key), [], $duration);
+        if ($duration > 0) {
+            $key    = ClCache::getKey($ip);
+            $result = cache($key);
+            if ($result === false) {
+                $result = self::getAddressWithBaiDu($ip, $bai_du_developer_key);
+                //存储
+                cache($key, $result, $duration);
+            }
+        } else {
+            $result = self::getAddressWithBaiDu($ip, $bai_du_developer_key);
+        }
+        return $result;
+    }
+
+    /**
+     * 按百度获取
+     * @param $ip
+     * @param $bai_du_developer_key
+     * @return mixed
+     */
+    private static function getAddressWithBaiDu($ip, $bai_du_developer_key) {
+        $r = ClHttp::request(sprintf('http://api.map.baidu.com/location/ip?ip=%s&ak=%s&coor=bd09ll', $ip, $bai_du_developer_key));
         if ($r['status'] == 0) {
             return $r['content'];
         } else {

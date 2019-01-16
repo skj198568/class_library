@@ -185,15 +185,28 @@ class ClHttp {
 
     /**
      * https请求
-     * @param $url
+     * @param string $url 请求地址
      * @param array $params 上传文件采用 @文件绝对地址 方式
-     * @param bool $debug
+     * @param bool $debug 是否调试
+     * @param int $duration 缓存时间
      * @param string $result_type json/xml
      * @param array $header
-     * @param int $timeout
+     * @param int $timeout 超时时间
      * @return mixed
      */
-    public static function request($url, $params = [], $debug = false, $result_type = 'json', $header = [], $timeout = 30) {
+    public static function request($url, $params = [], $debug = false, $duration = 0, $result_type = 'json', $header = [], $timeout = 30) {
+        if ($duration > 0) {
+            $key    = ClCache::getKey($url, $params);
+            $result = cache($key);
+            if ($result !== false) {
+                if (strtolower($result_type) == 'json') {
+                    $result = json_decode($result, true);
+                } else if (strtolower($result_type) == 'xml') {
+                    $result = ClXml::toArray($result);
+                }
+                return $result;
+            }
+        }
         $ch = curl_init();
         //处理包含文件的参数
         $is_post_file = false;
@@ -241,6 +254,11 @@ class ClHttp {
             log_info('response', $response);
         }
         curl_close($ch);
+        if ($duration > 0) {
+            $key = ClCache::getKey($url, $params);
+            //缓存
+            cache($key, $response, $duration);
+        }
         if (strtolower($result_type) == 'json') {
             $response = json_decode($response, true);
         } else if (strtolower($result_type) == 'xml') {

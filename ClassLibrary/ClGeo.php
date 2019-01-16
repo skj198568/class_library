@@ -46,10 +46,11 @@ class ClGeo {
      * 依据地址获取经纬度，建议缓存查询结果
      * @param string $address 地址
      * @param string $qq_developer_key qq开发者key
+     * @param integer $duration 缓存时间
      * @return bool|mixed
      */
-    public static function getByAddressWithQQMap($address, $qq_developer_key) {
-        $r = ClHttp::request(sprintf('http://apis.map.qq.com/ws/geocoder/v1/?address=%s&key=%s', urlencode($address), $qq_developer_key));
+    public static function getByAddressWithQQMap($address, $qq_developer_key, $duration = 3600) {
+        $r = ClHttp::request(sprintf('http://apis.map.qq.com/ws/geocoder/v1/?address=%s&key=%s', urlencode($address), $qq_developer_key), [], false, $duration);
         return $r['status'] == 0 ? $r['result'] : false;
     }
 
@@ -57,22 +58,24 @@ class ClGeo {
      * 依据地址获取经纬度，建议缓存查询结果
      * @param string $address
      * @param string $bai_du_developer_key 百度开发者key
+     * @param integer $duration 缓存时间
      * @return bool|mixed
      */
-    public static function getByAddressWithBaiDu($address, $bai_du_developer_key) {
-        $r = ClHttp::request(sprintf('http://api.map.baidu.com/geocoder/v2/?address=%s&output=json&ak=%s', urlencode($address), $bai_du_developer_key));
+    public static function getByAddressWithBaiDu($address, $bai_du_developer_key, $duration = 3600 * 24) {
+        $r = ClHttp::request(sprintf('http://api.map.baidu.com/geocoder/v2/?address=%s&output=json&ak=%s', urlencode($address), $bai_du_developer_key), [], false, $duration);
         return $r['status'] == 0 ? $r['result'] : false;
     }
 
     /**
      * 依据经纬度获取地址
-     * @param $latitude
-     * @param $longitude
-     * @param $bai_du_developer_key
+     * @param float $latitude
+     * @param float $longitude
+     * @param string $bai_du_developer_key
+     * @param integer $duration 缓存时间
      * @return mixed
      */
-    public static function getAddressByLocationWithBaiDu($latitude, $longitude, $bai_du_developer_key) {
-        $r = ClHttp::request(sprintf('http://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location=%s,%s&pois=0&ak=%s', $latitude, $longitude, $bai_du_developer_key), [], false, 'xml');
+    public static function getAddressByLocationWithBaiDu($latitude, $longitude, $bai_du_developer_key, $duration = 3600) {
+        $r = ClHttp::request(sprintf('http://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location=%s,%s&pois=0&ak=%s', $latitude, $longitude, $bai_du_developer_key), [], false, $duration, 'xml');
         return $r['result'];
     }
 

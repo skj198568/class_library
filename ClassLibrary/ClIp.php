@@ -73,12 +73,13 @@ class ClIp {
 
     /**
      * 按百度获取
-     * @param $ip
-     * @param $bai_du_developer_key
+     * @param string $ip
+     * @param string $bai_du_developer_key
+     * @param integer $duration 缓存时间
      * @return mixed
      */
-    private static function getAddressWithBaiDu($ip, $bai_du_developer_key) {
-        $r = ClHttp::request(sprintf('http://api.map.baidu.com/location/ip?ip=%s&ak=%s&coor=bd09ll', $ip, $bai_du_developer_key));
+    private static function getAddressWithBaiDu($ip, $bai_du_developer_key, $duration = 3600 * 24) {
+        $r = ClHttp::request(sprintf('http://api.map.baidu.com/location/ip?ip=%s&ak=%s&coor=bd09ll', $ip, $bai_du_developer_key), [], false, $duration);
         if ($r['status'] == 0) {
             return $r['content'];
         } else {

@@ -73,7 +73,7 @@ class ClGeo {
      */
     public static function getAddressByLocationWithBaiDu($latitude, $longitude, $bai_du_developer_key) {
         $r = ClHttp::request(sprintf('http://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location=%s,%s&pois=0&ak=%s', $latitude, $longitude, $bai_du_developer_key), [], false, 'xml');
-        return $r['result']['formatted_address'] . $r['result']['sematic_description'];
+        return $r['result'];
     }
 
 }

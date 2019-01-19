@@ -577,119 +577,45 @@ class ClString {
      * @return string
      */
     public static function jsonFormat($json, $html = false) {
-        $tab_count   = 0;
-        $result      = '';
-        $in_quote    = false;
-        $ignore_next = false;
-        if ($html) {
-            $tab     = "&nbsp;&nbsp;&nbsp;&nbsp;";
-            $newline = "<br/>";
-        } else {
-            $tab     = "\t";
-            $newline = "\n";
+        $str = json_decode($json, true);
+        if (empty($str)) {
+            return '';
         }
-        $json = self::toArray($json);
-        try {
-            foreach ($json as $k_char => $char) {
-                if ($ignore_next) {
-                    $result      .= $char;
-                    $ignore_next = false;
-                } else {
-                    switch ($char) {
-                        case '{':
-                            $tab_count++;
-                            $result .= $char . $newline . str_repeat($tab, $tab_count);
-                            break;
-                        case '}':
-                            if ($tab_count > 0) {
-                                $tab_count--;
-                            }
-                            $result = trim($result) . $newline . str_repeat($tab, $tab_count) . $char;
-                            break;
-                        case '[':
-                            $tab_count++;
-                            $result .= $char . $newline . str_repeat($tab, $tab_count);
-                            break;
-                        case ']':
-                            if ($tab_count > 0) {
-                                $tab_count--;
-                            }
-                            $result = trim($result) . $newline . str_repeat($tab, $tab_count) . $char;
-                            break;
-                        case ',':
-                            //判断+1字符串为"时，才换行
-                            if (isset($json[$k_char + 1]) && ($json[$k_char + 1] == '"' || $json[$k_char + 1] == '{')) {
-                                $result .= $char . $newline . str_repeat($tab, $tab_count);
-                            } else {
-                                $result .= $char;
-                            }
-                            break;
-                        case '"':
-                            if (isset($json[$k_char + 1]) && $json[$k_char + 1] == ']') {
-                                $tab_count--;
-                                $result .= $char . $newline . str_repeat($tab, $tab_count);
-                            } else {
-                                $in_quote = !$in_quote;
-                                $result   .= $char;
-                            }
-                            break;
-                        case '\\':
-                            if ($in_quote) {
-                                $ignore_next = true;
-                            }
-                            $result .= $char;
-                            break;
-                        default:
-                            $result .= $char;
+        $str = json_encode($str, JSON_PRETTY_PRINT);
+        //美化
+        if ($html) {
+            $str_array = explode("\n", $str);
+            $search    = [];
+            $replace   = [];
+            foreach ($str_array as $each) {
+                $item = self::getBetween($each, '"', ':', false);
+                if (!empty($item)) {
+                    $item = '"' . $item;
+                    if (!in_array($item, $search)) {
+                        $search[]  = $item;
+                        $replace[] = '<span style="color: blue;">' . $item . '</span>';
                     }
                 }
             }
-        } catch (ErrorException $e) {
-            return 'json格式错误';
-        }
-        if ($html) {
-            $result = explode($newline, $result);
-            foreach ($result as $k => $v) {
-                $has_comma = false;
-                //最后一个,号处理
-                if (substr($v, -1, 1) == ',') {
-                    $v         = rtrim($v, ',');
-                    $has_comma = true;
-                }
-                if (strpos($v, ':') !== false) {
-                    $pre  = ClString::getBetween($v, '', ':', false);
-                    $left = trim(str_replace($pre, '', $v), ':');
-                    if ($left == '{') {
-                        $left = '<span style="color: #FF3300;">{</span>';
-                    } elseif ($left == '[') {
-                        $left = '<span style="color: #3ab54a;">[</span>';
-                    } elseif ($left == '[]') {
-                        $left = '<span style="color: #3ab54a;">[]</span>';
-                    }
-                    $v = sprintf('%s:%s', sprintf('<span style="color: blue;">%s</span>', $pre), $left);
-                } else if (str_replace('&nbsp;', '', $v) == '{') {
-                    $v = str_replace('{', '<span style="color: #FF3300;">{</span>', $v);
-                } else if (str_replace('&nbsp;', '', $v) == '}') {
-                    $v = str_replace('}', '<span style="color: #FF3300;">}</span>', $v);
-                } else if (str_replace('&nbsp;', '', $v) == ']') {
-                    $v = str_replace(']', '<span style="color: #3ab54a;">]</span>', $v);
-                } else if (str_replace('&nbsp;', '', $v) == '[') {
-                    $v = str_replace('[', '<span style="color: #3ab54a;">[</span>', $v);
-                }
-                if ($has_comma) {
-                    $v .= '<i style="color: blue;">,</i>';
-                }
-                $result[$k] = $v;
-            }
-            $result = implode($newline, $result);
-        }
-        //替换转义字符
-        if ($html) {
-            $result = str_replace(['\/', '\"'], ['<span style="color: #3ab54a;">/</span>', '"'], $result);
+            $str = str_replace(' ', '&nbsp;&nbsp;', $str);
+            $str = nl2br($str);
+            $str = str_replace('{', '<span style="color: #FF3300;">{</span>', $str);
+            $str = str_replace('}', '<span style="color: #FF3300;">}</span>', $str);
+            $str = str_replace('[', '<span style="color: #3ab54a;">[</span>', $str);
+            $str = str_replace(']', '<span style="color: #3ab54a;">]</span>', $str);
+            $str = str_replace(',', '<span style="color: blue;">,</span>', $str);
+            $str = str_replace($search, $replace, $str);
+            $str = str_replace(['\/'], ['<span style="color: #3ab54a;">/</span>'], $str);
         } else {
-            $result = str_replace(['\/', '\"'], ['/', '"'], $result);
+            $str = str_replace(['\/'], ['/'], $str);
         }
-        return $result;
+        //中文处理
+        $str = preg_replace_callback('/\\\\u([0-9a-f]{4})/i',
+            function ($matches) {
+                return mb_convert_encoding(pack("H*", $matches[1]), "UTF-8", "UCS-2BE");
+            },
+            $str);
+        return $str;
     }
 
     /**

@@ -597,7 +597,7 @@ class ClString {
                     }
                 }
             }
-            $str = str_replace(' ', '&nbsp;&nbsp;', $str);
+            $str = str_replace(' ', '&nbsp;', $str);
             $str = nl2br($str);
             $str = str_replace('{', '<span style="color: #FF3300;">{</span>', $str);
             $str = str_replace('}', '<span style="color: #FF3300;">}</span>', $str);

@@ -266,8 +266,35 @@ class ClString {
      * @return string 结果
      */
     public static function getBetween($string, $begin_tag, $end_tag = '', $is_include_tag = true) {
-        $temp = self::split($string, $begin_tag, false, $is_include_tag);
-        return $end_tag === '' ? $temp : self::split($temp, $end_tag, true, $is_include_tag);
+        $string = self::split($string, $begin_tag, false, true);
+        if ($end_tag !== '') {
+            //end_tag不为空时
+            $string = self::split($string, $end_tag, true, true);
+            //在end_tag仍存在的情况下，判断begin_tag是否存在多个
+            if (strpos($string, $begin_tag) != strrpos($string, $begin_tag)) {
+                $string = substr($string, strlen($begin_tag));
+                //当end_tag存在，且位置大于begin_tag
+                if (strpos($string, $end_tag) !== false && strpos($string, $end_tag) > strpos($string, $begin_tag)) {
+                    $string = self::getBetween($string, $begin_tag, $end_tag, true);
+                }
+            }
+        } else {
+            //只需判断begin_tag是否仍旧存在
+            if (strpos($string, $begin_tag) != strrpos($string, $begin_tag)) {
+                $string = substr($string, strlen($begin_tag));
+                $string = self::getBetween($string, $begin_tag, $end_tag, true);
+            }
+        }
+        //最后处理是否包含标签
+        if (!$is_include_tag) {
+            $string = substr($string, strlen($begin_tag));
+            if ($end_tag !== '') {
+                $string = substr($string, 0, strlen($string) - strlen($end_tag));
+            }
+        }
+        //去除两端空格及换行符、tab等
+        $string = trim(trim(trim($string), "\n"), "\t");
+        return $string;
     }
 
     /**

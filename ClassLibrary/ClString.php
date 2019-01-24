@@ -271,7 +271,7 @@ class ClString {
             //end_tag不为空时
             $string = self::split($string, $end_tag, true, true);
             //在end_tag仍存在的情况下，判断begin_tag是否存在多个
-            if (strpos($string, $begin_tag) != strrpos($string, $begin_tag)) {
+            if (!empty($string) && !empty($begin_tag) && (strpos($string, $begin_tag) != strrpos($string, $begin_tag))) {
                 $string = substr($string, strlen($begin_tag));
                 //当end_tag存在，且位置大于begin_tag
                 if (strpos($string, $end_tag) !== false && strpos($string, $end_tag) > strpos($string, $begin_tag)) {
@@ -280,7 +280,7 @@ class ClString {
             }
         } else {
             //只需判断begin_tag是否仍旧存在
-            if (strpos($string, $begin_tag) != strrpos($string, $begin_tag)) {
+            if (!empty($string) && !empty($begin_tag) && (strpos($string, $begin_tag) != strrpos($string, $begin_tag))) {
                 $string = substr($string, strlen($begin_tag));
                 $string = self::getBetween($string, $begin_tag, $end_tag, true);
             }

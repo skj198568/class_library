@@ -701,10 +701,14 @@ class ClFieldVerify extends ClFieldBase {
      * @return string
      */
     private static function getErrorMsg($verify, $fields, $k_field, $instance = null) {
-        if (!ClVerify::isJson(json_encode($fields[$k_field]))) {
-            $fields[$k_field] = '';
+        if (isset($fields[$k_field])) {
+            if (!ClVerify::isJson(json_encode($fields[$k_field]))) {
+                $fields[$k_field] = '';
+            } else {
+                $fields[$k_field] = is_string($fields[$k_field]) ? $fields[$k_field] : json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE);
+            }
         } else {
-            $fields[$k_field] = is_string($fields[$k_field]) ? $fields[$k_field] : json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE);
+            $fields[$k_field] = null;
         }
         switch ((is_array($verify) ? $verify[0] : $verify)) {
             case 'password':

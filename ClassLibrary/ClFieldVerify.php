@@ -708,7 +708,7 @@ class ClFieldVerify extends ClFieldBase {
                 $fields[$k_field] = is_string($fields[$k_field]) ? $fields[$k_field] : json_encode($fields[$k_field], JSON_UNESCAPED_UNICODE);
             }
         } else {
-            $fields[$k_field] = null;
+            $fields[$k_field] = '';
         }
         switch ((is_array($verify) ? $verify[0] : $verify)) {
             case 'password':

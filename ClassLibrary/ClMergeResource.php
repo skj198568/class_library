@@ -108,25 +108,8 @@ class ClMergeResource {
         }
         $js_files = array_values($js_files);
         if (count($js_files) > 0) {
-            if (!ClVerify::isLocalIp()) {
-                //非局域网请求
-                //合并js
-                $merge_js_file = self::mergeJs($js_files);
-                //替换js文件
-                foreach ($js_files as $k => $v) {
-                    if ($k == 0) {
-                        //替换
-                        $content = str_replace($v, sprintf('<script src="%s"></script>', $merge_js_file), $content);
-                    } else {
-                        //删除
-                        $content = str_replace($v, '', $content);
-                    }
-                }
-            } else {
-                //局域网请求
-                foreach ($js_files as $each) {
-                    $content = self::replaceJsAddVersion($content, $each);
-                }
+            foreach ($js_files as $each) {
+                $content = self::replaceJsAddVersion($content, $each);
             }
         }
         $css_files = ClString::parseToArray($content, '<link ', '>');
@@ -148,25 +131,9 @@ class ClMergeResource {
         }
         $css_files = array_values($css_files);
         if (count($css_files) > 0) {
-            if (!ClVerify::isLocalIp()) {
-                //合并css文件
-                $merge_css_file = sprintf('<link rel="stylesheet" href="%s"/>', self::mergeCss($css_files));
-                //替换css文件
-                foreach ($css_files as $k => $v) {
-                    if ($k == 0) {
-                        //替换
-                        $content = str_replace($v, $merge_css_file, $content);
-                    } else {
-                        //删除
-                        $content = str_replace($v, '', $content);
-                    }
-                }
-            } else {
-                //局域网请求
-                foreach ($css_files as $each) {
-                    //替换
-                    $content = self::replaceCssAddVersion($content, $each);
-                }
+            foreach ($css_files as $each) {
+                //替换
+                $content = self::replaceCssAddVersion($content, $each);
             }
         }
         if (!empty(self::$not_has_files)) {
@@ -179,31 +146,6 @@ class ClMergeResource {
             cache(self::getAllResourceFileCacheKey($key), self::$all_resource_file_map_create_time);
         }
         return $content;
-    }
-
-    /**
-     * 合并js文件
-     * @param $js_files
-     * @return mixed
-     */
-    private static function mergeJs($js_files) {
-        //合并js文件
-        $js_temp_file = DOCUMENT_ROOT_PATH . '/resource/js/' . ClString::toCrc32(json_encode($js_files)) . '/temp.js';
-        //创建文件夹
-        ClFile::dirCreate($js_temp_file);
-        $js_temp_file_handle = fopen($js_temp_file, 'w+');
-        $js_path             = '';
-        foreach ($js_files as $v) {
-            $js_path = self::getJsAbsolutePath($v);
-            if (is_file($js_path)) {
-                fputs($js_temp_file_handle, file_get_contents($js_path) . "\n");
-            }
-        }
-        fclose($js_temp_file_handle);
-        $merge_js_file = str_replace('temp.js', self::getFileVersion($js_temp_file) . '.js', $js_temp_file);
-        //移动文件
-        rename($js_temp_file, $merge_js_file);
-        return str_replace(DOCUMENT_ROOT_PATH, '', $merge_js_file);
     }
 
     /**
@@ -229,44 +171,6 @@ class ClMergeResource {
             self::$all_resource_file_map_create_time[$js_file] = self::getFileVersion($js_file);
         }
         return $js_file;
-    }
-
-    /**
-     * 合并css文件
-     * @param $css_files
-     * @return mixed
-     */
-    private static function mergeCss($css_files) {
-        //合并js文件
-        $temp_file = DOCUMENT_ROOT_PATH . '/resource/css/' . ClString::toCrc32(json_encode($css_files)) . '/temp.css';
-        //创建文件夹
-        ClFile::dirCreate($temp_file);
-        $temp_file_handle = fopen($temp_file, 'w+');
-        $file_path        = '';
-        $file_content     = '';
-        $resource_files   = [];
-        foreach ($css_files as $v) {
-            $file_path      = self::getCssAbsolutePath($v);
-            $file_content   = file_get_contents($file_path);
-            $resource_files = ClString::parseToArray($file_content, 'url\(', '\)');
-            if (!empty($resource_files)) {
-                foreach ($resource_files as $resource_file) {
-                    $path = self::getCssResourcePath($file_path, $resource_file);
-                    if (!empty($path)) {
-                        //替换css资源
-                        $file_content = str_replace($resource_file, sprintf('url("%s")', $path), $file_content);
-                    }
-                }
-            }
-            if (is_file($file_path)) {
-                fputs($temp_file_handle, $file_content . "\n");
-            }
-        }
-        fclose($temp_file_handle);
-        $merge_file = str_replace('temp.css', self::getFileVersion($temp_file) . '.css', $temp_file);
-        //移动文件
-        rename($temp_file, $merge_file);
-        return str_replace(DOCUMENT_ROOT_PATH, '', $merge_file);
     }
 
     /**

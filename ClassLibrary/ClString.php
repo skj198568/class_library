@@ -269,7 +269,15 @@ class ClString {
         $string = self::split($string, $begin_tag, false, true);
         if ($end_tag !== '') {
             //end_tag不为空时
+            if (!empty($begin_tag)) {
+                //先去除begin_tag
+                if (strpos($string, $begin_tag) !== false) {
+                    $string = substr($string, strlen($begin_tag));
+                }
+            }
             $string = self::split($string, $end_tag, true, true);
+            //拼接上begin_tag
+            $string = $begin_tag . $string;
             //在end_tag仍存在的情况下，判断begin_tag是否存在多个
             if (!empty($string) && !empty($begin_tag) && (strpos($string, $begin_tag) != strrpos($string, $begin_tag))) {
                 $string = substr($string, strlen($begin_tag));
@@ -287,9 +295,15 @@ class ClString {
         }
         //最后处理是否包含标签
         if (!$is_include_tag) {
-            $string = substr($string, strlen($begin_tag));
+            if ($begin_tag !== '') {
+                if (strpos($string, $begin_tag) !== false) {
+                    $string = substr($string, strlen($begin_tag));
+                }
+            }
             if ($end_tag !== '') {
-                $string = substr($string, 0, strlen($string) - strlen($end_tag));
+                if (strpos($string, $end_tag) !== false) {
+                    $string = substr($string, 0, strlen($string) - strlen($end_tag));
+                }
             }
         }
         //去除两端空格及换行符、tab等

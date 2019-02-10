@@ -801,5 +801,45 @@ class ClImage {
         return $save_absolute_file_url;
     }
 
+    /**
+     * 输出图片至浏览器
+     * @param $image_absolute_url
+     */
+    public static function outputToBrowser($image_absolute_url) {
+        if (!is_file($image_absolute_url)) {
+            $image_absolute_url = DOCUMENT_ROOT_PATH . $image_absolute_url;
+        }
+        if (!is_file($image_absolute_url)) {
+            echo 'image file is not exist';
+            exit;
+        }
+        $im    = null;
+        $image = getimagesize($image_absolute_url, $info);
+        echo_info($image, $info);
+        switch ($image[2]) {
+            case 1:
+                //gif
+                $im = imagecreatefromgif($image_absolute_url);
+                header('Content-Type: image/gif');
+                imagegif($im);
+                break;
+            case 2:
+                //jpg
+                $im = imagecreatefromjpeg($image_absolute_url);
+                header('Content-Type: image/jpeg');
+                imagejpeg($im);
+                break;
+            case 3:
+                //png
+                $im = imagecreatefrompng($image_absolute_url);
+                header('Content-Type: image/png');
+                imagepng($im);
+                break;
+        }
+        if ($im != null) {
+            imagedestroy($im);
+        }
+    }
+
 }
 

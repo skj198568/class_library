@@ -687,4 +687,54 @@ class ClString {
         return $source_str;
     }
 
+    /**
+     * 数字金额转换成中文大写金额
+     * @param integer $num 金额
+     * @param bool $is_simple 是否是中文简写
+     * @param bool $mode 模式
+     * @return mixed|string
+     */
+    public static function monenyFormatRmb($num, $is_simple = false, $mode = true) {
+        if (!is_numeric($num)) {
+            return '含有非数字非小数点字符！';
+        }
+        $char   = $is_simple ? ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九']
+            : ['零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖'];
+        $unit   = $is_simple ? ['', '十', '百', '千', '', '万', '亿', '兆']
+            : ['', '拾', '佰', '仟', '', '萬', '億', '兆'];
+        $retval = $mode ? '元' : '点';
+        //小数部分
+        if (strpos($num, '.')) {
+            list($num, $dec) = explode('.', $num);
+            $dec = strval(round($dec, 2));
+            if ($mode) {
+                if (strlen($dec) == 1) {
+                    $retval .= sprintf('%s角', $char[$dec{0}]);
+                } else {
+                    $retval .= sprintf('%s角%s分', $char[$dec{0}], $char[$dec{1}]);
+                }
+            } else {
+                for ($i = 0, $c = strlen($dec); $i < $c; $i++) {
+                    $retval .= $char[$dec[$i]];
+                }
+            }
+        }
+        //整数部分
+        $str = $mode ? strrev(intval($num)) : strrev($num);
+        for ($i = 0, $c = strlen($str); $i < $c; $i++) {
+            $out[$i] = $char[$str[$i]];
+            if ($mode) {
+                $out[$i] .= $str[$i] != '0' ? $unit[$i % 4] : '';
+                if ($i > 1 and $str[$i] + $str[$i - 1] == 0) {
+                    $out[$i] = '';
+                }
+                if ($i % 4 == 0) {
+                    $out[$i] .= $unit[4 + floor($i / 4)];
+                }
+            }
+        }
+        $retval = join('', array_reverse($out)) . $retval;
+        return $retval;
+    }
+
 }

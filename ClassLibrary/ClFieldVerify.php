@@ -689,7 +689,20 @@ class ClFieldVerify extends ClFieldBase {
      * @return bool
      */
     private static function fieldNeedCheck($fields, $k_field) {
-        return isset($fields[$k_field]) && (is_numeric($fields[$k_field]) || !empty($fields[$k_field]));
+        //不存在，不进行校验
+        if (!isset($fields[$k_field])) {
+            return false;
+        }
+        //是数字，则进行校验
+        if (is_numeric($fields[$k_field])) {
+            return true;
+        }
+        //为空，不进行校验
+        if (empty($fields[$k_field])) {
+            return false;
+        }
+        //其余情况，进行校验
+        return true;
     }
 
     /**

@@ -855,7 +855,7 @@ class ClWXQY {
      * @return bool|mixed array('type' => '文件类型', 'media_id' => '媒体文件上传后获取的唯一标识', 'created_at ' => '媒体上传时间戳')
      */
     public static function mediaUpload($access_token, $type, $name, $filename, $file_absolute_url) {
-        $r = ClHttp::uploadFile(self::URL . "/media/upload?access_token=$access_token&type=$type", array(), $name, $filename, $file_absolute_url);
+        $r = ClHttp::uploadFile(self::URL . "/media/upload?access_token=$access_token&type=$type", [], $name, $filename, $file_absolute_url);
         $r = json_decode($r, true);
         return $r['errcode'] == 0 ? $r : false;
     }
@@ -867,7 +867,7 @@ class ClWXQY {
      * @param $local_file_absolute_url
      */
     public static function mediaGet($access_token, $media_id, $local_file_absolute_url) {
-        Http::curlDownload(self::URL . "/media/get?access_token=$access_token&media_id=$media_id", $local_file_absolute_url);
+        ClHttp::fsockopenDownload(self::URL . "/media/get?access_token=$access_token&media_id=$media_id", $local_file_absolute_url);
     }
 
     /**
@@ -1019,7 +1019,7 @@ class ClWXQY {
                 "media_id" => $media_id
             ),
             "safe"    => $is_safe
-        ]));
+        ]);
         return $r['errcode'] == 0 ? true : false;
     }
 
@@ -1248,9 +1248,9 @@ class ClWXQY {
      */
     public static function menuCreate($access_token, $agent_id, array $buttons) {
         $r = ClHttp::request(self::URL . "/menu/create?access_token=$access_token&agentid=$agent_id", [
-            'button' => array(
+            'button' => [
                 $buttons
-            )
+            ]
         ]);
         return $r['errcode'] == 0 ? true : false;
     }

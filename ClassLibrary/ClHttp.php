@@ -138,52 +138,6 @@ class ClHttp {
     }
 
     /**
-     * http请求
-     * @param string $url 请求地址
-     * @param array $params 请求参数数组
-     * @param int $duration 缓存时间
-     * @param bool $is_debug 是否是debug模式
-     * @param string $result_type 结果格式
-     * @return mixed
-     */
-    public static function http($url, $params = [], $duration = null, $is_debug = false, $result_type = 'json') {
-        $config = ['post' => $params];
-        if ($result_type == 'json') {
-            $config['content_type'] = 'application/json';
-        }
-        if ($duration !== null) {
-            $key    = ClCache::getKey($url, $params);
-            $result = cache($key);
-            if ($result === false) {
-                $result = self::fsockopenDownload($url, $config);
-                if (strtolower($result_type) == 'json') {
-                    $result = json_decode($result, true);
-                }
-                //写入缓存
-                cache($key, $result, $duration);
-            }
-        } else {
-            $result = self::fsockopenDownload($url, $config);
-            if (strtolower($result_type) == 'json') {
-                $result = json_decode($result, true);
-            }
-        }
-        if ($is_debug) {
-            log_info('HTTP:', $url, $params, $result);
-        }
-        return $result;
-    }
-
-    /**
-     * 删除缓存
-     * @param $url
-     * @param $params
-     */
-    public static function httpRc($url, $params) {
-        ClCache::remove($url, $params);
-    }
-
-    /**
      * https请求
      * @param string $url 请求地址
      * @param array $params 上传文件采用 @文件绝对地址 方式

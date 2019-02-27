@@ -110,15 +110,17 @@ class ClMigrateTable {
 
     /**
      * 获取更新Comment SQL
-     * @param $table
-     * @param $table_desc
-     * @param string $engine
+     * @param $table 表名
+     * @param $table_desc 表描述
+     * @param string $engine 引擎
+     * @param int $ignore 是否忽略该表
      * @return string
      */
-    public function getUpdateCommentSql($table, $table_desc, $engine = 'InnoDB') {
+    public function getUpdateCommentSql($table, $table_desc, $engine = 'InnoDB', $ignore = 0) {
         $sql                = sprintf("ALTER TABLE `%s` ENGINE=%s COMMENT='%s'", config('database.prefix') . $table, $engine, str_replace(["'"], ["\'"], json_encode(
                 array_merge([
-                    'name' => $table_desc
+                    'name'   => $table_desc,
+                    'ignore' => $ignore
                 ], $this->table_config),
                 JSON_UNESCAPED_UNICODE))
         );

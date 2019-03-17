@@ -136,7 +136,7 @@ class ClImage {
 
     /**
      * 生成二维码图片
-     * @param $str 二维码内容
+     * @param string $str 二维码内容
      * @param string $logo_absolute_file 二维码logo绝对路径
      * @param int $width 图片宽度，
      * @param int $margin 二维码margin

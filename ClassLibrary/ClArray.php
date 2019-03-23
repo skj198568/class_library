@@ -167,6 +167,9 @@ class ClArray {
      */
     public static function getByKeys($array, $keys, $filters = ['trim']) {
         $return = [];
+        if (empty($array) || !is_array($array)) {
+            return $return;
+        }
         foreach ($array as $k => $v) {
             if (in_array($k, $keys)) {
                 $return[$k] = $v;

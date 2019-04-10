@@ -237,20 +237,18 @@ class ClString {
         if ($separator_tag === '') {
             return $string;
         }
-        $lc_str     = strtolower($string);
-        $marker     = strtolower($separator_tag);
-        $split_here = strpos($lc_str, $marker);
+        $split_here = strpos($string, $separator_tag);
         if ($split_here === false) {
             return '';
         }
         if ($get_before) {
             if ($is_include_tag != false) {
-                $split_here = strpos($lc_str, $marker) + strlen($marker);
+                $split_here = strpos($string, $separator_tag) + strlen($separator_tag);
             }
             $parsed_string = substr($string, 0, $split_here);
         } else {
             if ($is_include_tag == false) {
-                $split_here = $split_here + strlen($marker);
+                $split_here = $split_here + strlen($separator_tag);
             }
             $parsed_string = substr($string, $split_here, strlen($string));
         }

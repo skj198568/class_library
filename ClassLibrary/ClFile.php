@@ -393,9 +393,11 @@ class ClFile {
                 );
             } else {
                 $return = array(
-                    'result' => true,
-                    'msg'    => '上传成功',
-                    'file'   => str_replace(DOCUMENT_ROOT_PATH, '', $save_file)
+                    'result'    => true,
+                    'msg'       => '上传成功',
+                    'file_name' => $file_name,
+                    'file_size' => $file_size,
+                    'file'      => str_replace(DOCUMENT_ROOT_PATH, '', $save_file)
                 );
             }
             return $return;
@@ -443,9 +445,11 @@ class ClFile {
                 }
                 $destination_file = $temp_name;
                 return [
-                    'result' => true,
-                    'msg'    => '上传成功',
-                    'file'   => str_replace(DOCUMENT_ROOT_PATH, '', $destination_file)
+                    'result'    => true,
+                    'msg'       => '上传成功',
+                    'file_name' => $file_name,
+                    'file_size' => $file_size,
+                    'file'      => str_replace(DOCUMENT_ROOT_PATH, '', $destination_file)
                 ];
             }
         } else {

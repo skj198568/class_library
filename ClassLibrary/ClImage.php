@@ -801,5 +801,39 @@ class ClImage {
         return $save_absolute_file_url;
     }
 
+    /**
+     * 压缩png图片
+     * centos系统先安装pngquant：yum install gcc && yum install pngquant
+     * @param string $source_png_file 源png图片地址
+     * @param string $save_absolute_file 存储png图片地址，如果为空，则覆盖源文件
+     * @param int $min_quality 最小质量(0-100)
+     * @param int $max_quality 最大质量(0-100)
+     * @return string
+     */
+    public static function compressPng($source_png_file, $save_absolute_file = '', $min_quality = 60, $max_quality = 90) {
+        if (!file_exists($source_png_file)) {
+            throw new Exception("File does not exist: $source_png_file");
+        }
+        // guarantee that quality won't be worse than that.
+
+        // '-' makes it use stdout, required to save to $compressed_png_content variable
+        // '<' makes it read from the given file path
+        // escapeshellarg() makes this safe to use with any path
+        $compressed_png_content = shell_exec("pngquant --quality=$min_quality-$max_quality - < " . escapeshellarg($source_png_file));
+        if (!$compressed_png_content) {
+            throw new Exception("Conversion to compressed PNG failed. Is pngquant 1.8+ installed on the server?");
+        }
+        //存储文件
+        if (empty($save_absolute_file)) {
+            //覆盖原文件
+            $save_absolute_file = $source_png_file;
+        }
+        //先创建文件夹
+        ClFile::dirCreate($save_absolute_file);
+        //保存
+        file_put_contents($save_absolute_file, $compressed_png_content);
+        return $save_absolute_file;
+    }
+
 }
 

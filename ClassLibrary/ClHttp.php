@@ -148,9 +148,9 @@ class ClHttp {
             $key    = ClCache::getKey($url, $params);
             $result = cache($key);
             if ($result !== false) {
-                if (strtolower($result_type) == 'json') {
+                if (strtolower($result_type) == self::REQUEST_RESULT_TYPE_JSON) {
                     $result = json_decode($result, true);
-                } else if (strtolower($result_type) == 'xml') {
+                } else if (strtolower($result_type) == self::REQUEST_RESULT_TYPE_XML) {
                     $result = ClXml::toArray($result);
                 }
                 return $result;

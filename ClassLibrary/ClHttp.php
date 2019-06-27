@@ -141,14 +141,14 @@ class ClHttp {
      * https请求
      * @param string $url 请求地址
      * @param array $params 上传文件采用 @文件绝对地址 方式
+     * @param string $result_type json/xml 默认为空，不进行处理
      * @param bool $debug 是否调试
      * @param int $duration 缓存时间
-     * @param string $result_type json/xml
      * @param array $header
      * @param int $timeout 超时时间
      * @return mixed
      */
-    public static function request($url, $params = [], $debug = false, $duration = 0, $result_type = 'json', $header = [], $timeout = 30) {
+    public static function request($url, $params = [], $result_type = '', $duration = 0, $debug = false, $header = [], $timeout = 30) {
         if ($duration > 0) {
             $key    = ClCache::getKey($url, $params);
             $result = cache($key);

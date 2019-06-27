@@ -323,20 +323,7 @@ class ClString {
         preg_match_all("($preg_quote_begin_tag(.*)$preg_quote_end_tag)siU", $string, $matching_data);
         //循环处理，获取最小结果值
         foreach ($matching_data[0] as $k => $each) {
-            while (substr_count($each, $begin_tag) > 1 || substr_count($each, $end_tag) > 1) {
-                if (substr_count($each, $begin_tag) > 1) {
-                    $each = trim($each, $begin_tag);
-                }
-                if (substr_count($each, $end_tag) > 1) {
-                    $each = trim($each, $end_tag);
-                }
-                $each = ClString::getBetween($each, $begin_tag, $end_tag, $is_include_tag);
-            }
-            if ($is_include_tag == false) {
-                $each = str_replace($begin_tag, '', $each);
-                $each = str_replace($end_tag, '', $each);
-            }
-            $matching_data[0][$k] = $each;
+            $matching_data[0][$k] = ClString::getBetween($each, $begin_tag, $end_tag, $is_include_tag);
         }
         return $matching_data[0];
     }

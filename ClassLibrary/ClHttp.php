@@ -18,21 +18,6 @@ use think\Exception;
 class ClHttp {
 
     /**
-     * http结果格式
-     */
-    const V_HTTP_RESULT_JSON = 'json';
-
-    /**
-     * http debug
-     */
-    const V_HTTP_IS_DEBUG_YES = true;
-
-    /**
-     * http debug
-     */
-    const V_HTTP_IS_DEBUG_NO = false;
-
-    /**
      * 获取服务器地址
      * @param bool $with_protocol
      * @return string
@@ -138,10 +123,20 @@ class ClHttp {
     }
 
     /**
+     * 请求返回值为json
+     */
+    const REQUEST_RESULT_TYPE_JSON = 'json';
+
+    /**
+     * 请求返回值为xml
+     */
+    const REQUEST_RESULT_TYPE_XML = 'xml';
+
+    /**
      * https请求
      * @param string $url 请求地址
      * @param array $params 上传文件采用 @文件绝对地址 方式
-     * @param string $result_type json/xml 默认为空，不进行处理
+     * @param string $result_type REQUEST_RESULT_TYPE_JSON/REQUEST_RESULT_TYPE_XML 默认为空，不进行处理
      * @param bool $debug 是否调试
      * @param int $duration 缓存时间
      * @param array $header

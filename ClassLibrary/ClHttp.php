@@ -208,9 +208,9 @@ class ClHttp {
             //缓存
             cache($key, $response, $duration);
         }
-        if (strtolower($result_type) == 'json') {
+        if (strtolower($result_type) == self::REQUEST_RESULT_TYPE_JSON) {
             $response = json_decode($response, true);
-        } else if (strtolower($result_type) == 'xml') {
+        } else if (strtolower($result_type) == self::REQUEST_RESULT_TYPE_XML) {
             $response = ClXml::toArray($response);
         }
         return $response;

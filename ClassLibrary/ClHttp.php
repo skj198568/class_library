@@ -135,7 +135,7 @@ class ClHttp {
     /**
      * https请求
      * @param string $url 请求地址
-     * @param array $params 上传文件采用 @文件绝对地址 方式
+     * @param array $params 上传文件采用 @文件绝对地址方式，如果为空，则采用GET方式提交，如果不为空，则采用POST方式提交
      * @param string $result_type REQUEST_RESULT_TYPE_JSON/REQUEST_RESULT_TYPE_XML 默认为空，不进行处理
      * @param bool $debug 是否调试
      * @param int $duration 缓存时间
@@ -188,9 +188,11 @@ class ClHttp {
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        //文件上传不可build
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $is_post_file ? $params : (is_array($params) ? http_build_query($params) : $params));
+        if (!empty($params)) {
+            curl_setopt($ch, CURLOPT_POST, 1);
+            //文件上传不可build
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $is_post_file ? $params : (is_array($params) ? http_build_query($params) : $params));
+        }
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
         $response = curl_exec($ch);
         if ($error = curl_error($ch)) {

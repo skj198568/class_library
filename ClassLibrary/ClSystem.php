@@ -104,6 +104,19 @@ class ClSystem {
     }
 
     /**
+     * 获取外网ip地址
+     * @return mixed|string
+     */
+    public static function getIp() {
+        $result = ClHttp::request('http://ip.360.cn/IPShare/info', [], ClHttp::REQUEST_RESULT_TYPE_JSON);
+        if (is_array($result) && isset($result['ip'])) {
+            return $result['ip'];
+        } else {
+            return '';
+        }
+    }
+
+    /**
      * 判断系统是否是windows
      * @return bool
      */

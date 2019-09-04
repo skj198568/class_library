@@ -812,7 +812,8 @@ class ClImage {
      */
     public static function compressPng($source_png_file, $save_absolute_file = '', $min_quality = 60, $max_quality = 90) {
         if (!file_exists($source_png_file)) {
-            throw new Exception("File does not exist: $source_png_file");
+            //文件不存在，直接返回源文件
+            return $source_png_file;
         }
         // guarantee that quality won't be worse than that.
 
@@ -820,8 +821,9 @@ class ClImage {
         // '<' makes it read from the given file path
         // escapeshellarg() makes this safe to use with any path
         $compressed_png_content = shell_exec("pngquant --quality=$min_quality-$max_quality - < " . escapeshellarg($source_png_file));
-        if (!$compressed_png_content) {
-            throw new Exception("Conversion to compressed PNG failed. Is pngquant 1.8+ installed on the server?");
+        if (empty($compressed_png_content)) {
+            //压缩失败，直接返回源文件
+            return $source_png_file;
         }
         //存储文件
         if (empty($save_absolute_file)) {

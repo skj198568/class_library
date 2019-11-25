@@ -200,6 +200,8 @@ class ClHttp {
         }
         // 打印错误信息
         if ($debug) {
+            log_info('url', $url);
+            log_info('params', $params);
             log_info('info', curl_getinfo($ch));
             log_info('error', curl_error($ch));
             log_info('response', $response);

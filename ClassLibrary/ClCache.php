@@ -75,7 +75,7 @@ class ClCache {
      * @param $params
      * @return string
      */
-    private static function createKeyByParams($params) {
+    public static function createKeyByParams($params) {
         $key = '';
         foreach ($params as $each) {
             if (is_string($each)) {

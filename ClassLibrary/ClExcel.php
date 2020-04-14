@@ -157,7 +157,7 @@ class ClExcel {
         $return_array = [];
         //保存csv格式
         for ($sheet_index = 0; $sheet_index < $count; $sheet_index++) {
-            $csv_file = str_replace(ClFile::getSuffix($excel_file, true), sprintf('_%s.csv', $sheet_index), $excel_file);
+            $csv_file   = str_replace(ClFile::getSuffix($excel_file, true), sprintf('_%s.csv', $sheet_index), $excel_file);
             $obj_writer = IOFactory::createWriter($spreadsheet, 'Csv');
             //设置sheet
             $obj_writer->setSheetIndex($sheet_index);
@@ -340,6 +340,36 @@ class ClExcel {
             $item = '';
         }
         return $items_temp;
+    }
+
+    /**
+     * csv自动填充合并的字段内容
+     * @param $csv_absulute_url
+     * @return array
+     * @author SongKeJing
+     * @date 2020/4/14 20:38
+     */
+    public static function csvAutoFixedColumn($csv_absulute_url) {
+        $csv_absulute_url = self::csvClear($csv_absulute_url);
+        $handle           = fopen($csv_absulute_url, 'r');
+        $items            = [];
+        while (!feof($handle)) {
+            $items[] = self::csvLineToArray(fgets($handle));
+        }
+        foreach ($items as $k_son => $v_son) {
+            $has_field = false;
+            foreach ($v_son as $k_k_son => $v_v_son) {
+                if (empty($v_v_son) && !$has_field) {
+                    if (isset($items[$k_son - 1][$k_k_son]) && !empty($items[$k_son - 1][$k_k_son])) {
+                        $items[$k_son][$k_k_son] = $items[$k_son - 1][$k_k_son];
+                    }
+                } else {
+                    $has_field = true;
+                }
+            }
+        }
+        fclose($handle);
+        return $items;
     }
 
 }

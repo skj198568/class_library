@@ -66,7 +66,6 @@ class ClMigrateField extends ClFieldBase {
      */
     public function isReadOnly() {
         $this->field_config['is_read_only'] = 1;
-        $this->verifyIsRequire();
         return $this;
     }
 

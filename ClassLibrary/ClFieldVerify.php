@@ -648,14 +648,16 @@ class ClFieldVerify extends ClFieldBase {
             if (!empty($error_msg)) {
                 if (!ClVerify::isJson(json_encode($fields))) {
                     $response = json_return([
-                        'status'  => -1,
-                        'message' => $error_msg
+                        'status'      => -1,
+                        'status_code' => -1,
+                        'message'     => $error_msg
                     ]);
                 } else {
                     $response = json_return([
-                        'status'  => -1,
-                        'message' => $error_msg,
-                        'data'    => $fields
+                        'status'      => -1,
+                        'status_code' => -1,
+                        'message'     => $error_msg,
+                        'data'        => $fields
                     ]);
                 }
                 $response->send();
@@ -749,7 +751,7 @@ class ClFieldVerify extends ClFieldBase {
                 $error_msg = sprintf('%s:%s 最小长度%s', self::getFieldDesc($k_field, $instance), $fields[$k_field], $verify[1]);
                 break;
             case 'is_required':
-                $error_msg = sprintf('%s为必填项', self::getFieldDesc($k_field, $instance));
+                $error_msg = sprintf('%s 为必填项', self::getFieldDesc($k_field, $instance));
                 break;
             case 'email':
                 $error_msg = sprintf('%s:%s 邮箱格式错误', self::getFieldDesc($k_field, $instance), $fields[$k_field]);

@@ -646,21 +646,16 @@ class ClFieldVerify extends ClFieldBase {
                 }
             }
             if (!empty($error_msg)) {
-                if (!ClVerify::isJson(json_encode($fields))) {
-                    $response = json_return([
-                        'status'      => -1,
-                        'status_code' => -1,
-                        'message'     => $error_msg
-                    ]);
-                } else {
-                    $response = json_return([
-                        'status'      => -1,
-                        'status_code' => -1,
-                        'message'     => $error_msg,
-                        'data'        => $fields
-                    ]);
+                $data = [
+                    'status'      => -1,
+                    'status_code' => -1,
+                    'message'     => $error_msg
+                ];
+                if (is_array($fields) && !empty($fields)) {
+                    $data['data'] = $fields;
                 }
-                $response->send();
+                //输出
+                json_return($data)->send();
                 //退出
                 exit();
             }

@@ -249,6 +249,10 @@ class ClExcel {
                 return false;
             }
         }
+        //转码
+        $encoded_content = ClString::encoding(file_get_contents($csv_absolute_file));
+        //回写
+        file_put_contents($csv_absolute_file, $encoded_content);
         $new_csv_absolute_file = str_replace('.csv', '_temp.csv', $csv_absolute_file);
         $file_handle           = fopen($csv_absolute_file, 'r');
         $new_file_handle       = fopen($new_csv_absolute_file, 'w+');
@@ -319,8 +323,6 @@ class ClExcel {
      */
     public static function csvLineToArray($line_content) {
         $line_content = trim($line_content);
-        //转码
-        $line_content = ClString::encoding($line_content);
         $delimiter    = ',';
         $items        = explode(',', $line_content);
         $items_temp   = [];

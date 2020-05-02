@@ -53,7 +53,10 @@ class ClString {
     public static function encoding($string, $to = 'UTF-8') {
         $encode_arr = ['GB2312', 'UTF-8', 'ASCII', 'GBK', 'BIG5', 'JIS', 'eucjp-win', 'sjis-win', 'EUC-JP'];
         $encoded    = mb_detect_encoding($string, $encode_arr);
-        $string     = mb_convert_encoding($string, $to, $encoded);
+        if ($encoded == $to) {
+            return $string;
+        }
+        $string = mb_convert_encoding($string, $to, $encoded);
         return $string;
     }
 

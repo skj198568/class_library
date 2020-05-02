@@ -538,22 +538,26 @@ class ClPinYin {
      * @return string
      */
     private static function str2py($s, $curt = true) {
-        $s  = preg_replace('/\s/is', '_', $s);
-        $s  = preg_replace('/(|\~|\`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\-|\+|\=|\{|\}|\[|\]|\||\\|\:|\;|\"|\'|\<|\,|\>|\.|\?|\/)/is', '', $s);
-        $py = '';
-        $i  = 0;
+        $source_str = $s;
+        $s          = preg_replace('/\s/is', '_', $s);
+        $s          = preg_replace('/(|\~|\`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\-|\+|\=|\{|\}|\[|\]|\||\\|\:|\;|\"|\'|\<|\,|\>|\.|\?|\/)/is', '', $s);
+        $py         = '';
+        $i          = 0;
         //加入这一句，自动识别UTF-8
         if (strlen('拼音') > 4)
             $s = iconv('UTF-8', 'GBK', $s);
         for ($i = 0; $i < strlen($s); $i++) {
             if (ord($s[$i]) > 128) {
                 $char = self::asi2py(ord($s[$i]) + ord($s[$i + 1]) * 256);
-                if ($curt) {
-                    $py .= $char[0];//取拼音的第一个字符
+                if (empty($char)) {
+                    $py .= $source_str;
                 } else {
-                    $py .= $char;//全拼
+                    if ($curt) {
+                        $py .= $char[0];//取拼音的第一个字符
+                    } else {
+                        $py .= $char;//全拼
+                    }
                 }
-                //$py.=$char[0];//取拼音的第一个字符
                 $i++;
             } else {
                 $py .= $s[$i];

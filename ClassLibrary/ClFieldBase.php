@@ -309,4 +309,17 @@ class ClFieldBase {
         return $this;
     }
 
+    /**
+     * 合并字段配置
+     * @param array $field_config
+     * @return $this
+     */
+    public function verifyMergeConfig($field_config = []) {
+        if (!isset($this->field_config['verifies'])) {
+            $this->field_config['verifies'] = [];
+        }
+        $this->field_config['verifies'] = array_merge($this->field_config['verifies'], $field_config);
+        return $this;
+    }
+
 }

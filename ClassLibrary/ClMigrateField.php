@@ -137,6 +137,15 @@ class ClMigrateField extends ClFieldBase {
     }
 
     /**
+     * 拼接域名
+     * @return $this
+     */
+    public function appendDomain(){
+        $this->field_config['append_domain'] = 1;
+        return $this;
+    }
+
+    /**
      * 获取字段名定义
      * @param string $name 字段名称
      * @return string

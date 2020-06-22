@@ -26,6 +26,8 @@ class ClImage {
      * @param bool $is_delete 当save_img_url不为空时，是否删掉原始img
      */
     public static function centerCut($img_url, $cut_width, $cut_height = 0, $save_img_url = '', $is_delete = false) {
+        //不限制内存，部分方法使用内存过大，故不限制内存使用
+        ini_set('memory_limit', '-1');
         if (!is_file($img_url)) {
             if (is_file(DOCUMENT_ROOT_PATH . $img_url)) {
                 $img_url = DOCUMENT_ROOT_PATH . $img_url;
@@ -692,6 +694,8 @@ class ClImage {
      * @return mixed
      */
     public static function png2jpg($file_absolute_url, $is_delete = true, $quality = 90) {
+        //不限制内存，部分方法使用内存过大，故不限制内存使用
+        ini_set('memory_limit', '-1');
         $src_file                     = $file_absolute_url;
         $add_server_document_root_dir = false;
         if (!is_file($src_file)) {

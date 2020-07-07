@@ -124,10 +124,10 @@ class ClSystem {
         if (self::$is_win !== null) {
             return self::$is_win;
         }
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            self::$is_win = true;
-        } else {
+        if (strtoupper(PHP_OS) === 'LINUX') {
             self::$is_win = false;
+        } else {
+            self::$is_win = true;
         }
         return self::$is_win;
     }

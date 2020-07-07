@@ -13,8 +13,7 @@
     "php": ">=7.0.0",
     "phpoffice/phpspreadsheet": "*",
     "phpmailer/phpmailer": "*",
-    "michelf/php-markdown": "*",
-    "mpdf/mpdf": "*"
+    "michelf/php-markdown": "*"
   },
   "autoload": {
     "files": ["ClassLibrary/common.php"],

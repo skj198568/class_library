@@ -28,6 +28,18 @@ class ClSystem {
     private static $is_win = null;
 
     /**
+     * 是否是苹果mac
+     * @var null
+     */
+    private static $is_apple_mac = null;
+
+    /**
+     * 是否是linux
+     * @var null
+     */
+    private static $is_linux = null;
+
+    /**
      * 本机ip
      * @var null
      */
@@ -124,12 +136,44 @@ class ClSystem {
         if (self::$is_win !== null) {
             return self::$is_win;
         }
-        if (strtoupper(PHP_OS) === 'LINUX') {
-            self::$is_win = false;
-        } else {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             self::$is_win = true;
+        } else {
+            self::$is_win = false;
         }
         return self::$is_win;
+    }
+
+    /**
+     * 是否是苹果mac
+     * @return bool|null
+     */
+    public static function isAppleMac() {
+        if (self::$is_apple_mac !== null) {
+            return self::$is_apple_mac;
+        }
+        if (strtoupper(PHP_OS) === 'DARWIN') {
+            self::$is_apple_mac = true;
+        } else {
+            self::$is_apple_mac = false;
+        }
+        return self::$is_apple_mac;
+    }
+
+    /**
+     * 是否是linux
+     * @return bool|null
+     */
+    public static function isLinux() {
+        if (self::$is_linux !== null) {
+            return self::$is_linux;
+        }
+        if (strtoupper(PHP_OS) === 'LINUX') {
+            self::$is_linux = true;
+        } else {
+            self::$is_linux = false;
+        }
+        return self::$is_linux;
     }
 
     /**

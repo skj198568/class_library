@@ -84,8 +84,8 @@ class ClDate {
         $month         = ClString::getInt($month);
         $return        = array();
         $return[0]     = strtotime($month . '01 00:00:00');
-        $current_year  = $month{0} . $month{1} . $month{2} . $month{3};
-        $current_month = $month{4} . $month{5};
+        $current_year  = $month[0] . $month[1] . $month[2] . $month[3];
+        $current_month = $month[4] . $month[5];
         if ($current_month == '12') {
             $return[1] = (intval($current_year) + 1) . '0101 00:00:00';
         } else {

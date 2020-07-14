@@ -104,7 +104,7 @@ class ClString {
         if (strpos($money, '.')) {
             $money_array = explode('.', $money);
             for ($i = 0; $i < strlen($money_array[1]); $i++) {
-                $return_str .= $money_array[1]{$i};
+                $return_str .= $money_array[1][$i];
                 if (($i + 1) % 4 == 0 && ($i + 1) < strlen($money_array[1])) {
                     $return_str .= ',';
                 }
@@ -112,7 +112,7 @@ class ClString {
             $return_str = $money_array[0] . '.' . $return_str;
         } else {
             for ($i = 0; $i < strlen($money); $i++) {
-                $return_str .= $money{$i};
+                $return_str .= $money[$i];
                 if (($i + 1) % 4 == 0 && ($i + 1) < strlen($money)) {
                     $return_str .= ',';
                 }
@@ -697,9 +697,9 @@ class ClString {
             $dec = strval(round($dec, 2));
             if ($mode) {
                 if (strlen($dec) == 1) {
-                    $retval .= sprintf('%s角', $char[$dec{0}]);
+                    $retval .= sprintf('%s角', $char[$dec[0]]);
                 } else {
-                    $retval .= sprintf('%s角%s分', $char[$dec{0}], $char[$dec{1}]);
+                    $retval .= sprintf('%s角%s分', $char[$dec[0]], $char[$dec[1]]);
                 }
             } else {
                 for ($i = 0, $c = strlen($dec); $i < $c; $i++) {

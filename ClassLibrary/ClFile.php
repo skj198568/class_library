@@ -359,9 +359,12 @@ class ClFile {
     /**
      * 处理客户端上传
      * @param string $file_save_dir 文件保存绝对路径或相对路径，如果是相对路径，则会自动拼接成绝对路径
+     * @param string $block_name 文件存储的块名，主要目的用于分类，便于后期管理资源
      * @return array
+     * @author SongKeJing qq:597481334 mobile:159-5107-8050
+     * @date 2020/8/4 18:32
      */
-    public static function uploadDealClient($file_save_dir = '') {
+    public static function uploadDealClient($file_save_dir = '', $block_name = '') {
         //判断上传文件是否存在
         if (!isset($_FILES['file'])) {
             $response = json_return([
@@ -376,7 +379,7 @@ class ClFile {
         $file_size = input('post.file_size', $_FILES['file']['size'], 'trim');
         $file_name = input('post.name', $_FILES['file']['name'], 'trim,strval');
         $chunk     = input('post.chunk', 'no', 'trim');
-        $root_path = sprintf(DOCUMENT_ROOT_PATH . '/upload/%s/', date('Y/m/d'));
+        $root_path = sprintf(DOCUMENT_ROOT_PATH . '/upload/' . (empty($block_name) ? '' : $block_name . '/') . '%s/', date('Y/m/d'));
         if (!is_dir($root_path)) {
             ClFile::dirCreate($root_path);
         }

@@ -155,17 +155,22 @@ class ClImage {
         include_once "phpqrcode/phpqrcode.php";
         $file_dir  = '/qr_code';
         $file_name = md5($str . $logo_absolute_file . $width . $margin) . '.png';
+        //取前两位作为目录名
+        $dir_name = substr($file_name, 0, 2);
         //三级目录存储
-        $file = $file_dir . '/' . date('Y/m/d') . '/' . $file_name;
+        $file = $file_dir . '/' . $dir_name . '/' . $file_name;
         if ($cover == false && is_file(DOCUMENT_ROOT_PATH . $file)) {
             return $file;
         }
         //创建文件夹
         ClFile::dirCreate(DOCUMENT_ROOT_PATH . $file);
-        \QRcode::png($str, DOCUMENT_ROOT_PATH . $file, QR_ECLEVEL_M, $width, $margin);
+        //先按最大的图来生成
+        \QRcode::png($str, DOCUMENT_ROOT_PATH . $file, QR_ECLEVEL_M, 1024, $margin);
         if (!empty($logo_absolute_file)) {
             self::qrCodeAddLogo(DOCUMENT_ROOT_PATH . $file, $logo_absolute_file);
         }
+        //自动截取宽高
+        self::centerCut(DOCUMENT_ROOT_PATH . $file, $width, $width);
         return $file;
     }
 
